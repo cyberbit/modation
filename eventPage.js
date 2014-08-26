@@ -26,59 +26,6 @@ function install_notice() {
     chrome.tabs.create({url: "options.html#about"});
 }
 
-/* Analyzes tracked pages for new comments */
-/*function watchlist() {
-	var tComments = 0;
-	var tGroups = 0;
-	var tTracks = 0;
-	
-	//Run for loop over all wl_ entries in localStorage
-	$.get("http://soundation.com/group/team-soundation", function(data) {
-		var oHtml = $(data);
-		var commentActions = oHtml.find(".comment .actions").children(".flag, .delete");
-		var commentIDs = [];
-		
-		commentActions.each(function() {
-			var attr;
-			switch ($(this).attr("class")) {
-				case "flag":
-					attr = $(this).attr("onclick");
-					break;
-				case "delete":
-					attr = $(this).attr("href");
-					break;
-			}
-			commentIDs.push(attr.match(/(\d+)/g));
-		});
-		
-		latestComment = commentIDs[0];
-		
-		if (typeof localStorage["watchlistg_team-soundation_comment"] == "undefined") {
-			localStorage["watchlistg_team-soundation_comment"] = latestComment;
-		}
-		
-		commentIndex = $.inArray(localStorage["watchlistg_team-soundation_comment"], commentIDs);
-		
-		if (commentIndex) {
-			if (commentIndex == 1) {
-				alert("No new comments");
-			} else if (commentIndex > 1) {
-				alert(commentIndex - 1 + " new comment" + (commentIndex > 2 ? "s" : ""));
-			}
-		} else {
-			/*
-			 * As of version 0.6, there is no way to check if a comment
-			 * fell off the first page or was deleted. I plan to implement
-			 * the ability to look at first five pages to determine for sure
-			 * if comment fell off. This is only accurate to the first fifty
-			 * comments, however. Perhaps an easier way would be to store
-			 * the time the comment was added and compare the difference?
-			 *
-			alert("10+ new comments");
-		}
-	});
-}*/
-
 install_notice();
 //watchlist();
 var hashes = [];
