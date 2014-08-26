@@ -29,8 +29,7 @@ $(document).ready(function() {
 	$(window).on("hashchange", function() {
 		parseHash();
 	});
-	//This is now initiated by the getLogin function
-	/* $(window).trigger("hashchange"); */
+	
 	selectMenu("tab-community", "menu-sticky-sidebars");
 	getLogin();
 });
@@ -407,11 +406,6 @@ function status(msg) {
 	msg = (typeof msg == "undefined" ? "Something happened." : msg);
 	
 	showNotificationBar(msg, 1300, "#15842f", "white");
-}
-
-function newFunc3() {
-	//fixed the bug!
-	//fixed other bug!
 }
 
 function error(msg) {
