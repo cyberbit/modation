@@ -4,10 +4,10 @@
 	"version": "0.5.2",
 
 	"description": "Soundation, amplified.",
-	"icons": { "16": "icon16.png",
-		"19": "icon19.png",
-		"48": "icon48.png",
-		"128": "icon128.png" },
+	"icons": { "16": "img/icon16.png",
+		"19": "img/icon19.png",
+		"48": "img/icon48.png",
+		"128": "img/icon128.png" },
 
 	"author": "cyberbit",
 	"permissions": [
@@ -23,13 +23,13 @@
 	},
 
 	"browser_action": {
-		"default_icon": "icon19.png",
+		"default_icon": "img/icon19.png",
 		"default_popup": "popup.html"
 	},
 	
 	"content_scripts": [{
 		"matches": ["http://soundation.com/*"],
-		"js": ["jquery.all.js", "content.js"]
+		"js": ["js/jquery.all.js", "js/content.js"]
 	}],
 	
 	"options_page": "options.html",

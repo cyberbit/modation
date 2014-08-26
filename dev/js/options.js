@@ -84,7 +84,7 @@ function selectMenu(parentID, id, callback) {
 //Grab email and resore settings
 function getLogin() {
 	if (!$('#logincheck .loader').length) {
-		$('#pdalogincheck').before('<img class="loader" src="loadingf5t.gif">');
+		$('#pdalogincheck').before('<img class="loader" src="img/loadingf5t.gif">');
 		$('#logincheck .loader').hide();
 		$('#logincheck .loader').fadeIn(150);
 	}
@@ -166,7 +166,7 @@ function getTrackPage(page) {
 }
 
 function getChangelog() {
-	$('#tab-about h3').after('<span class="loader">Grabbing current information... <img src="loadingf5t.gif"></span>');
+	$('#tab-about h3').after('<span class="loader">Grabbing current information... <img src="img/loadingf5t.gif"></span>');
 	$.get("http://soundation.com/group/modation", function(html) {
 		var oHtml = $(html);
 		var changelog = oHtml.find('h3:contains("Changelog") + div').html();
@@ -183,7 +183,7 @@ function editTrack(id, page) {
 	if (!$('#tab-tracks aside').length) {
 		$('#tab-tracks').prepend('<aside style="display: none">\
 			<div class="container">\
-				<div class="aside-cover"><img src="loadingealarget.gif"></div>\
+				<div class="aside-cover"><img src="img/loadingealarget.gif"></div>\
 				<div class="wrapper"><h3>Modation Track Editor</h3></div>\
 				<form accept-charset="UTF-8" enctype="multipart/form-data" id="edit_mixdown">\
 					<div class="wrapper">\
@@ -308,7 +308,7 @@ function enumerateTrackList() {
 }
 
 function updateTrack(id) {
-	var page = getTrack(id).wrapInner('<div class="inner-wrap"></div>').prepend('<div class="track-cover"><img src="loadingealarget.gif" style="border-bottom: none"></div>').find('input[type="hidden"]').val()
+	var page = getTrack(id).wrapInner('<div class="inner-wrap"></div>').prepend('<div class="track-cover"><img src="img/loadingealarget.gif" style="border-bottom: none"></div>').find('input[type="hidden"]').val()
 	var trackContainer = getTrack(id);
 	trackContainer.addClass("disabled");
 	trackContainer.find('.track-cover').fadeIn(200);
@@ -317,7 +317,7 @@ function updateTrack(id) {
 		var data = $(getTrack(id, oHtml)[0].outerHTML).append('<input type="hidden" value="' + page + '">')[0].innerHTML;
 		getTrack(id).find('.inner-wrap').replaceWith(data);
 		var track = getTrack(id);
-		track.prepend('<div class="track-cover" style="display: block"><img src="loadingealarget.gif" style="border-bottom: none"></div>');
+		track.prepend('<div class="track-cover" style="display: block"><img src="img/loadingealarget.gif" style="border-bottom: none"></div>');
 		track.find('a[href*="edit"]').each(function() {
 			$(this).on("click", function(e) {
 				editTrack(id, page);

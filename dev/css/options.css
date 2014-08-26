@@ -196,15 +196,15 @@ blockquote {
 }
 
 #watchlist-container .wItem.group {
-	background-image: url("group.png");
+	background-image: url("../img/group.png");
 }
 
 #watchlist-container .wItem.track {
-	background-image: url("music.png");
+	background-image: url("../img/music.png");
 }
 
 #watchlist-container .wItem.load {
-	background-image: url("loadingf5t.gif");
+	background-image: url("../img/loadingf5t.gif");
 }
 
 #watchlist-container .wItem.fail {
@@ -270,7 +270,7 @@ header .sub a:hover {
 
 .menu.column a.current {
 	color: white;
-	background: url("columnnav2.png") no-repeat top left;
+	background: url("../img/columnnav2.png") no-repeat top left;
 }
 
 /* Current tab styling...? */
