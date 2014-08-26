@@ -411,9 +411,14 @@ function status(msg) {
 
 function newFunc() {
 	//Doesn't do anything yet, just chillin'
+	alert("this is a new func!");
 }
 
 function newFunc2() {
+	alert("this is a new func, too!");
+}
+
+function newFunc3() {
 	
 }
 
