@@ -1,7 +1,5 @@
 //This is a test change
 
-//I made this change online, yo!
-
 String.prototype.hashCode = function(){
     var hash = 0, i, char;
     if (this.length == 0) return hash;
@@ -82,7 +80,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 				chrome.browserAction.setBadgeText({text:numAlerts[0]});
 				if ((hashes.indexOf(asideHash) == -1) && doNotifs(emailHash)) chrome.notifications.create(asideHash, {
 					type: "basic",
-					iconUrl: "iconapp.png",
+					iconUrl: "img/iconapp.png",
 					title: "Soundation Notifications",
 					message: numAlerts[0] + " new notification" + (parseInt(numAlerts[0]) > 1 ? "s" : ""),
 					contextMessage: authorString.replace(/\d* new /, "")
