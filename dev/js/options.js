@@ -409,6 +409,14 @@ function status(msg) {
 	showNotificationBar(msg, 1300, "#15842f", "white");
 }
 
+function newFunc() {
+	//Doesn't do anything yet, just chillin'
+}
+
+function newFunc2() {
+	
+}
+
 function error(msg) {
 	msg = (typeof msg == "undefined" ? "Something <strong>bad</strong> happened." : msg);
 	
