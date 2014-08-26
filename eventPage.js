@@ -1,5 +1,5 @@
 //This is a test change
-//This is another change
+//Removed change
 
 String.prototype.hashCode = function(){
     var hash = 0, i, char;
