@@ -416,7 +416,8 @@ function newFunc2() {
 }
 
 function newFunc3() {
-	this is potentially a bug;;;
+	//fixed the bug!
+	introduce new bug;df;ajf
 }
 
 function error(msg) {
