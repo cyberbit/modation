@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="http://assets.soundation.com/assets/reset.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="http://assets.soundation.com/assets/account.css" media="screen" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+		<link href="options.css" media="screen" rel="stylesheet" type="text/css">
+		<title>Modation Settings</title>
+		<script src="jquery.all.js"></script>
+	</head>
+	<body class="account edit_account">
+		<header>
+			<div class="main">
+				<div class="wrapper">
+					<nav>
+						<a href="http://l.plxbt.us/k" class="home" target="_new">Modation</a>
+					</nav>
+				</div>
+			</div>
+			<div class="sub">
+				<nav class="wrapper">
+					<span>My Account</span>
+					<a class="hand current" data-tab="tab-general" data-hash="general">General Settings</a>
+					<a class="hand" data-tab="tab-notifs" data-hash="notifs">Notifications</a>
+					<a class="hand" data-tab="tab-community" data-hash="community">Community</a>
+					<a class="hand" data-tab="tab-tracks" data-hash="tracks">Tracks</a>
+					<a class="hand" data-tab="tab-about" data-hash="about">About</a>
+				</nav>
+			</div>
+		</header>
+		<div id="content">
+			<div class="main-wrapper current" id="tab-general">
+				<div id="main" class="full-width">
+					<h2>General Settings</h2>
+					<div class="column">
+						<span class="header">Logged in as:<span id="logincheck" style="float: right"><img class="loader" src="loadingf5t.gif"><input class="nice-button blue" id="pdalogincheck" type="button" value="Login Check"></span></span>
+						<input class="with-help" id="email" name="email" size="30" type="email" value="" disabled>
+						<p class="field-help">These settings will be saved as this user</p>
+					</div>
+					<div class="column last">
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+						<p>Check your login status here. If you see any errors on other pages, hit Login Check to reload the settings.</p>
+						<p>If you manage multiple users, settings will apply individually to each.</p>
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+					</div>
+				</div>
+				<br style="clear:both">
+			</div>
+			<div class="main-wrapper" id="tab-notifs">
+				<div id="main" class="full-width">
+					<h2>Notifications</h2>
+					<div class="column">
+						<label class="header">Desktop notifications policy</label>
+						<p class="field-help">Opt in or out of desktop notifications (toolbar notifications will still function).</p>
+						<label class="toggle-label">Show desktop notifications?</label>&nbsp;&nbsp;
+						<input type="radio" name="desktop_notifs" id="desktop_notifs_on" class="toggle nice-button green" value="on">
+						<input type="radio" name="desktop_notifs" id="desktop_notifs_off" class="toggle nice-button red" value="off">
+					</div>
+					<div class="column last">
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+						<p>If you see any errors, check your login under General Settings.</p>
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+					</div>
+				</div>
+				<br style="clear:both">
+			</div>
+			<div class="main-wrapper" id="tab-community">
+				<div id="main" class="full-width">
+					<h2>Community</h2>
+					<div class="menu column">
+						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars (Beta)</a>
+						<a class="hand" data-menu="menu-group-mods">Group Mods (Beta)</a>
+						<a class="hand" data-menu="menu-player-downloads">Player Downloads</a>
+						<a class="hand" data-menu="menu-super-pages">Super Pages (Beta)</a>
+						<a class="hand" data-menu="menu-watchlist">Watchlist (Beta)</a>
+					</div>
+					<div class="menu column last">
+						<div id="menu-sticky-sidebars" class="current">
+							<label class="header">Sticky Sidebars (Beta)</label>
+							<p class="field-help">Makes certian boxes in the community (Notifications, Group/Track Search, etc.) easily accessible, even while scrolling the page.</p>
+							<label class="toggle-label">Enable Sticky Sidebars?</label>&nbsp;&nbsp;
+							<input type="radio" name="sticky_sidebars" id="sticky_sidebars_on" class="toggle nice-button green" value="on">
+							<input type="radio" name="sticky_sidebars" id="sticky_sidebars_off" class="toggle nice-button red" value="off">
+						</div>
+						<div id="menu-group-mods">
+							<label class="header">Group Mods (Beta)</label>
+							<p class="field-help">Adds several filtering enhancements to all Group pages.</p>
+							<label class="toggle-label">Enable Group Mods?</label>&nbsp;&nbsp;
+							<input type="radio" name="group_mods" id="group_mods_on" class="toggle nice-button green" value="on">
+							<input type="radio" name="group_mods" id="group_mods_off" class="toggle nice-button red" value="off">
+						</div>
+						<div id="menu-player-downloads">
+							<label class="header">Player Downloads (Beta)</label>
+							<p class="field-help">Shows the number of downloads on a track in the track players.</p>
+							<label class="toggle-label">Enable Player Downloads?</label>&nbsp;&nbsp;
+							<input type="radio" name="player_downloads" id="player_downloads_on" class="toggle nice-button green" value="on">
+							<input type="radio" name="player_downloads" id="player_downloads_off" class="toggle nice-button red" value="off">
+						</div>
+						<div id="menu-super-pages">
+							<label class="header">Super Pages (Beta)</label>
+							<p class="field-help">Modifies page navigation on track comments, group lists, messages, etc. to be dynamic (stays on the same page rather than jumping from page to page; significantly faster load times than before) </p>
+							<label class="toggle-label">Enable Super Pages?</label>&nbsp;&nbsp;
+							<input type="radio" name="super_pages_global" id="super_pages_global_on" class="toggle nice-button green" value="on">
+							<input type="radio" name="super_pages_global" id="super_pages_global_off" class="toggle nice-button red" value="off">
+							<blockquote>
+								<input type="radio" name="super_pages_track_comments" id="super_pages_track_comments_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_track_comments" id="super_pages_track_comments_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Track Comments</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_account_tracks" id="super_pages_account_tracks_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_account_tracks" id="super_pages_account_tracks_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Account Tracks List</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_product_list" id="super_pages_product_list_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_product_list" id="super_pages_product_list_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Product List</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_feed" id="super_pages_feed_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_feed" id="super_pages_feed_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Feed</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_tracks" id="super_pages_tracks_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_tracks" id="super_pages_tracks_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Tracks</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_groups" id="super_pages_groups_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_groups" id="super_pages_groups_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Groups</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_user_tracks" id="super_pages_user_tracks_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_user_tracks" id="super_pages_user_tracks_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">User Tracks</label>&nbsp;&nbsp;<br>
+								<input type="radio" name="super_pages_group_comments" id="super_pages_group_comments_on" class="toggle nano nice-button green" value="on">
+								<input type="radio" name="super_pages_group_comments" id="super_pages_group_comments_off" class="toggle nano nice-button red" value="off">
+								<label class="toggle-label">Group Comments</label>&nbsp;&nbsp;<br>
+							</blockquote>
+						</div>
+						<div id="menu-watchlist">
+							<label class="header">Watchlist (Beta)</label>
+							<p class="field-help">Monitors changes in groups and tracks for added comments.</p>
+							<hr>
+							<div id="watchlist-container">
+							</div>
+							<button id="watchlist_check" class="nice-button blue">Check Watchlist</button>
+						</div>
+					</div>
+				</div>
+				<br style="clear:both">
+			</div>
+			<!-- old community tab
+			<div class="main-wrapper" id="tab-community">
+				<div id="main" class="full-width">
+					<h2>Community</h2>
+					<div class="column">
+						/* Content used to be here!!! */
+					</div>
+					<div class="column last">
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+						<p>Various mods to enhance the Soundation community experience.</p>
+						<p>Note that all of these are still in beta; there may be bugs or things that just don't work right. Please report these to improve functionality in the future!</p>
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+					</div>
+				</div>
+				<br style="clear:both">
+			</div>
+			-->
+			<div class="main-wrapper" id="tab-tracks">
+				<div id="main" class="tracks">
+					<h2>Tracks</h2>
+					<div>
+						<p>Manage your tracks here. To grab a fresh list press Download List.</p>
+						<table id="actions">
+							<tr>
+								<td><a id="download_tracks" class="nice-button blue">Download List</a></td>
+								<td id="progressContainer"></td>
+							</tr>
+						</table>
+						<input id="track-filter" type="text" placeholder="Search for tracks"></input>
+						<span id="filter-result"></span>
+						<div class="tracks-container"></div>
+					</div>
+				</div>
+				<br style="clear:both">
+			</div>
+			<div class="main-wrapper" id="tab-about">
+				<div id="main" class="tracks">
+					<h2>About Modation</h2>
+					<p>
+						<span id="modation_version">Unknown version!</span><br>
+						<span id="modation_author">Unknown author!</span>
+					</p>
+					<h3>Changelog</h3>
+					<div id="modation_changelog"></div>
+				</div>
+				<br style="clear:both">
+			</div>
+		</div>
+		<footer>
+			<div class="wrapper">
+				<div id="copyright">
+					<p><b>Modation</b> - a thingy by <a href="http://plxbt.us" target="_new">cyberbit</a>. All rights reserved by unicorns.<br>
+					Core styles are the property of PowerFX Systems AB, <a href="http://powerfx.com">powerfx.com</a>.</p>
+				</div>
+			</div>
+		</footer>
+		<div class="cover"></div>
+		<iframe id="dummy" style="display: none"></iframe>
+		<div class="factory" style="display: none">
+			<div class="wItem">
+				<input class="link" type="hidden">
+				<span class="label">Title</span>
+				<span class="actions">
+					<span style="color: red; margin-right: 10px"></span>
+					<button class="nice-button nano green view" style="margin-right: 4px">View</button
+					><button class="nice-button nano red remove">Remove</button>
+				</span>
+			</div>
+		</div>
+	</body>
+	<script src="options.js"></script>
+</html>

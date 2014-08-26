@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Modation Notifs</title>
+		<link href="http://assets.soundation.com/assets/reset.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="http://assets.soundation.com/assets/community.css" media="screen" rel="stylesheet" type="text/css">
+		<script src="jquery.all.js"></script>
+		<script src="popup.js"></script>
+		<style>
+			body { background: #f5f5f5; }
+			aside { float: none; margin: 0px; }
+			#modation-watchlist { display: none; }
+			.factory { display: none; }
+			.community .main-wrapper { width: auto; min-height: 0; background: #f5f5f5; padding: 8px; }
+			#content { width: auto; min-height: 0; border-bottom: none; }
+			aside .notifications .super.clear-notification { position: relative; float: right; padding-left: 4px; }
+		</style>
+	</head>
+	<body class="community feed show">
+		<div id="content">
+			<div class="main-wrapper">
+				<aside id="modation-notifications">
+					<div class="container">
+						<div class="wrapper notifications last">
+							<h3>Notifications</h3>
+							<span class="empty"><img src="loading.gif"> Just a moment...</span>
+						</div>
+					</div>
+				</aside>
+				<aside id="modation-watchlist">
+					<div class="container">
+						<div class="wrapper notifications last">
+							<h3>Watchlist</h3>
+						</div>
+					</div>
+				</aside>
+			</div>
+		</div>
+		<div class="factory">
+			<aside class="modation-notifications-login">
+				<div class="container">
+					<div class="wrapper notifications last">
+						<h3>You are not logged in</h3>
+						<span class="empty">Please <a href="/feed">login</a> to view notifications.</span>
+					</div>
+				</div>
+			</aside>
+		</div>
+		<!-- <iframe width="0" height="0" name="clearcatcher" style="display: none"></iframe> -->
+	</body>
+</html>
