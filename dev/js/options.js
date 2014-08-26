@@ -409,15 +409,9 @@ function status(msg) {
 	showNotificationBar(msg, 1300, "#15842f", "white");
 }
 
-//Don't need newFunc anymore :(
-
-function newFunc2() {
-	alert("this is a new func, too!");
-}
-
 function newFunc3() {
 	//fixed the bug!
-	introduce new bug;df;ajf
+	//fixed other bug!
 }
 
 function error(msg) {
