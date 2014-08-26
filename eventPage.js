@@ -1,5 +1,7 @@
 //This is a test change
 
+//I made this change online, yo!
+
 String.prototype.hashCode = function(){
     var hash = 0, i, char;
     if (this.length == 0) return hash;
