@@ -1,4 +1,4 @@
-modation
+Modation
 ========
 
 Soundation, amplified.
