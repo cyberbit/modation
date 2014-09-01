@@ -99,6 +99,12 @@ function init() {
 	if (location.href.match(/\/user\/[\w-]*\/track\//)) {
 		watchlist_ui();
 	}
+	
+	//Add recent tracks link
+	if ($("body").hasClass("community")){
+		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent" style="display: none">Recent</a>');
+		$("nav.wrapper .modation-recent-tracks").fadeIn(1000);
+	}
 }
 
 //Get a factory item
