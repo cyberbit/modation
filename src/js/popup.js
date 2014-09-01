@@ -46,7 +46,7 @@ function parseNotifs() {
 					$('form').submit()
 						.parents('div.notifications div').slideUp();
 					if (!$('div.notifications h3 img').length) {
-						$('div.notifications h3').append('<img src="loading.gif" style="float: right">');
+						$('div.notifications h3').append('<img src="img/loading.gif" style="float: right">');
 						$(this).fadeOut();
 						parseNotifs();
 					}
@@ -56,7 +56,7 @@ function parseNotifs() {
 				$(this).click(function() {
 					$(this).parents('div.notifications div').slideUp();
 					if (!$('div.notifications h3 img').length) {
-						$('div.notifications h3').append('<img src="loading.gif" style="float: right">');
+						$('div.notifications h3').append('<img src="img/loading.gif" style="float: right">');
 						parseNotifs();
 					}
 				});
