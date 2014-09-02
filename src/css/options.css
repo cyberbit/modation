@@ -189,6 +189,7 @@ blockquote {
 	margin-bottom: 2px;
 	background-repeat: no-repeat;
 	padding-left: 1.5em;
+	line-height: 1.45em;
 }
 
 #watchlist-container > .wItem:hover {
@@ -213,7 +214,9 @@ blockquote {
 }
 
 #watchlist-container .wItem span.label {
-	line-height: 16px;
+	max-width: 350px;
+	display: inline-block;
+	/*line-height: 16px;*/
 }
 
 #watchlist-container .wItem span.actions {
