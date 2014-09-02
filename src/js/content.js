@@ -25,6 +25,16 @@ clone_storage(function() {
 
 //Initialization that is independent of user settings
 function preinit() {
+	//Add recent tracks link
+	if ($("body").hasClass("community")){
+		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
+	}
+	
+	//Recent tracks page
+	if (location.href.match(/\/tracks\/recent/)) {
+		$("nav.wrapper .current").removeClass("current");
+		$(".modation-recent-tracks").addClass("current");
+	}
 }
 
 function init() {
@@ -106,11 +116,6 @@ function init() {
 	//Track page
 	if (location.href.match(/\/user\/[\w-]*\/track\//)) {
 		watchlist_ui();
-	}
-	
-	//Add recent tracks link
-	if ($("body").hasClass("community")){
-		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
 	}
 }
 
