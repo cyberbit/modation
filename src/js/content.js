@@ -10,6 +10,10 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
+//Initialize stuff without extra configuration
+preinit();
+
+//Storage for cloned user settings
 var modationStorage = {};
 
 //Clone storage into modationStorage
@@ -18,6 +22,10 @@ clone_storage(function() {
 })
 
 /* ======== HELPERS ======== */
+
+//Initialization that is independent of user settings
+function preinit() {
+}
 
 function init() {
 	var hash = getEmailHash();
