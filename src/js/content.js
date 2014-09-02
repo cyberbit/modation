@@ -102,8 +102,7 @@ function init() {
 	
 	//Add recent tracks link
 	if ($("body").hasClass("community")){
-		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent" style="display: none">Recent</a>');
-		$("nav.wrapper .modation-recent-tracks").fadeIn(1000);
+		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
 	}
 }
 
