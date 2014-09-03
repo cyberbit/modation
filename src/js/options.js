@@ -57,7 +57,7 @@ function selectTab(id) {
 		$('.main-wrapper').hide();
 		$('#' + id).show();
 		if (id == "tab-about") {
-			var manifest = getManifest();
+			var manifest = crapi.manifest();
 			$('#modation_version').html("Version: <strong>" + manifest.version + "</strong>");
 			$('#modation_author').html("Author: <strong>" + manifest.author + "</strong>");
 			getChangelog();
