@@ -25,6 +25,19 @@ clone_storage(function() {
 
 //Initialization that is independent of user settings
 function preinit() {
+<<<<<<< HEAD
+=======
+	//Add recent tracks link
+	if ($("body").hasClass("community")){
+		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
+	}
+	
+	//Recent tracks page
+	if (location.href.match(/\/tracks\/recent/)) {
+		$("nav.wrapper .current").removeClass("current");
+		$(".modation-recent-tracks").addClass("current");
+	}
+>>>>>>> feature/recent-tracks-link
 }
 
 function init() {
