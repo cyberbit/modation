@@ -5,8 +5,8 @@
  * @version 0.1
  */
 
-//Universal identifier for CrAPI class
-_cr = new CrAPI();
+//Global identifier for CrAPI class
+crapi = new CrAPI();
 
 /**
  * Contains workarounds for tricky bits in the Chrome API
@@ -26,8 +26,8 @@ CrAPI.prototype.clone = function(callback) {
 	
 	chrome.storage.local.get(function(d) {
         console.log("Storage cloned! Result: ");
-		console.log(modationStorage);
-		return callback(d);
+		console.log(d);
+		callback(d);
 	});
 }
 
@@ -59,24 +59,6 @@ CrAPI.prototype.updateAll = function(items, callback) {
 	
 	//Update storage
 	chrome.storage.local.set(items, callback);
-}
-
-/**
- * Clone and update storage using callback
- *
- * @param	{function}	cloneCallback	Recieves cloned storage and returns modified storage
- * @param	{function}	updateCallback	Executes after update
- *
- * Usage:
- *		clup_storage(function(d){return d},function(){});
- */
-//Clone and update storage using callback
-CrAPI.prototype.clup = function(cloneCallback, updateCallback) {
-	if (typeof cloneCallback == "undefined") cloneCallback = DEFAULT_CALLBACK;
-	if (typeof updateCallback == "undefined") updateCallback = DEFAULT_CALLBACK;
-	
-	//Clone storage using callback, update, run update callback
-	this.updateAll(this.clone(cloneCallback), updateCallback);
 }
 
 /**
