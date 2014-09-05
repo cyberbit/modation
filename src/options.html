@@ -57,8 +57,7 @@
 						<label class="header">Desktop notifications policy</label>
 						<p class="field-help">Opt in or out of desktop notifications (toolbar notifications will still function).</p>
 						<label class="toggle-label">Show desktop notifications?</label>&nbsp;&nbsp;
-						<input type="radio" name="desktop_notifs" id="desktop_notifs_on" class="toggle nice-button green" value="on">
-						<input type="radio" name="desktop_notifs" id="desktop_notifs_off" class="toggle nice-button red" value="off">
+						<input type="checkbox" id="desktop_notifs" class="option toggle nice-button green">
 					</div>
 					<div class="column last">
 						<p>&nbsp;</p>
@@ -77,7 +76,7 @@
 						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars (Beta)</a>
 						<a class="hand" data-menu="menu-group-mods">Group Mods (Beta)</a>
 						<a class="hand" data-menu="menu-player-downloads">Player Downloads</a>
-						<a class="hand" data-menu="menu-super-pages">Super Pages (Beta)</a>
+						<!-- <a class="hand" data-menu="menu-super-pages">Super Pages (Beta)</a> -->
 						<a class="hand" data-menu="menu-watchlist">Watchlist (Beta)</a>
 					</div>
 					<div class="menu column last">
@@ -85,24 +84,22 @@
 							<label class="header">Sticky Sidebars (Beta)</label>
 							<p class="field-help">Makes certian boxes in the community (Notifications, Group/Track Search, etc.) easily accessible, even while scrolling the page.</p>
 							<label class="toggle-label">Enable Sticky Sidebars?</label>&nbsp;&nbsp;
-							<input type="radio" name="sticky_sidebars" id="sticky_sidebars_on" class="toggle nice-button green" value="on">
-							<input type="radio" name="sticky_sidebars" id="sticky_sidebars_off" class="toggle nice-button red" value="off">
+							<input type="checkbox" id="sticky_sidebars" class="option toggle nice-button green">
 						</div>
 						<div id="menu-group-mods">
 							<label class="header">Group Mods (Beta)</label>
 							<p class="field-help">Adds several filtering enhancements to all Group pages.</p>
 							<label class="toggle-label">Enable Group Mods?</label>&nbsp;&nbsp;
-							<input type="radio" name="group_mods" id="group_mods_on" class="toggle nice-button green" value="on">
-							<input type="radio" name="group_mods" id="group_mods_off" class="toggle nice-button red" value="off">
+							<input type="checkbox" id="group_mods" class="option toggle nice-button green">
 						</div>
 						<div id="menu-player-downloads">
 							<label class="header">Player Downloads (Beta)</label>
 							<p class="field-help">Shows the number of downloads on a track in the track players.</p>
 							<label class="toggle-label">Enable Player Downloads?</label>&nbsp;&nbsp;
-							<input type="radio" name="player_downloads" id="player_downloads_on" class="toggle nice-button green" value="on">
-							<input type="radio" name="player_downloads" id="player_downloads_off" class="toggle nice-button red" value="off">
+							<input type="checkbox" id="player_downloads" class="option toggle nice-button green">
 						</div>
-						<div id="menu-super-pages">
+						<!-- Removed for now due to buggyness -->
+						<!-- <div id="menu-super-pages">
 							<label class="header">Super Pages (Beta)</label>
 							<p class="field-help">Modifies page navigation on track comments, group lists, messages, etc. to be dynamic (stays on the same page rather than jumping from page to page; significantly faster load times than before) </p>
 							<label class="toggle-label">Enable Super Pages?</label>&nbsp;&nbsp;
@@ -134,7 +131,7 @@
 								<input type="radio" name="super_pages_group_comments" id="super_pages_group_comments_off" class="toggle nano nice-button red" value="off">
 								<label class="toggle-label">Group Comments</label>&nbsp;&nbsp;<br>
 							</blockquote>
-						</div>
+						</div> -->
 						<div id="menu-watchlist">
 							<label class="header">Watchlist (Beta)</label>
 							<p class="field-help">Monitors changes in groups and tracks for added comments.</p>
