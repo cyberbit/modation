@@ -25,8 +25,6 @@ CrAPI.prototype.clone = function(callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	chrome.storage.local.get(function(d) {
-        console.log("Storage cloned! Result: ");
-		console.log(d);
 		callback(d);
 	});
 }

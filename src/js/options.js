@@ -4,6 +4,14 @@ var tracks = [];
 var pages = [];
 var trackInfo = [];
 
+//Storage for option defaults
+var optionDefaults = {
+	desktop_notifs: true,
+	sticky_sidebars: true,
+	group_mods: true,
+	player_downloads: true
+};
+
 $(document).ready(function() {
 	$('#pdalogincheck').click(getLogin);
 	$('#download_tracks').click(getTracks);
@@ -172,10 +180,6 @@ function getChangelog() {
 		$('#modation_changelog').html(changelog);
 		$('#tab-about .loader').remove();
 	});
-}
-
-function getManifest() {
-	return chrome.runtime.getManifest();
 }
 
 function editTrack(id, page) {
@@ -414,58 +418,37 @@ function error(msg) {
 	showNotificationBar(msg, 0, "#842f15", "white", 58);
 }
 
-// Restores options to saved values from localStorage.
+//Restores options and sets defaults
 function restore_options(email) {
-	chrome.storage.local.get(email, function(d) {
-		var emailSettings = d[email];
+	crapi.clone(function(d) {
+		//Storage for options
+		var options = $(".option");
 		
-		//set up defaults (need more fool-proof method)
-		if ($.isEmptyObject(emailSettings)) {
-			$('#desktop_notifs_on').prop("checked", true);
-			$('#sticky_sidebars_on').prop("checked", true);
-			$('#group_mods_on').prop("checked", true);
-			$('#player_downloads_on').prop("checked", true);
-			$('#super_pages_global_on').prop("checked", true);
-			$('#super_pages_track_comments_on').prop("checked", true);
-			$('#super_pages_account_tracks_on').prop("checked", true);
-			$('#super_pages_product_list_on').prop("checked", true);
-			$('#super_pages_feed_on').prop("checked", true);
-			$('#super_pages_tracks_on').prop("checked", true);
-			$('#super_pages_groups_on').prop("checked", true);
-			$('#super_pages_user_tracks_on').prop("checked", true);
-			$('#super_pages_group_comments_on').prop("checked", true);
-			save_options();
-		} else {
-			//Parse desktop notification settings
-			var desktop_notifs = emailSettings["desktop_notifs"];
-			var sticky_sidebars = emailSettings["sticky_sidebars"];
-			var group_mods = emailSettings["group_mods"];
-			var player_downloads = emailSettings["player_downloads"];
-			var super_pages_global = emailSettings["super_pages_global"];
-			var super_pages_track_comments = emailSettings["super_pages_track_comments"];
-			var super_pages_account_tracks = emailSettings["super_pages_account_tracks"];
-			var super_pages_product_list = emailSettings["super_pages_product_list"];
-			var super_pages_feed = emailSettings["super_pages_feed"];
-			var super_pages_tracks = emailSettings["super_pages_tracks"];
-			var super_pages_groups = emailSettings["super_pages_groups"];
-			var super_pages_user_tracks = emailSettings["super_pages_user_tracks"];
-			var super_pages_group_comments = emailSettings["super_pages_group_comments"];
-			$('#desktop_notifs_' + desktop_notifs).prop("checked", true);
-			$('#sticky_sidebars_' + sticky_sidebars).prop("checked", true);
-			$('#group_mods_' + group_mods).prop("checked", true);
-			$('#player_downloads_' + player_downloads).prop("checked", true);
-			$('#super_pages_global_' + super_pages_global).prop("checked", true);
-			$('#super_pages_track_comments_' + super_pages_track_comments).prop("checked", true);
-			$('#super_pages_account_tracks_' + super_pages_account_tracks).prop("checked", true);
-			$('#super_pages_product_list_' + super_pages_product_list).prop("checked", true);
-			$('#super_pages_feed_' + super_pages_feed).prop("checked", true);
-			$('#super_pages_tracks_' + super_pages_tracks).prop("checked", true);
-			$('#super_pages_groups_' + super_pages_groups).prop("checked", true);
-			$('#super_pages_user_tracks_' + super_pages_user_tracks).prop("checked", true);
-			$('#super_pages_group_comments_' + super_pages_group_comments).prop("checked", true);
+		//Storage for missing settings counter
+		var missing = 0;
+		
+		//Storage for completion callback
+		var cb = function(){status("Settings restored.")};
+		
+		//Iterate through options
+		options.each(function() {
+			var id = $(this).attr("id");
 			
-			status("Settings restored.");
-		}
+			//Add unsaved options to storage
+			if (!(id in d[email])) {
+				d[email][id] = (id in optionDefaults ? optionDefaults[id] : true);
+				missing++;
+			}
+			
+			//Apply option to element
+			$("#" + id).attr("checked", d[email][id]);
+		});
+		
+		//Set defaults, if needed
+		if (missing) {
+			console.log("setting defaults...");
+			crapi.update(email, d[email], cb);
+		} else cb();
 	});
 }
 
