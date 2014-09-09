@@ -12,14 +12,14 @@ var optionDefaults = {
 	player_downloads: true
 };
 
-$(document).ready(function() {
+$(function() {
+	initOptions();
 	$('#pdalogincheck').click(getLogin);
 	$('#download_tracks').click(getTracks);
 	$('#watchlist_check').click(function() {
 		$("#watchlist-container .wItem").addClass("load");
 		check_watchlist(true, refresh_watchlist);
 	});
-	$('.main-wrapper:not(#tab-tracks) input').on("change", save_options);
 	$('#track-filter').hide();
 	$('header .sub a').click(function() {
 		var tab = $(this).attr("data-tab");
@@ -41,6 +41,11 @@ $(document).ready(function() {
 	selectMenu("tab-community", "menu-sticky-sidebars");
 	getLogin();
 });
+
+//Initialize options handler
+function initOptions() {
+	$(".option").change(save_options);
+}
 
 //Get a factory item
 function _factory(key) {
@@ -337,64 +342,29 @@ function getTrack(id, parent) {
 	return $('a[href*="/tracks/' + id + '/edit"]').parents('div.track');
 }
 
-// Saves options to localStorage.
 function save_options() {
-	chrome.storage.local.get(email, function(d) {
-		var emailSettings = d[email];
+	crapi.clone(function(d) {
+		//Storage for email
+		var email = $("#email").val();
 		
+		//Storage for account options
+		var o = d[email];
+		
+		//Save options, if needed
 		if (save) {
-			var email = $('#email').val();
-			var desktop_notifs = $('[name^="desktop_notifs"]:checked').val();
-			var sticky_sidebars = $('[name^="sticky_sidebars"]:checked').val();
-			var group_mods = $('[name^="group_mods"]:checked').val();
-			var player_downloads = $('[name^="player_downloads"]:checked').val();
-			var super_pages_global = $('[name^="super_pages_global"]:checked').val();
-			var super_pages_track_comments = $('[name^="super_pages_track_comments"]:checked').val();
-			var super_pages_account_tracks = $('[name^="super_pages_account_tracks"]:checked').val();
-			var super_pages_product_list = $('[name^="super_pages_product_list"]:checked').val();
-			var super_pages_feed = $('[name^="super_pages_feed"]:checked').val();
-			var super_pages_tracks = $('[name^="super_pages_tracks"]:checked').val();
-			var super_pages_groups = $('[name^="super_pages_groups"]:checked').val();
-			var super_pages_user_tracks = $('[name^="super_pages_user_tracks"]:checked').val();
-			var super_pages_group_comments = $('[name^="super_pages_group_comments"]:checked').val();
-			/*var watchlist = [];
-			watchlist.push({
-				"title": "Team Soundation",
-				"link": "group/team-soundation",
-				"following": 0,
-				"comments": 85502,
-				//"changed": 1402191771040
-			});
-			watchlist.push({
-				"title": "Distant by cyberbit",
-				"link": "user/cyberbit/track/distant",
-				"comments": 83881,
-				"likes": 5,
-				"downloads": 2,
-				//"changed": 1402191771040
-			});
-			watchlist.push({
-				"link": "user/foobar/track/htied"
-			});*/
-			emailSettings["desktop_notifs"] = desktop_notifs;
-			emailSettings["sticky_sidebars"] = sticky_sidebars;
-			emailSettings["group_mods"] = group_mods;
-			emailSettings["player_downloads"] = player_downloads;
-			emailSettings["super_pages_global"] = super_pages_global;
-			emailSettings["super_pages_track_comments"] = super_pages_track_comments;
-			emailSettings["super_pages_account_tracks"] = super_pages_account_tracks;
-			emailSettings["super_pages_product_list"] = super_pages_product_list;
-			emailSettings["super_pages_feed"] = super_pages_feed;
-			emailSettings["super_pages_tracks"] = super_pages_tracks;
-			emailSettings["super_pages_groups"] = super_pages_groups;
-			emailSettings["super_pages_user_tracks"] = super_pages_user_tracks;
-			emailSettings["super_pages_group_comments"] = super_pages_group_comments;
-			
-			update_storage(email, emailSettings, function() {
-				// Update status to let user know options were saved.
-				status("Settings saved.");
+			$(".option").each(function() {
+				//Storage for ID
+				var id = $(this).attr("id");
+				
+				//Store option state for ID
+				o[id] = $(this).is(":checked");
 			});
 		}
+		
+		//Update storage
+		crapi.update(email, o, function() {
+			status("Settings saved.");
+		});
 	});
 }
 
