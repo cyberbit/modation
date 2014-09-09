@@ -13,14 +13,50 @@ var optionDefaults = {
 };
 
 $(function() {
+	//Initialize all the things
 	initOptions();
-	$('#pdalogincheck').click(getLogin);
-	$('#download_tracks').click(getTracks);
-	$('#watchlist_check').click(function() {
+	initTracks();
+	initWatchlist();
+	initPages();
+	
+	//Hash parsing for tabs
+	$(window).on("hashchange", function() {
+		parseHash();
+	});
+	
+	//Pick initial menu
+	selectMenu("tab-community", "menu-sticky-sidebars");
+	
+	//Login
+	getLogin();
+});
+
+//Initialize options handler
+function initOptions() {
+	$("#check-login").click(getLogin);
+	$(".option").change(save_options);
+	console.debug("options initialized");
+}
+
+//Initialize track manager
+function initTracks() {
+	$("#track-filter").hide();
+	$("#download-tracks").click(getTracks);
+	console.debug("track manager initialized");
+	
+}
+
+//Initialize watchlist
+function initWatchlist() {
+	$("#check-watchlist").click(function() {
 		$("#watchlist-container .wItem").addClass("load");
 		check_watchlist(true, refresh_watchlist);
 	});
-	$('#track-filter').hide();
+	console.debug("watchlist initialized");
+}
+
+//Initialize pages
+function initPages() {
 	$('header .sub a').click(function() {
 		var tab = $(this).attr("data-tab");
 		location.hash = "#" + $(this).attr("data-hash");
@@ -34,17 +70,7 @@ $(function() {
 			}
 		});
 	});
-	$(window).on("hashchange", function() {
-		parseHash();
-	});
-	
-	selectMenu("tab-community", "menu-sticky-sidebars");
-	getLogin();
-});
-
-//Initialize options handler
-function initOptions() {
-	$(".option").change(save_options);
+	console.debug("pages initialized");
 }
 
 //Get a factory item
@@ -96,7 +122,7 @@ function selectMenu(parentID, id, callback) {
 //Grab email and resore settings
 function getLogin() {
 	if (!$('#logincheck .loader').length) {
-		$('#pdalogincheck').before('<img class="loader" src="img/loadingf5t.gif">');
+		$('#check-login').before('<img class="loader" src="img/loadingf5t.gif">');
 		$('#logincheck .loader').hide();
 		$('#logincheck .loader').fadeIn(150);
 	}
@@ -109,7 +135,7 @@ function getLogin() {
 			save = false;
 			$(".cover").fadeIn(150);
 			error('<strong>Please <a href="http://soundation.com/feed" target="_new" style="color: #de5931">login</a> to change settings!</strong><br><input class="nice-button orange noshadow" id="pdalogincheckagain" type="button" style="padding: 5px 8px;" value="Double-check">');
-			$("#pdalogincheckagain").click(function() {$("#pdalogincheck").click()});
+			$("#pdalogincheckagain").click(function() {$("#check-login").click()});
 		} else {
 			if (!save) {
 				$('#notification-bar').animate({top: "-" + (58 + 1) + "px"}, "fast", "easeOutQuart", function() {
