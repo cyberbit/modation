@@ -28,12 +28,12 @@ $(function() {
 	selectMenu("tab-community", "menu-sticky-sidebars");
 	
 	//Login
-	getLogin();
+	login();
 });
 
 //Initialize options handler
 function initOptions() {
-	$("#check-login").click(getLogin);
+	$("#check-login").click(login);
 	$(".option").change(save_options);
 	console.debug("options initialized");
 }
@@ -43,7 +43,6 @@ function initTracks() {
 	$("#track-filter").hide();
 	$("#download-tracks").click(getTracks);
 	console.debug("track manager initialized");
-	
 }
 
 //Initialize watchlist
@@ -119,37 +118,69 @@ function selectMenu(parentID, id, callback) {
 	callback(id);
 }
 
-//Grab email and resore settings
-function getLogin() {
-	if (!$('#logincheck .loader').length) {
-		$('#check-login').before('<img class="loader" src="img/loadingf5t.gif">');
-		$('#logincheck .loader').hide();
-		$('#logincheck .loader').fadeIn(150);
-	}
-	$('header .sub a:not(.current)').addClass("disabled");
-	$.get("http://soundation.com/account/profile", function(html) {
-		html = html.replace(/<img\b[^>]*>/ig, '');
-		var oHtml = $(html);
-		var email = oHtml.find('.email').text();
-		if (email == "") {
-			save = false;
-			$(".cover").fadeIn(150);
-			error('<strong>Please <a href="http://soundation.com/feed" target="_new" style="color: #de5931">login</a> to change settings!</strong><br><input class="nice-button orange noshadow" id="pdalogincheckagain" type="button" style="padding: 5px 8px;" value="Double-check">');
-			$("#pdalogincheckagain").click(function() {$("#check-login").click()});
-		} else {
+//Login to settings
+function login() {
+	//Grab loader
+	$loader = $("#logincheck .loader");
+	
+	//Show loader
+	$loader.fadeIn(150);
+	
+	//Disable navigation
+	$("header .sub a:not(.current)").addClass("disabled");
+	
+	//Grab current user
+	$.getJSON("http://api.soundation.com/me", function(data) {
+		var me = data.data;
+		
+		//Trace data
+		console.log(data);
+		
+		//If successful, do stuff
+		if (data.success) {
+			//Hide notif bar, if needed
 			if (!save) {
 				$('#notification-bar').animate({top: "-" + (58 + 1) + "px"}, "fast", "easeOutQuart", function() {
 					$(this).remove();
 				});
 			}
+			
+			//Enable option saving
 			save = true;
+			
+			//Demodalize
 			$(".cover").fadeOut(150);
-			$('#email').val(email);
-			restore_options(email);
-			$('header .sub a').removeClass("disabled");
+			
+			//Set email
+			$("#email").val(me.email);
+			
+			//Restore options
+			restore_options();
+			
+			//Enable navigation
+			$("header .sub a").removeClass("disabled");
+			
+			//Load (bookmarked) page
 			$(window).trigger("hashchange");
 		}
-		$('#logincheck .loader').fadeOut(150, function(){$(this).remove();});
+		
+		//Not successful
+		else {
+			//Disable option saving
+			save = false;
+			
+			//Modalize
+			$(".cover").fadeIn(150);
+			
+			//Show error
+			error('<strong>Uh oh, looks like you are not logged in! <a href="http://soundation.com/feed" target="_new" style="color: #de5931">Login</a></strong><br><input class="nice-button orange noshadow" id="check-login-again" type="button" style="padding: 5px 8px;" value="Double-check">');
+			
+			//Bind double-check button
+			$("#check-login-again").click(login);
+		}
+		
+		//Hide loader
+		$loader.fadeOut(150);
 	});
 }
 
@@ -415,7 +446,9 @@ function error(msg) {
 }
 
 //Restores options and sets defaults
-function restore_options(email) {
+function restore_options() {
+	var email = $("#email").val();
+	
 	crapi.clone(function(d) {
 		//Storage for options
 		var options = $(".option");
