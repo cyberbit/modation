@@ -104,8 +104,6 @@ function selectTab(id) {
 }
 
 function selectMenu(parentID, id, callback) {
-	//console.log("parent:" + parentID);
-	//console.log("id:" + id);
 	if (typeof callback == "undefined") callback = function(){};
 	
 	if (!$('#' + parentID + ' [data-menu="' + id + '"]').is(".current")) {
@@ -132,9 +130,6 @@ function login() {
 	//Grab current user
 	$.getJSON("http://api.soundation.com/me", function(data) {
 		var me = data.data;
-		
-		//Trace data
-		console.log(data);
 		
 		//If successful, do stuff
 		if (data.success) {
