@@ -487,7 +487,7 @@ function check_watchlist(update, callback) {
 	var wFailed = [];
 	
 	chrome.storage.local.get(email, function(d) {
-		var watchlist = d[email]["watchlist"];
+		var watchlist = d[email]["watchlist"] || {};
 		var wLen = watchlist.length;
 		var wCt = 0;
 		
@@ -731,8 +731,8 @@ function delete_watchlist(link, callback) {
 function refresh_watchlist() {
 	var email = $('#email').val();
 	
-	chrome.storage.local.get(email, function(d) {
-		var watchlist = d[email]["watchlist"];
+	chrome.storage.local.get(email, function(d) {		
+		var watchlist = d[email]["watchlist"] || {};
 		
 		//Save container for future use
 		var $wContainer = $("#watchlist-container");
