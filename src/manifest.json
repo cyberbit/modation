@@ -11,7 +11,7 @@
 
 	"author": "cyberbit",
 	"permissions": [
-		"http://soundation.com/*",
+		"http://*.soundation.com/*",
 		"alarms",
 		"notifications",
 		"storage"
