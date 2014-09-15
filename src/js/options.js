@@ -230,7 +230,7 @@ function getTrackPage(page) {
 }
 
 function getChangelog() {
-	$('#tab-about h3').after('<span class="loader">Grabbing current information... <img src="img/loadingf5t.gif"></span>');
+	$('#modation_changelog').before('<span class="loader">Grabbing current information... <img src="img/loadingf5t.gif"></span>');
 	$.get("http://soundation.com/group/modation", function(html) {
 		var oHtml = $(html);
 		var changelog = oHtml.find('h3:contains("Changelog") + div').html();
