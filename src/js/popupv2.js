@@ -1,5 +1,7 @@
 $(document).ready(function() {
 	parseNotifs();
+	
+	initTabs();
 });
 
 //Get a factory item
@@ -7,11 +9,25 @@ function _factory(key) {
 	return $(".factory ." + key).clone();
 }
 
+//Initialize tabs
+function initTabs() {
+	$("nav a").click(function() {
+		$(this).parents("nav").find("a").removeClass("active");
+		$(this).addClass("active");
+		$(".main-wrapper .content").hide();
+		$("#" + $(this).data("tab") + "-container").show();
+	});
+	
+	$("nav a:first").click();
+}
+
 //Get and parse notifications
-function parseNotifs_v2() {
+function parseNotifs() {
 	$.get("http://soundation.com/feed", function(html) {
 		//Remove images and form usable object
-		var $aside = $(html.replace(/<img\b[^>]*>/ig, '')).find('aside');
+		html = html.replace(/(<iframe\b.*?<\/iframe>)|(<img\b[^>]*>)/ig, '');
+		var $aside = $(html).find('aside');
+		$aside.attr("id", "modation-notifications");
 		var $parse = $("<strong>Unknown error</strong>");
 		
 		//Notification box is there
@@ -31,7 +47,7 @@ function parseNotifs_v2() {
 		}
 		
 		//Show parsed notification box
-		$('#modation-notifications').replace($parse);
+		$('#modation-notifications').replaceWith($parse);
 		
 		$('.main-wrapper a').each(function() {
 			var href = $(this).attr('href');
@@ -39,7 +55,7 @@ function parseNotifs_v2() {
 			$(this).attr('target', '_new');
 		});
 		var ct = 0;
-		$('form').each(function() {
+		$('form[action*=clear_notification]').each(function() {
 			var action = $(this).attr('action');
 			$(this).attr('action', 'http://soundation.com' + action);
 			$(this).attr('target', 'clearcatcher' + ct);
@@ -49,12 +65,12 @@ function parseNotifs_v2() {
 		if (ct > 1) {
 			$('div.notifications h3').append('<span class="super clear-notification" id="superclear">Clear All</span>');
 			$('#superclear').click(function() {
-				$('form').submit()
+				$('form[action*=clear_notification]').submit()
 					.parents('div.notifications div').slideUp();
 				if (!$('div.notifications h3 img').length) {
-					$('div.notifications h3').append('<img src="loading.gif" style="float: right">');
+					$('div.notifications h3').append('<img src="img/loading.gif" style="float: right">');
 					$(this).fadeOut();
-					parseNotifs_v2();
+					parseNotifs();
 				}
 			});
 		}
@@ -62,8 +78,8 @@ function parseNotifs_v2() {
 			$(this).click(function() {
 				$(this).parents('div.notifications div').slideUp();
 				if (!$('div.notifications h3 img').length) {
-					$('div.notifications h3').append('<img src="loading.gif" style="float: right">');
-					parseNotifs_v2();
+					$('div.notifications h3').append('<img src="img/loading.gif" style="float: right">');
+					parseNotifs();
 				}
 			});
 		});
@@ -71,7 +87,7 @@ function parseNotifs_v2() {
 		var numAlerts = sCommunity.match(/(\d+)/);
 		if (numAlerts != null) {
 			var iTotal = 0, authors = [];
-			$(aside).find('a.author').each(function() {
+			$aside.find('a.author').each(function() {
 				author = $(this).text();
 				if (authors.indexOf(author) == -1) authors.push(author);
 				++iTotal;
@@ -95,7 +111,10 @@ function parseNotifs_v2() {
 	});
 }
 
-function parseNotifs() {
+/**
+ * Deprecated. Will be removed in v1.0
+ */
+/*function parseNotifs() {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "http://soundation.com/feed", true);
 	xhr.onreadystatechange = function() {
@@ -182,4 +201,4 @@ function parseNotifs() {
 		}
 	}
 	xhr.send();
-}
+}*/

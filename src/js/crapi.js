@@ -1,7 +1,7 @@
 /**
  * CrAPI (Chrome API Helper)
  *
- * @author cyberbit (D.J. Marcolesco) dj.marcolesco@gmail.com
+ * @author cyberbit (D.J. Marcolesco) dj.marcolesco@outlook.com
  * @version 0.1
  */
 
