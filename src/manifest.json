@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation Dev",
-	"version": "0.6",
+	"version": "1.0",
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/icon16.png",
@@ -29,7 +29,7 @@
 	
 	"content_scripts": [{
 		"matches": ["http://soundation.com/*"],
-		"js": ["js/jquery.all.js", "js/crapi.js", "js/content.js"]
+		"js": ["js/jquery.all.js", "js/crapi.js", "js/modapi.js", "js/content.js"]
 	}],
 	
 	"options_page": "options.html",

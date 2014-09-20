@@ -37,7 +37,7 @@ CrAPI.prototype.clone = function(callback) {
  * @param	{function}	callback	Function to run after update
  */
 CrAPI.prototype.update = function(key, value, callback) {
-	if (typeof callback == "undefined") callback = DEFAULT_CALLBACK;
+	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	var updatedStorage = {};
 	updatedStorage[key] = value;
@@ -53,7 +53,7 @@ CrAPI.prototype.update = function(key, value, callback) {
  * @param	{function}	callback	Function to run after update
  */
 CrAPI.prototype.updateAll = function(items, callback) {
-	if (typeof callback == "undefined") callback = DEFAULT_CALLBACK;
+	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	//Update storage
 	chrome.storage.local.set(items, callback);
