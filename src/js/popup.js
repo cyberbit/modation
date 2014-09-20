@@ -30,7 +30,7 @@ function parseNotifs() {
 			$('.main-wrapper a').each(function() {
 				var href = $(this).attr('href');
 				$(this).attr('href', 'http://soundation.com' + href);
-				$(this).attr('target', '_new');
+				$(this).attr('target', '_blank');
 			});
 			var ct = 0;
 			$('form').each(function() {

@@ -61,7 +61,7 @@ function parseNotifs() {
 		$('#modation-notifications a').each(function() {
 			var href = $(this).attr('href');
 			$(this).attr('href', 'http://soundation.com' + href);
-			$(this).attr('target', '_new');
+			$(this).attr('target', '_blank');
 		});
 		var ct = 0;
 		$('#modation-notifications form[action*=clear_notification]').each(function() {
@@ -154,7 +154,7 @@ function parseWatchlist() {
 					var wItem = $("#modation-watchlist .modation-watchlist-item-" + i);
 					
 					//Load added item
-					wItem.find(".item-title").html('<a href="http://soundation.com/' + q.link + '" target="_new">' + q.title);
+					wItem.find(".item-title").html('<a href="http://soundation.com/' + q.link + '" target="_blank">' + q.title);
 					wItem.find(".item-body").html(q.changes.join(", "));
 					
 					//Initialize clear handler

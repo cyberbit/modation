@@ -9,7 +9,7 @@
 modapi = new ModAPI();
 
 //Set debug mode
-modapi.debug = true;
+modapi.debug = false;
 
 /**
  * Contains helper functions specific to Modation

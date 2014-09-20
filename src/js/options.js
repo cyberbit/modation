@@ -168,7 +168,7 @@ function login() {
 			$(".cover").fadeIn(150);
 			
 			//Show error
-			error('<strong>Uh oh, looks like you are not logged in! <a href="http://soundation.com/feed" target="_new" style="color: #de5931">Login</a></strong><br><input class="nice-button orange noshadow" id="check-login-again" type="button" style="padding: 5px 8px;" value="Double-check">');
+			error('<strong>Uh oh, looks like you are not logged in! <a href="http://soundation.com/feed" target="_blank" style="color: #de5931">Login</a></strong><br><input class="nice-button orange noshadow" id="check-login-again" type="button" style="padding: 5px 8px;" value="Double-check">');
 			
 			//Bind double-check button
 			$("#check-login-again").click(login);
