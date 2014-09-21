@@ -128,7 +128,7 @@ function check_watchlist(email, update, callback) {
 	var wParsed = [];
 	var wFailed = [];
 	
-	chrome.storage.local.get(email, function(d) {
+	crapi.clone(function(d) {
 		var watchlist = d[email]["watchlist"];
 		var wLen = watchlist.length;
 		var wCt = 0;
@@ -228,12 +228,14 @@ function check_watchlist(email, update, callback) {
 				
 				//Title hook
 				if (title) {
+					console.log('title hook');
 					wChangedItem['title'] = title;
 					wChangedItem.state.title = title;
 				}
 				
 				//Likes hook
 				if (likes && wItem['likes'] != likes) {
+					console.log('likes hook');
 					var lDif = likes - wItem['likes'];
 					var lDifStr = lDif;
 					if (lDif > 0) lDifStr = "+" + lDif;
@@ -241,22 +243,31 @@ function check_watchlist(email, update, callback) {
 					//Set likes in storage
 					wChangedItem.state.likes = likes;
 					
-					if (!isNaN(lDif)) {
-						wChangedItem['likes'] = lDifStr + " like" + (lDif > 1 || lDif < -1 ? "s" : "");
-						wChangedItem['changes'].push(lDifStr + " like" + (lDif > 1 || lDif < -1 ? "s" : ""));
-						//alert(title + " :: " + lDifStr + " like" + (lDif > 1 || lDif < -1 ? "s" : ""))
+					var isNew = typeof wItem['likes'] == "undefined";
+					
+					if (!isNaN(lDif) || isNew) {
+						console.log('likes hook nan');
+						if (isNew) lDif = lDifStr = likes;
+						wChangedItem['likes'] = lDifStr + " like" + (Math.abs(lDif) > 1 || lDif == 0 ? "s" : "");
+						wChangedItem['changes'].push(lDifStr + " like" + (Math.abs(lDif) > 1 || lDif == 0 ? "s" : ""));
+						//alert(title + " :: " + lDifStr + " like" + (Math.abs(lDif) > 1 || lDif == 0 ? "s" : ""))
 					}
 				}
 				
 				//Downloads hook
 				if (downloads && wItem['downloads'] != downloads) {
+					console.log('downloads hook');
 					var dDif = downloads - wItem['downloads'];
 					var dDifStr = "+" + dDif;
 					
 					//Set downloads in storage
 					wChangedItem.state.downloads = downloads;
 					
-					if (!isNaN(dDif)) {
+					var isNew = typeof wItem['downloads'] == "undefined";
+					
+					if (!isNaN(dDif) || isNew) {
+						console.log('downloads hook nan');
+						if (isNew) dDif = dDifStr = downloads;
 						wChangedItem['downloads'] = dDifStr + " download" + (dDif > 1 ? "s" : "");
 						wChangedItem['changes'].push(dDifStr + " download" + (dDif > 1 ? "s" : ""));
 						//alert(title + " :: " + dDifStr + " download" + (dDif > 1 ? "s" : ""));
@@ -265,6 +276,7 @@ function check_watchlist(email, update, callback) {
 				
 				//Members hook
 				if (members && wItem['members'] != members) {
+					console.log('members hook');
 					var mDif = members - wItem['members'];
 					var mDifStr = mDif;
 					if (mDif > 0) mDifStr = "+" + mDif;
@@ -272,15 +284,20 @@ function check_watchlist(email, update, callback) {
 					//Set members in storage
 					wChangedItem.state.members = members;
 					
-					if (!isNaN(mDif)) {
-						wChangedItem['members'] = mDifStr + " members" + (mDif > 1 || mDif < -1 ? "s" : "");
-						wChangedItem['changes'].push(mDifStr + " members" + (mDif > 1 || mDif < -1 ? "s" : ""));
-						//alert(title + " :: " + mDifStr + " members" + (mDif > 1 || mDif < -1 ? "s" : ""));
+					var isNew = typeof wItem['members'] == "undefined";
+					
+					if (!isNaN(mDif) || isNew) {
+						console.log('members hook nan');
+						if (isNew) mDif = mDifStr = members;
+						wChangedItem['members'] = mDifStr + " member" + (Math.abs(mDif) > 1 || mDif == 0 ? "s" : "");
+						wChangedItem['changes'].push(mDifStr + " member" + (Math.abs(mDif) > 1 || mDif == 0 ? "s" : ""));
+						//alert(title + " :: " + mDifStr + " member" + (Math.abs(mDif) > 1 || mDif == 0 ? "s" : ""));
 					}
 				}
 				
 				//Followers hook
 				if (following && wItem['following'] != following) {
+					console.log('following hook');
 					var fDif = following - wItem['following'];
 					var fDifStr = fDif;
 					if (fDif > 0) fDifStr = "+" + fDif;
@@ -288,27 +305,36 @@ function check_watchlist(email, update, callback) {
 					//Set following in storage
 					wChangedItem.state.following = following;
 					
-					if (!isNaN(fDif)) {
-						wChangedItem['following'] = fDifStr + " follower" + (fDif > 1 || fDif < -1 ? "s" : "");
-						wChangedItem['changes'].push(fDifStr + " follower" + (fDif > 1 || fDif < -1 ? "s" : ""));
-						//alert(title + " :: " + fDifStr + " follower" + (fDif > 1 || fDif < -1 ? "s" : ""));
+					var isNew = typeof wItem['following'] == "undefined";
+					
+					if (!isNaN(fDif) || typeof wItem['following'] == "undefined") {
+						console.log('following hook nan');
+						if (isNew) fDif = fDifStr = following;
+						wChangedItem['following'] = fDifStr + " follower" + (Math.abs(fDif) > 1 || fDif == 0 ? "s" : "");
+						wChangedItem['changes'].push(fDifStr + " follower" + (Math.abs(fDif) > 1 || fDif == 0 ? "s" : ""));
+						//alert(title + " :: " + fDifStr + " follower" + (Math.abs(fDif) > 1 || fDif == 0 ? "s" : ""));
 					}
 				}
 				
 				//Comments hook
 				if (comment && wItem['comment'] != comment) {
+					console.log('comment hook');
 					//BUGFIX: Alert was displaying for every added watchlist item
-					if (typeof wItem['comment'] != "undefined") {
+					//if (typeof wItem['comment'] != "undefined") {
+						console.log('comment hook nan');
 						wChangedItem['comment'] = "New comment";
 						wChangedItem['changes'].push("New comment");
 						//alert(title + " :: New comment");
-					}
+					//}
 					
 					//Set comment in storage
 					wChangedItem.state.comment = comment;
 				}
 				
+				console.log(wChangedItem);
+				
 				if (wChangedItem['changes'].length) {
+					console.log('changes hook');
 					wChangedItem['link'] = link;
 					wChangedItem['index'] = i;
 					
@@ -350,7 +376,7 @@ function check_watchlist(email, update, callback) {
 			if (wChanged.length) //alert(results);
 			
 			console.debug("final iteration complete!");
-			if (update) update_storage(email, d[email], callback);
+			if (update) crapi.update(email, d[email], callback);
 			else callback();
 		}
 	});

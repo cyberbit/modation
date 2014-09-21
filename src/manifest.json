@@ -30,7 +30,7 @@
 	
 	"content_scripts": [{
 		"matches": ["http://soundation.com/*"],
-		"js": ["js/jquery.all.js", "js/api.min.js", "js/content.min.js"]
+		"js": ["js/jquery.all.js", "js/crapi.js", "js/modapi.js", "js/content.js"]
 	}],
 	
 	"options_page": "options.html",

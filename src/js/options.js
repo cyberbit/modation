@@ -430,7 +430,7 @@ function progress(tab, val) {
 
 function status(msg) {
 	msg = (typeof msg == "undefined" ? "Something happened." : msg);
-	
+	console.log('status');
 	showNotificationBar(msg, 1300, "#15842f", "white");
 }
 
@@ -445,6 +445,14 @@ function restore_options() {
 	var email = $("#email").val();
 	
 	crapi.clone(function(d) {
+		//Initialize user, if needed
+		if (typeof d[email] == "undefined") {
+			d[email] = {};
+		}
+		
+		//Trace storage
+		console.log(d);
+		
 		//Storage for options
 		var options = $(".option");
 		
@@ -452,11 +460,15 @@ function restore_options() {
 		var missing = 0;
 		
 		//Storage for completion callback
-		var cb = function(){status("Settings restored.")};
+		var cb = function() {
+			status("Settings restored.");
+		};
 		
 		//Iterate through options
 		options.each(function() {
 			var id = $(this).attr("id");
+			
+			console.log("i am option " + id);
 			
 			//Add unsaved options to storage
 			if (!(id in d[email])) {
@@ -468,11 +480,18 @@ function restore_options() {
 			$("#" + id).attr("checked", d[email][id]);
 		});
 		
+		//Default for watchlist?
+		if (typeof d[email]['watchlist'] == "undefined") d[email]['watchlist'] = [];
+		
 		//Set defaults, if needed
 		if (missing) {
+			console.log("is missing");
 			console.log("setting defaults...");
 			crapi.update(email, d[email], cb);
-		} else cb();
+		} else {
+			console.log("isn't missing");
+			cb();
+		}
 	});
 }
 

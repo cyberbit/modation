@@ -9,11 +9,13 @@
 modapi = new ModAPI();
 
 //Set debug mode
-modapi.debug = false;
+modapi.debug = true;
 
 //Disable all console logs
-console.log = function(){};
-console.debug = function(){};
+if (!modapi.debug) {
+	console.log = function(){};
+	console.debug = function(){};
+}
 
 /**
  * Contains helper functions specific to Modation
