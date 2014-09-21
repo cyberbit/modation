@@ -96,7 +96,7 @@ function selectTab(id) {
 		$('#' + id).show();
 		if (id == "tab-about") {
 			var manifest = crapi.manifest();
-			$('#modation_version').html("Version: <strong>" + manifest.version + "</strong>");
+			$('#modation_version').html("Version: <strong>" + manifest.version + (manifest.version_suffix ? "-" + manifest.version_suffix : "") + "</strong>");
 			$('#modation_author').html("Author: <strong>" + manifest.author + "</strong>");
 			getChangelog();
 		}
@@ -241,49 +241,49 @@ function getChangelog() {
 
 function editTrack(id, page) {
 	if (!$('#tab-tracks aside').length) {
-		$('#tab-tracks').prepend('<aside style="display: none">\
-			<div class="container">\
-				<div class="aside-cover"><img src="img/loadingealarget.gif"></div>\
-				<div class="wrapper"><h3>Modation Track Editor</h3></div>\
-				<form accept-charset="UTF-8" enctype="multipart/form-data" id="edit_mixdown">\
-					<div class="wrapper">\
-						<input name="_method" type="hidden" value="put">\
-						<input id="token" name="authenticity_token" type="hidden" value="">\
-						<label for="mixdown_title">Title</label>\
-						<input id="mixdown_title" maxlength="100" name="mixdown[title]" size="100" type="text" style="width: 93%">\
-						<label for="mixdown_description">Description</label>\
-						<textarea id="mixdown_description" maxlength="255" name="mixdown[description]" style="width: 93%; height: 75px; resize: vertical"></textarea>\
-						<label for="mixdown_genre_id" style="padding-right: 3px">Genre:</label>\
-						<select id="mixdown_genre_id" name="mixdown[genre_id]" style="margin: 0">\
-							<option value="">None</option>\
-							<option value="1">Blues</option>\
-							<option value="2">Classical</option>\
-							<option value="3">Country</option>\
-							<option value="4">DJ Effects</option>\
-							<option value="5">Electronica</option>\
-							<option value="6">Funk</option>\
-							<option value="7">Hip Hop/Urban</option>\
-							<option value="8">Jazz</option>\
-							<option value="9">Latin</option>\
-							<option value="10">Reggae</option>\
-							<option value="11">Rock</option>\
-							<option value="12">World</option>\
-						</select>\
-					</div>\
-					<div class="wrapper" style="text-align: center">\
-						<input name="mixdown[published]" type="hidden" value="0">\
-						<input id="mixdown_published" class="toggle visible nice-button green" name="mixdown[published]" type="checkbox" value="1">\
-						<input name="mixdown[allow_comments]" type="hidden" value="0">\
-						<input id="mixdown_allow_comments" class="toggle comments nice-button orange" name="mixdown[allow_comments]" type="checkbox" value="1">\
-						<input name="mixdown[allow_download]" type="hidden" value="0">\
-						<input id="mixdown_allow_download" class="toggle download nice-button blue" name="mixdown[allow_download]" type="checkbox" value="1">\
-					</div>\
-				</form>\
-				<div class="wrapper last" style="text-align: center">\
-					<a id="save" class="nice-button orange large">Save</a>\
-				</div>\
-			</div>\
-		</aside>');
+		$('#tab-tracks').prepend('<aside style="display: none">' +
+			'<div class="container">' +
+				'<div class="aside-cover"><img src="img/loadingealarget.gif"></div>' +
+				'<div class="wrapper"><h3>Modation Track Editor</h3></div>' +
+				'<form accept-charset="UTF-8" enctype="multipart/form-data" id="edit_mixdown">' +
+					'<div class="wrapper">' +
+						'<input name="_method" type="hidden" value="put">' +
+						'<input id="token" name="authenticity_token" type="hidden" value="">' +
+						'<label for="mixdown_title">Title</label>' +
+						'<input id="mixdown_title" maxlength="100" name="mixdown[title]" size="100" type="text" style="width: 93%">' +
+						'<label for="mixdown_description">Description</label>' +
+						'<textarea id="mixdown_description" maxlength="255" name="mixdown[description]" style="width: 93%; height: 75px; resize: vertical"></textarea>' +
+						'<label for="mixdown_genre_id" style="padding-right: 3px">Genre:</label>' +
+						'<select id="mixdown_genre_id" name="mixdown[genre_id]" style="margin: 0">' +
+							'<option value="">None</option>' +
+							'<option value="1">Blues</option>' +
+							'<option value="2">Classical</option>' +
+							'<option value="3">Country</option>' +
+							'<option value="4">DJ Effects</option>' +
+							'<option value="5">Electronica</option>' +
+							'<option value="6">Funk</option>' +
+							'<option value="7">Hip Hop/Urban</option>' +
+							'<option value="8">Jazz</option>' +
+							'<option value="9">Latin</option>' +
+							'<option value="10">Reggae</option>' +
+							'<option value="11">Rock</option>' +
+							'<option value="12">World</option>' +
+						'</select>' +
+					'</div>' +
+					'<div class="wrapper" style="text-align: center">' +
+						'<input name="mixdown[published]" type="hidden" value="0">' +
+						'<input id="mixdown_published" class="toggle visible nice-button green" name="mixdown[published]" type="checkbox" value="1">' +
+						'<input name="mixdown[allow_comments]" type="hidden" value="0">' +
+						'<input id="mixdown_allow_comments" class="toggle comments nice-button orange" name="mixdown[allow_comments]" type="checkbox" value="1">' +
+						'<input name="mixdown[allow_download]" type="hidden" value="0">' +
+						'<input id="mixdown_allow_download" class="toggle download nice-button blue" name="mixdown[allow_download]" type="checkbox" value="1">' +
+					'</div>' +
+				'</form>' +
+				'<div class="wrapper last" style="text-align: center">' +
+					'<a id="save" class="nice-button orange large">Save</a>' +
+				'</div>' +
+			'</div>' +
+		'</aside>');
 		$('#tab-tracks aside').fadeIn();
 	}
 	$('#edit_mixdown').off("submit");
@@ -782,11 +782,11 @@ function refresh_watchlist() {
 }
 
 String.prototype.hashCode = function(){
-    var hash = 0, i, char;
+    var hash = 0, i, c;
     if (this.length == 0) return hash;
     for (i = 0, l = this.length; i < l; i++) {
-        char  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+char;
+        c  = this.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+c;
         hash |= 0; // Convert to 32bit integer
     }
     return hash;

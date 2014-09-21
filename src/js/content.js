@@ -1,10 +1,10 @@
 //Needs to be up here for original hash check (ugh)
 String.prototype.hashCode = function(){
-    var hash = 0, i, char;
+    var hash = 0, i, c;
     if (this.length == 0) return hash;
     for (i = 0, l = this.length; i < l; i++) {
-        char  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+char;
+        c  = this.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+c;
         hash |= 0; // Convert to 32bit integer
     }
     return hash;
@@ -58,10 +58,10 @@ function init() {
 	}
 	
 	//Attach factories
-	$("body").append('\
-		<div class="factory" style="display: none">\
-			<button class="modation_watch nice-button pink" style="display: block">Watch Me</button>\
-		</div>');
+	$("body").append('' +
+		'<div class="factory" style="display: none">' +
+			'<button class="modation_watch nice-button pink" style="display: block">Watch Me</button>' +
+		'</div>');
 	
 	//Group page
 	if (location.href.match(/\/group\//)) {
@@ -168,7 +168,9 @@ function getEmailHash() {
 }
 
 /* Mod Settings Super Handler */
+//Default off for v1.0-beta
 function doMod(hash, setting) {
+	return false;
 	if ((typeof hash == "undefined") || (modationStorage[hash + "." + setting] == "on")) { return true; }
 	else if (modationStorage[hash + "." + setting] == "off") { return false; }
 	return true;
