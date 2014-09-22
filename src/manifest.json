@@ -3,6 +3,7 @@
 	"name": "Modation Dev",
 	"version": "1.0",
 	"version_suffix": "beta",
+	"debug": false,
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/icon16.png",
