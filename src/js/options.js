@@ -482,6 +482,7 @@ function restore_options() {
 		
 		//Default for watchlist?
 		if (typeof d[email]['watchlist'] == "undefined") d[email]['watchlist'] = [];
+		if (typeof d[email]['watchlist-queue'] == "undefined") d[email]['watchlist-queue'] = [];
 		
 		//Set defaults, if needed
 		if (missing) {
