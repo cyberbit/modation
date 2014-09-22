@@ -8,11 +8,11 @@
 //Global identifier for ModAPI class
 modapi = new ModAPI();
 
-//Set debug mode
-modapi.debug = true;
+//Get manifest
+modapi.manifest = crapi.manifest();
 
-//Disable all console logs
-if (!modapi.debug) {
+//Disable all console logs, unless in debug mode
+if (!modapi.manifest.debug) {
 	console.log = function(){};
 	console.debug = function(){};
 }

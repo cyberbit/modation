@@ -30,7 +30,7 @@ var hashes = [];
 
 /* Feed check timer */
 document.addEventListener('DOMContentLoaded', function () {
-	chrome.alarms.create("feed", {delayInMinutes: (modapi.debug ? 0 : 1), periodInMinutes: 1} );
+	chrome.alarms.create("feed", {delayInMinutes: (modapi.manifest.debug ? 0 : 1), periodInMinutes: 1} );
 });
 
 /* Handler for feed alarm */
