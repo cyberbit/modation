@@ -268,8 +268,8 @@ function check_watchlist(email, update, callback) {
 					if (!isNaN(dDif) || isNew) {
 						console.log('downloads hook nan');
 						if (isNew) dDif = dDifStr = downloads;
-						wChangedItem['downloads'] = dDifStr + " download" + (dDif > 1 ? "s" : "");
-						wChangedItem['changes'].push(dDifStr + " download" + (dDif > 1 ? "s" : ""));
+						wChangedItem['downloads'] = dDifStr + " download" + (dDif !== 1 ? "s" : "");
+						wChangedItem['changes'].push(dDifStr + " download" + (dDif !== 1 ? "s" : ""));
 						//alert(title + " :: " + dDifStr + " download" + (dDif > 1 ? "s" : ""));
 					}
 				}
