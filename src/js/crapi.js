@@ -12,7 +12,21 @@ crapi = new CrAPI();
  * Contains workarounds for tricky bits in the Chrome API
  */
 function CrAPI() {
+	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(d){return (typeof d != "undefined" ? d : false)};
+	
+	//Quick badge colors
+	this.badgeColors = {
+		gray: "#9a9a9a",
+		red: "#d00"
+	};
+	
+	//Default badge options
+	this.badgeOptions = {
+		title: false,
+		color: false,
+		text: false
+	};
 }
 
 /**
@@ -43,7 +57,9 @@ CrAPI.prototype.update = function(key, value, callback) {
 	updatedStorage[key] = value;
 	
 	//Update storage
-	chrome.storage.local.set(updatedStorage, callback);
+	chrome.storage.local.set(updatedStorage, function() {
+		callback(value);
+	});
 }
 
 /**
@@ -66,3 +82,20 @@ CrAPI.prototype.updateAll = function(items, callback) {
  * @name 
  */
 CrAPI.prototype.manifest = function() { return chrome.runtime.getManifest(); }
+
+/**
+ * Modify extension badge from settings matrix
+ *
+ * @param	{object}	matrix		Badge options
+ */
+CrAPI.prototype.badge = function(matrix) {
+	var options = $.extend({}, this.badgeOptions, matrix);
+	
+	var color = (typeof this.badgeColors[options.color] != "undefined" ? this.badgeColors[options.color] : options.color);
+	
+	console.log(options);
+	
+	if (options.title !== false) chrome.browserAction.setTitle({title: options.title});
+	if (color !== false) chrome.browserAction.setBadgeBackgroundColor({color: color});
+	if (options.text !== false) chrome.browserAction.setBadgeText({text: options.text});
+}

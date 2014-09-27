@@ -37,62 +37,124 @@ document.addEventListener('DOMContentLoaded', function () {
 chrome.alarms.onAlarm.addListener(function(alarm) {
 	var views = chrome.extension.getViews({type: "popup"});
 	
-	//Feed alarm handler
-	if (alarm.name == "feed") {
-		if (!views.length) $.get("http://soundation.com/feed", function(html) {
-			html = html.replace(/<img\b[^>]*>/ig, '').replace(/<span class=\"time\">.*<\/span>/ig, '');
-			var oHtml = $(html);
-			var email = oHtml.find('.email').text();
-			var emailHash = email.hashCode();
-			if (typeof localStorage[email] == "undefined") {
-				localStorage[email] = emailHash;
-				localStorage[emailHash + ".desktop_notifs"] = "on";
-			}
-			var aside = oHtml.find('aside')[0];
-			if (typeof aside == "undefined") {
-				chrome.browserAction.setTitle({title:"Please login to view notifications"});
-				chrome.browserAction.setBadgeBackgroundColor({color:"#9a9a9a"});
-				chrome.browserAction.setBadgeText({text:"?"});
-			}
-			var asideHTML = aside.outerHTML;
-			var asideHash = String(asideHTML.hashCode());
-			//console.log(asideHash);
-			var sCommunity = oHtml.find("a[href='/feed']")[0].innerText;
-			var numAlerts = sCommunity.match(/(\d+)/);
-			if (numAlerts != null) {
-				var iTotal = 0, authors = [];
-				$(asideHTML).find('a.author').each(function() {
-					author = $(this).text();
-					if (authors.indexOf(author) == -1) authors.push(author);
-					++iTotal;
-				});
-				var iAuthors = authors.length, iOthers = iAuthors - 3, i = 0, authorString = iTotal + " new from ";
-				for (i = 0; i < 2 && i < (iAuthors - 1); ++i) {
-					authorString += authors[i] + ", ";
-				}
-				authorString += authors[i];
-				if (iOthers > 0) authorString += ", plus " + iOthers + " other" + (iOthers > 1 ? "s" : "");
-				console.log(authorString);
-				chrome.browserAction.setTitle({title:authorString});
-				chrome.browserAction.setBadgeBackgroundColor({color:"#d00"});
-				chrome.browserAction.setBadgeText({text:numAlerts[0]});
-				if ((hashes.indexOf(asideHash) == -1) && doNotifs(emailHash)) chrome.notifications.create(asideHash, {
-					type: "basic",
-					iconUrl: "img/iconapp.png",
-					title: "Soundation Notifications",
-					message: numAlerts[0] + " new notification" + (parseInt(numAlerts[0]) > 1 ? "s" : ""),
-					contextMessage: authorString.replace(/\d* new /, "")
-				}, function(notificationId) {hashes.push(asideHash)});
-			} else {
-				console.log("modation: no notifs");
-				chrome.browserAction.setTitle({title:"No new notifications :("});
-				chrome.browserAction.setBadgeText({text:""})
-			}
+	//Grab storage
+	crapi.clone(function(d) {
+		console.log(d);
+		
+		//Login
+		modapi.login(function(me) {
+			console.log(me);
 			
-			//Check watchlist
-			check_watchlist(email, true);
+			//Feed alarm handler (runs if popup is closed)
+			if (alarm.name == "feed" && !views.length) {
+				//User is not logged in
+				if (!me) {
+					crapi.badge({
+						title: "Please login to view notifications",
+						color: "gray",
+						text: "?"
+					});
+				}
+				
+				//User is logged in
+				else {
+					$.get("http://soundation.com/feed", function(html) {
+						//Parse HTML to remove images and timing values
+						html = html.replace(/<img\b[^>]*>/ig, '').replace(/<span class=\"time\">.*<\/span>/ig, '');
+						
+						var $html = $(html);
+						var $aside = $html.find('aside');
+						var asideHTML = $aside[0].outerHTML;
+						var asideHash = String(asideHTML.hashCode());
+						var feedLink = $html.find("a[href='/feed']")[0].innerText;
+						var feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+						
+						//Generate initial alerts
+						_generateAlerts(d[me.email]);
+						
+						//Check watchlist and re-generate alerts
+						check_watchlist(me.email, true, function(data) {
+							_generateAlerts(data);
+						});
+						
+						function _generateAlerts(data) {
+							var watchlistAlerts = data['watchlist-queue'].length;
+							var alerts = feedAlerts + watchlistAlerts;
+							var alertString = "";
+							
+							//Soundation notifs handler
+							if (feedAlerts) {
+								var authors = [];
+								
+								//Grab authors
+								$aside.find('a.author').each(function() {
+									author = $(this).text();
+									if (authors.indexOf(author) == -1) authors.push(author);
+								});
+								
+								//Initialize author string
+								var authorCount = authors.length
+								var others = authorCount - 3;
+								alertString = authorCount + " new from ";
+								
+								//Iterate authors
+								var i = 0;
+								for (; i < 2 && i < (authorCount - 1); ++i) {
+									alertString += authors[i] + ", ";
+								}
+								
+								//Add final author
+								alertString += authors[i];
+								
+								//Add others, if needed
+								if (others > 0) alertString += ", plus " + others + " other" + (others > 1 ? "s" : "");
+								
+								//Trace authors
+								console.log(alertString);
+								
+								if ((hashes.indexOf(asideHash) == -1) && data['desktop_notifs']) chrome.notifications.create(asideHash, {
+									type: "basic",
+									iconUrl: "img/iconapp.png",
+									title: "Soundation Notifications",
+									message: feedAlerts + " new notification" + (parseInt(feedAlerts) > 1 ? "s" : ""),
+									contextMessage: alertString.replace(/\d* new /, "")
+								}, function(notificationId) {hashes.push(asideHash)});
+							}
+							
+							//No Soundation notifs
+							else {
+								console.log("modation: no notifs");
+							}
+							
+							//Watchlist notifs handler
+							if (watchlistAlerts) {
+								alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
+							}
+							
+							//Global notifs handler
+							if (alerts) {
+								//Updage badge
+								crapi.badge({
+									title: alertString,
+									color: "red",
+									text: String(alerts)
+								});
+							}
+							
+							//No global notifs
+							else {
+								//Update badge
+								crapi.badge({
+									title: "No new notifications :(",
+									text: ""
+								});
+							}
+						}
+					});
+				}
+			}
 		});
-	}
+	});
 });
 
 //Add to watchlist
@@ -377,7 +439,7 @@ function check_watchlist(email, update, callback) {
 			
 			console.debug("final iteration complete!");
 			if (update) crapi.update(email, d[email], callback);
-			else callback();
+			else callback(d[email]);
 		}
 	});
 }

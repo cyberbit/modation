@@ -65,6 +65,7 @@ function init() {
 	
 	//Group page
 	if (location.href.match(/\/group\//)) {
+		console.log("groupie");
 		/*var commentActions = $(".comment .actions").children(".flag, .delete");
 		var commentIDs = [];
 		
@@ -115,7 +116,13 @@ function init() {
 	
 	//Track page
 	if (location.href.match(/\/user\/[\w-]*\/track\//)) {
+		console.log("trak");
 		watchlist_ui();
+	}
+	
+	//Player widget
+	if (location.href.match(/\player\//)) {
+		console.log("Player");
 	}
 }
 

@@ -3,7 +3,7 @@
 	"name": "Modation Dev",
 	"version": "1.0",
 	"version_suffix": "beta",
-	"debug": false,
+	"debug": true,
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/icon16.png",
@@ -31,7 +31,9 @@
 	
 	"content_scripts": [{
 		"matches": ["http://soundation.com/*"],
-		"js": ["js/jquery.all.js", "js/api.min.js", "js/content.min.js"]
+		"js": ["js/jquery.all.js", "js/api.min.js", "js/content.js"],
+		"run_at": "document_start",
+		"all_frames": true
 	}],
 	
 	"options_page": "options.html",
