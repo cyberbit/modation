@@ -15,8 +15,7 @@ var alarmRun = 0;
 function install_notice() {
 	var manifest = chrome.runtime.getManifest();
 	
-    if (localStorage['version'] == manifest.version)
-        return;
+    if (localStorage['version'] == manifest.version) return;
 
     var now = new Date().getTime();
     localStorage['install_time'] = now;
@@ -38,119 +37,144 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 	var views = chrome.extension.getViews({type: "popup"});
 	
 	//Grab storage
-	crapi.clone(function(d) {
-		console.log(d);
-		
+	crapi.clone(function(d) {		
 		//Login
-		modapi.login(function(me) {
-			console.log(me);
-			
-			//Feed alarm handler (runs if popup is closed)
-			if (alarm.name == "feed" && !views.length) {
-				//User is not logged in
-				if (!me) {
-					crapi.badge({
-						title: "Please login to view notifications",
-						color: "gray",
-						text: "?"
-					});
+		modapi.login(function(me) {			
+			//Feed alarm handler
+			if (alarm.name == "feed") {
+				//Popup is open
+				if (views.length) {
+					console.info("Popup open, notification handler cancelled");
 				}
 				
-				//User is logged in
+				//Popup is not open
 				else {
-					$.get("http://soundation.com/feed", function(html) {
-						//Parse HTML to remove images and timing values
-						html = html.replace(/<img\b[^>]*>/ig, '').replace(/<span class=\"time\">.*<\/span>/ig, '');
+					//Begin trace group
+					console.group("Modation :: Check notifications")
+					
+					//User is not logged in
+					if (!me) {
+						//Log failure
+						console.warn("Could not log in to Soundation");
 						
-						var $html = $(html);
-						var $aside = $html.find('aside');
-						var asideHTML = $aside[0].outerHTML;
-						var asideHash = String(asideHTML.hashCode());
-						var feedLink = $html.find("a[href='/feed']")[0].innerText;
-						var feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+						//End trace group
+						console.groupEnd();
 						
-						//Generate initial alerts
-						_generateAlerts(d[me.email]);
-						
-						//Check watchlist and re-generate alerts
-						check_watchlist(me.email, true, function(data) {
-							_generateAlerts(data);
+						crapi.badge({
+							title: "Please login to view notifications",
+							color: "gray",
+							text: "?"
 						});
-						
-						function _generateAlerts(data) {
-							var watchlistAlerts = data['watchlist-queue'].length;
-							var alerts = feedAlerts + watchlistAlerts;
-							var alertString = "";
+					}
+					
+					//User is logged in
+					else {
+						$.get("http://soundation.com/feed", function(html) {
+							//Parse HTML to remove images and timing values
+							html = html.replace(/<img\b[^>]*>/ig, '').replace(/<span class=\"time\">.*<\/span>/ig, '');
 							
-							//Soundation notifs handler
-							if (feedAlerts) {
-								var authors = [];
+							var $html = $(html);
+							var $aside = $html.find('aside');
+							var asideHTML = $aside[0].outerHTML;
+							var asideHash = String(asideHTML.hashCode());
+							var feedLink = $html.find("a[href='/feed']")[0].innerText;
+							var feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+							
+							//Generate initial alerts
+							var initialAlerts = _generateAlerts(d[me.email]);
+							
+							//Trace initial alerts
+							console.log("Initial alerts:", initialAlerts);
+							
+							//Check watchlist
+							check_watchlist(me.email, true, function(data) {
+								//Re-generate alerts
+								var regenAlerts = _generateAlerts(data);
+							
+								//Trace re-generated alerts
+								console.log("Re-generated alerts:", regenAlerts);
 								
-								//Grab authors
-								$aside.find('a.author').each(function() {
-									author = $(this).text();
-									if (authors.indexOf(author) == -1) authors.push(author);
-								});
+								//End trace group
+								console.groupEnd();
+							});
+							
+							function _generateAlerts(data) {
+								var watchlistAlerts = data['watchlist-queue'].length;
+								var alerts = feedAlerts + watchlistAlerts;
+								var alertString = "";
 								
-								//Initialize author string
-								var authorCount = authors.length
-								var others = authorCount - 3;
-								alertString = authorCount + " new from ";
-								
-								//Iterate authors
-								var i = 0;
-								for (; i < 2 && i < (authorCount - 1); ++i) {
-									alertString += authors[i] + ", ";
+								//Soundation notifs handler
+								if (feedAlerts) {
+									var authors = [];
+									
+									//Grab authors
+									$aside.find('a.author').each(function() {
+										author = $(this).text();
+										if (authors.indexOf(author) == -1) authors.push(author);
+									});
+									
+									//Initialize author string
+									var authorCount = authors.length
+									var others = authorCount - 3;
+									alertString = authorCount + " new from ";
+									
+									//Iterate authors
+									var i = 0;
+									for (; i < 2 && i < (authorCount - 1); ++i) {
+										alertString += authors[i] + ", ";
+									}
+									
+									//Add final author
+									alertString += authors[i];
+									
+									//Add others, if needed
+									if (others > 0) alertString += ", plus " + others + " other" + (others > 1 ? "s" : "");
+									
+									//Trace authors
+									console.log(alertString);
+									
+									if ((hashes.indexOf(asideHash) == -1) && data['desktop_notifs']) chrome.notifications.create(asideHash, {
+										type: "basic",
+										iconUrl: "img/iconapp.png",
+										title: "Soundation Notifications",
+										message: feedAlerts + " new notification" + (parseInt(feedAlerts) > 1 ? "s" : ""),
+										contextMessage: alertString.replace(/\d* new /, "")
+									}, function(notificationId) {hashes.push(asideHash)});
 								}
 								
-								//Add final author
-								alertString += authors[i];
+								//No Soundation notifs
+								else { /* Do nothing */ }
 								
-								//Add others, if needed
-								if (others > 0) alertString += ", plus " + others + " other" + (others > 1 ? "s" : "");
+								//Watchlist notifs handler
+								if (watchlistAlerts) {
+									alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
+								}
 								
-								//Trace authors
-								console.log(alertString);
+								//Global notifs handler
+								if (alerts) {
+									//Updage badge
+									crapi.badge({
+										title: alertString,
+										color: "red",
+										text: String(alerts)
+									});
+								}
 								
-								if ((hashes.indexOf(asideHash) == -1) && data['desktop_notifs']) chrome.notifications.create(asideHash, {
-									type: "basic",
-									iconUrl: "img/iconapp.png",
-									title: "Soundation Notifications",
-									message: feedAlerts + " new notification" + (parseInt(feedAlerts) > 1 ? "s" : ""),
-									contextMessage: alertString.replace(/\d* new /, "")
-								}, function(notificationId) {hashes.push(asideHash)});
+								//No global notifs
+								else {
+									alertString = "No new notifications :(";
+									
+									//Update badge
+									crapi.badge({
+										title: alertString,
+										text: ""
+									});
+								}
+								
+								return alertString;
 							}
-							
-							//No Soundation notifs
-							else {
-								console.log("modation: no notifs");
-							}
-							
-							//Watchlist notifs handler
-							if (watchlistAlerts) {
-								alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
-							}
-							
-							//Global notifs handler
-							if (alerts) {
-								//Updage badge
-								crapi.badge({
-									title: alertString,
-									color: "red",
-									text: String(alerts)
-								});
-							}
-							
-							//No global notifs
-							else {
-								//Update badge
-								crapi.badge({
-									title: "No new notifications :(",
-									text: ""
-								});
-							}
-						}
-					});
+						});
+					}
 				}
 			}
 		});
@@ -158,7 +182,8 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 });
 
 //Add to watchlist
-function add_watchlist(email, link) {
+//Deprecated as of v1.0
+/*function add_watchlist(email, link) {
 	chrome.storage.local.get(email, function(d) {
 		var watchlist = d[email]['watchlist'];
 		var newItem = true;
@@ -180,12 +205,15 @@ function add_watchlist(email, link) {
 			update_storage(email, d[email]);
 		}
 	});
-}
+}*/
 
 //Check watchlist
 function check_watchlist(email, update, callback) {
 	if (typeof update == "undefined") update = true;
 	if (typeof callback == "undefined") callback = function(){};
+	
+	//Begin trace group
+	console.group("Modation :: Check watchlist");
 	
 	var wParsed = [];
 	var wFailed = [];
@@ -194,6 +222,9 @@ function check_watchlist(email, update, callback) {
 		var watchlist = d[email]["watchlist"];
 		var wLen = watchlist.length;
 		var wCt = 0;
+		
+		//Trace watchlist queueing start
+		console.group("Queueing watchlist...");
 		
 		//Count up invalid links and adjust wLen accordingly
 		$.each(watchlist, function(i, v) {
@@ -215,11 +246,18 @@ function check_watchlist(email, update, callback) {
 			});
 			
 			function _complete() {
-				wCt++;
+				//Trace queued item
+				console.log("Queued item %s", link);
+				
+				//Increment counter
+				++wCt;
 				
 				//If last index, run iteration
 				if (wCt == wLen) {
-					console.debug("final check complete!");
+					//End trace group
+					console.groupEnd();
+					
+					//Iterate items
 					_iterate();
 				}
 			}
@@ -227,8 +265,12 @@ function check_watchlist(email, update, callback) {
 		
 		//Iterate watchlist items
 		function _iterate() {
+			//Trace watchlist iteration start
+			console.groupCollapsed("Iterating watchlist...");
+			
 			var wChanged = [];
 			
+			//Loop through queued items
 			$.each(wParsed, function(i, v) {
 				var wItem = v;
 				var link = wItem['link'];
@@ -290,14 +332,12 @@ function check_watchlist(email, update, callback) {
 				
 				//Title hook
 				if (title) {
-					console.log('title hook');
 					wChangedItem['title'] = title;
 					wChangedItem.state.title = title;
 				}
 				
 				//Likes hook
 				if (likes && wItem['likes'] != likes) {
-					console.log('likes hook');
 					var lDif = likes - wItem['likes'];
 					var lDifStr = lDif;
 					if (lDif > 0) lDifStr = "+" + lDif;
@@ -308,7 +348,6 @@ function check_watchlist(email, update, callback) {
 					var isNew = typeof wItem['likes'] == "undefined";
 					
 					if (!isNaN(lDif) || isNew) {
-						console.log('likes hook nan');
 						if (isNew) lDif = lDifStr = likes;
 						wChangedItem['likes'] = lDifStr + " like" + (Math.abs(lDif) > 1 || lDif == 0 ? "s" : "");
 						wChangedItem['changes'].push(lDifStr + " like" + (Math.abs(lDif) > 1 || lDif == 0 ? "s" : ""));
@@ -318,7 +357,6 @@ function check_watchlist(email, update, callback) {
 				
 				//Downloads hook
 				if (downloads && wItem['downloads'] != downloads) {
-					console.log('downloads hook');
 					var dDif = downloads - wItem['downloads'];
 					var dDifStr = "+" + dDif;
 					
@@ -328,7 +366,6 @@ function check_watchlist(email, update, callback) {
 					var isNew = typeof wItem['downloads'] == "undefined";
 					
 					if (!isNaN(dDif) || isNew) {
-						console.log('downloads hook nan');
 						if (isNew) dDif = dDifStr = downloads;
 						wChangedItem['downloads'] = dDifStr + " download" + (dDif !== 1 ? "s" : "");
 						wChangedItem['changes'].push(dDifStr + " download" + (dDif !== 1 ? "s" : ""));
@@ -338,7 +375,6 @@ function check_watchlist(email, update, callback) {
 				
 				//Members hook
 				if (members && wItem['members'] != members) {
-					console.log('members hook');
 					var mDif = members - wItem['members'];
 					var mDifStr = mDif;
 					if (mDif > 0) mDifStr = "+" + mDif;
@@ -349,7 +385,6 @@ function check_watchlist(email, update, callback) {
 					var isNew = typeof wItem['members'] == "undefined";
 					
 					if (!isNaN(mDif) || isNew) {
-						console.log('members hook nan');
 						if (isNew) mDif = mDifStr = members;
 						wChangedItem['members'] = mDifStr + " member" + (Math.abs(mDif) > 1 || mDif == 0 ? "s" : "");
 						wChangedItem['changes'].push(mDifStr + " member" + (Math.abs(mDif) > 1 || mDif == 0 ? "s" : ""));
@@ -359,7 +394,6 @@ function check_watchlist(email, update, callback) {
 				
 				//Followers hook
 				if (following && wItem['following'] != following) {
-					console.log('following hook');
 					var fDif = following - wItem['following'];
 					var fDifStr = fDif;
 					if (fDif > 0) fDifStr = "+" + fDif;
@@ -370,7 +404,6 @@ function check_watchlist(email, update, callback) {
 					var isNew = typeof wItem['following'] == "undefined";
 					
 					if (!isNaN(fDif) || typeof wItem['following'] == "undefined") {
-						console.log('following hook nan');
 						if (isNew) fDif = fDifStr = following;
 						wChangedItem['following'] = fDifStr + " follower" + (Math.abs(fDif) > 1 || fDif == 0 ? "s" : "");
 						wChangedItem['changes'].push(fDifStr + " follower" + (Math.abs(fDif) > 1 || fDif == 0 ? "s" : ""));
@@ -380,10 +413,8 @@ function check_watchlist(email, update, callback) {
 				
 				//Comments hook
 				if (comment && wItem['comment'] != comment) {
-					console.log('comment hook');
 					//BUGFIX: Alert was displaying for every added watchlist item
 					//if (typeof wItem['comment'] != "undefined") {
-						console.log('comment hook nan');
 						wChangedItem['comment'] = "New comment";
 						wChangedItem['changes'].push("New comment");
 						//alert(title + " :: New comment");
@@ -393,32 +424,24 @@ function check_watchlist(email, update, callback) {
 					wChangedItem.state.comment = comment;
 				}
 				
-				console.log(wChangedItem);
-				
 				if (wChangedItem['changes'].length) {
-					console.log('changes hook');
 					wChangedItem['link'] = link;
 					wChangedItem['index'] = i;
 					
 					wChanged.push(wChangedItem);
 				}
+				
+				//Trace iteration
+				console.log("Parsed item %s: %O", link, wChangedItem);
 			});
+			
+			//End trace group
+			console.groupEnd();
 			
 			//Store watchlist queue
 			d[email]['watchlist-queue'] = wChanged;
 			
-			//Trace queue
-			console.log(wChanged);
-			
-			//Trace state
-			console.log(d[email]);
-			
-			//Debug results
-			var results = "MODATION WATCHLIST\n----------------\n\n";
-			
 			$.each(wChanged, function(i, item) {
-				results += item['title'] + /*" with link " + item['link'] + */" has changes!\n" + item['changes'].join(", ") + "\n\n";
-				
 				var hash = String(JSON.stringify(item).hashCode());
 				
 				//Generate notification
@@ -433,11 +456,13 @@ function check_watchlist(email, update, callback) {
 				}
 			});
 			
-			results += "END OF WATCHLIST";
-			
 			if (wChanged.length) //alert(results);
 			
 			console.debug("final iteration complete!");
+			
+			//End trace group
+			console.groupEnd();
+			
 			if (update) crapi.update(email, d[email], callback);
 			else callback(d[email]);
 		}
@@ -445,13 +470,14 @@ function check_watchlist(email, update, callback) {
 }
 
 //Update storage for provided key
-function update_storage(key, value) {
+//Deprecated as of v1.0
+/*function update_storage(key, value) {
 	var updatedStorage = {};
 	updatedStorage[key] = value;
 	
 	//Update storage
 	chrome.storage.local.set(updatedStorage);
-}
+}*/
 
 /* Check if desktop notifications should be shown */
 function doNotifs(hash) {
