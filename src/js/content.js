@@ -26,7 +26,7 @@ clone_storage(function() {
 //Initialization that is independent of user settings
 function preinit() {
 	//Add recent tracks link
-	if ($("body").hasClass("community")){
+	if ($("body").hasClass("community")) {
 		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
 	}
 	
@@ -265,8 +265,19 @@ function watchlist_ui() {
 	var isGroup = location.href.match(/\/group\//);
 	var isTrack = location.href.match(/\/user\/[\w-]*\/track\//);
 	var link = location.href.replace("http://soundation.com/", '');
+	var title = "Title";
 	var email = $(".email").text();
 	var isWatched = is_watched(link);
+				
+	//Is track
+	if (isTrack) {
+		title = $("#main .title").text();
+	}
+	
+	//Is group
+	else if (isGroup) {
+		title = $("#group-info h2").html();
+	}
 	
 	if (isWatched) {
 		//alert("you are being watched");
@@ -404,7 +415,7 @@ function watchlist_ui() {
 		
 		//Add new watchlist item and update
 		if (newItem) {
-			d[email]['watchlist'].push({link: link});
+			d[email]['watchlist'].push({link: link, title: title});
 			
 			//Reapply handlers
 			_handle(true);

@@ -30,6 +30,9 @@ function CrAPI() {
 	//Begin trace group
 	console.groupCollapsed("CrAPI :: Init");
 	
+	//Begin trace timing
+	console.time("CrAPI init");
+	
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(d){return (typeof d != "undefined" ? d : false)};
 	
@@ -55,6 +58,9 @@ function CrAPI() {
 	//Trace badge options
 	console.log("badgeOptions: %O", this.badgeOptions);
 	
+	//End trace timing
+	console.timeEnd("CrAPI init");
+	
 	//End trace group
 	console.groupEnd();
 }
@@ -71,6 +77,9 @@ CrAPI.prototype.clone = function(callback) {
 	//Begin trace group
 	console.groupCollapsed("CrAPI :: Clone storage");
 	
+	//Begin trace timing
+	console.time("CrAPI clone");
+	
 	//Trace callback
 	if (crapi.debug) console.trace("Stack trace");
 	
@@ -78,6 +87,9 @@ CrAPI.prototype.clone = function(callback) {
 	chrome.storage.local.get(function(d) {
 		//Trace storage
 		console.log("Storage: %O", d);
+	
+		//Begin trace timing
+		console.timeEnd("CrAPI clone");
 		
 		//End trace group
 		console.groupEnd();
@@ -100,6 +112,9 @@ CrAPI.prototype.update = function(key, value, callback) {
 	//Begin trace group
 	console.groupCollapsed("CrAPI :: Update storage");
 	
+	//Begin trace timing
+	console.time("CrAPI update");
+	
 	//Trace callback
 	if (crapi.debug) console.trace("Stack trace");
 	
@@ -110,6 +125,9 @@ CrAPI.prototype.update = function(key, value, callback) {
 	chrome.storage.local.set(updatedStorage, function() {
 		//Trace updated storage
 		console.log("New storage: %O", updatedStorage);
+	
+		//End trace timing
+		console.timeEnd("CrAPI update");
 		
 		//End trace group
 		console.groupEnd();
@@ -131,6 +149,9 @@ CrAPI.prototype.updateAll = function(items, callback) {
 	//Begin trace group
 	console.groupCollapsed("CrAPI :: Update all storage");
 	
+	//Begin trace timing
+	console.time("CrAPI update all");
+	
 	//Trace callback
 	if (crapi.debug) console.trace("Stack trace");
 	
@@ -138,6 +159,9 @@ CrAPI.prototype.updateAll = function(items, callback) {
 	chrome.storage.local.set(items, function() {
 		//Trace updated storage
 		console.log("New storage: %O", items);
+	
+		//End trace timing
+		console.timeEnd("CrAPI update all");
 		
 		//End trace group
 		console.groupEnd();
@@ -156,6 +180,9 @@ CrAPI.prototype.badge = function(matrix) {
 	//Begin trace group
 	console.groupCollapsed("CrAPI :: Update badge");
 	
+	//Begin trace timing
+	console.time("CrAPI badge");
+	
 	//Trace callback
 	if (crapi.debug) console.trace("Stack trace");
 	
@@ -171,6 +198,9 @@ CrAPI.prototype.badge = function(matrix) {
 	if (options.title !== false) chrome.browserAction.setTitle({title: options.title});
 	if (color !== false) chrome.browserAction.setBadgeBackgroundColor({color: color});
 	if (options.text !== false) chrome.browserAction.setBadgeText({text: options.text});
+	
+	//End trace timing
+	console.timeEnd("CrAPI badge");
 	
 	//End trace group
 	console.groupEnd();

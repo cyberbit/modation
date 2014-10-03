@@ -9,7 +9,8 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
-var alarmRun = 0;
+//Switch for alarm state
+var alarmRunning = false;
 
 /* Checks for new installs */
 function install_notice() {
@@ -37,143 +38,173 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 	var views = chrome.extension.getViews({type: "popup"});
 	
 	//Grab storage
-	crapi.clone(function(d) {		
+	crapi.clone(function(d) {
 		//Login
-		modapi.login(function(me) {			
+		modapi.login(function(me) {
 			//Feed alarm handler
 			if (alarm.name == "feed") {
-				//Popup is open
-				if (views.length) {
-					console.info("Popup open, notification handler cancelled");
+				//Alarm is running
+				if (alarmRunning) {
+					console.info("Alarm running, notification handler cancelled");
 				}
 				
-				//Popup is not open
+				//Alarm is not running
 				else {
-					//Begin trace group
-					console.group("Modation :: Check notifications")
-					
-					//User is not logged in
-					if (!me) {
-						//Log failure
-						console.warn("Could not log in to Soundation");
-						
-						//End trace group
-						console.groupEnd();
-						
-						crapi.badge({
-							title: "Please login to view notifications",
-							color: "gray",
-							text: "?"
-						});
+					//Popup is open
+					if (views.length) {						
+						//Log status
+						console.info("Popup open, notification handler cancelled");
 					}
 					
-					//User is logged in
+					//Popup is not open
 					else {
-						$.get("http://soundation.com/feed", function(html) {
-							//Parse HTML to remove images and timing values
-							html = html.replace(/<img\b[^>]*>/ig, '').replace(/<span class=\"time\">.*<\/span>/ig, '');
+						//Set alarm state
+						alarmRunning = true;
+						
+						//Begin trace group
+						console.group("Modation :: Check notifications");
+						
+						//Begin trace timing
+						console.time("Modation feed notifications");
+						
+						//User is not logged in
+						if (!me) {
+							//Log failure
+							console.warn("Could not login to Soundation");
+						
+							//End trace timing
+							console.timeEnd("Modation feed notifications");
 							
-							var $html = $(html);
-							var $aside = $html.find('aside');
-							var asideHTML = $aside[0].outerHTML;
-							var asideHash = String(asideHTML.hashCode());
-							var feedLink = $html.find("a[href='/feed']")[0].innerText;
-							var feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+							//End trace group
+							console.groupEnd();
 							
-							//Generate initial alerts
-							var initialAlerts = _generateAlerts(d[me.email]);
-							
-							//Trace initial alerts
-							console.log("Initial alerts:", initialAlerts);
-							
-							//Check watchlist
-							check_watchlist(me.email, true, function(data) {
-								//Re-generate alerts
-								var regenAlerts = _generateAlerts(data);
-							
-								//Trace re-generated alerts
-								console.log("Re-generated alerts:", regenAlerts);
-								
-								//End trace group
-								console.groupEnd();
+							crapi.badge({
+								title: "Please login to view notifications",
+								color: "gray",
+								text: "?"
 							});
 							
-							function _generateAlerts(data) {
-								var watchlistAlerts = data['watchlist-queue'].length;
-								var alerts = feedAlerts + watchlistAlerts;
-								var alertString = "";
+							//Set alarm state
+							alarmRunning = false;
+						}
+						
+						//User is logged in
+						else {
+							$.get("http://soundation.com/feed", function(html) {
+								//Parse HTML to remove images and timing values
+								html = html.replace(/<img\b[^>]*>/ig, '').replace(/<span class=\"time\">.*<\/span>/ig, '');
 								
-								//Soundation notifs handler
-								if (feedAlerts) {
-									var authors = [];
+								var $html = $(html);
+								var $aside = $html.find('aside');
+								var asideHTML = $aside[0].outerHTML;
+								var asideHash = String(asideHTML.hashCode());
+								var feedLink = $html.find("a[href='/feed']")[0].innerText;
+								var feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+								
+								//Generate initial alerts
+								var initialAlerts = _generateAlerts(d[me.email]);
+								
+								//Trace initial alerts
+								console.log("Initial alerts:", initialAlerts);
+								
+								//End trace timing
+								console.timeEnd("Modation feed notifications");
+								
+								//Begin trace timing
+								console.time("Modation watchlist");
+								
+								//Check watchlist
+								check_watchlist(me.email, true, function(data) {
+									//Re-generate alerts
+									var regenAlerts = _generateAlerts(data);
 									
-									//Grab authors
-									$aside.find('a.author').each(function() {
-										author = $(this).text();
-										if (authors.indexOf(author) == -1) authors.push(author);
-									});
+									//Trace re-generated alerts
+									console.log("Re-generated alerts:", regenAlerts);
 									
-									//Initialize author string
-									var authorCount = authors.length
-									var others = authorCount - 3;
-									alertString = authorCount + " new from ";
+									//End trace timing
+									console.timeEnd("Modation watchlist");
 									
-									//Iterate authors
-									var i = 0;
-									for (; i < 2 && i < (authorCount - 1); ++i) {
-										alertString += authors[i] + ", ";
+									//End trace group
+									console.groupEnd();
+									
+									//Set alarm state
+									alarmRunning = false;
+								});
+								
+								function _generateAlerts(data) {
+									var watchlistAlerts = data['watchlist-queue'].length;
+									var alerts = feedAlerts + watchlistAlerts;
+									var alertString = "";
+									
+									//Soundation notifs handler
+									if (feedAlerts) {
+										var authors = [];
+										
+										//Grab authors
+										$aside.find('a.author').each(function() {
+											author = $(this).text();
+											if (authors.indexOf(author) == -1) authors.push(author);
+										});
+										
+										//Initialize author string
+										var authorCount = authors.length
+										var others = authorCount - 3;
+										alertString = authorCount + " new from ";
+										
+										//Iterate authors
+										var i = 0;
+										for (; i < 2 && i < (authorCount - 1); ++i) {
+											alertString += authors[i] + ", ";
+										}
+										
+										//Add final author
+										alertString += authors[i];
+										
+										//Add others, if needed
+										if (others > 0) alertString += ", plus " + others + " other" + (others > 1 ? "s" : "");
+										
+										if ((hashes.indexOf(asideHash) == -1) && data['desktop_notifs']) chrome.notifications.create(asideHash, {
+											type: "basic",
+											iconUrl: "img/iconapp.png",
+											title: "Soundation Notifications",
+											message: feedAlerts + " new notification" + (parseInt(feedAlerts) > 1 ? "s" : ""),
+											contextMessage: alertString.replace(/\d* new /, "")
+										}, function(notificationId) {hashes.push(asideHash)});
 									}
 									
-									//Add final author
-									alertString += authors[i];
+									//No Soundation notifs
+									else { /* Do nothing */ }
 									
-									//Add others, if needed
-									if (others > 0) alertString += ", plus " + others + " other" + (others > 1 ? "s" : "");
+									//Watchlist notifs handler
+									if (watchlistAlerts) {
+										alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
+									}
 									
-									//Trace authors
-									console.log(alertString);
+									//Global notifs handler
+									if (alerts) {
+										//Updage badge
+										crapi.badge({
+											title: alertString,
+											color: "red",
+											text: String(alerts)
+										});
+									}
 									
-									if ((hashes.indexOf(asideHash) == -1) && data['desktop_notifs']) chrome.notifications.create(asideHash, {
-										type: "basic",
-										iconUrl: "img/iconapp.png",
-										title: "Soundation Notifications",
-										message: feedAlerts + " new notification" + (parseInt(feedAlerts) > 1 ? "s" : ""),
-										contextMessage: alertString.replace(/\d* new /, "")
-									}, function(notificationId) {hashes.push(asideHash)});
-								}
-								
-								//No Soundation notifs
-								else { /* Do nothing */ }
-								
-								//Watchlist notifs handler
-								if (watchlistAlerts) {
-									alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
-								}
-								
-								//Global notifs handler
-								if (alerts) {
-									//Updage badge
-									crapi.badge({
-										title: alertString,
-										color: "red",
-										text: String(alerts)
-									});
-								}
-								
-								//No global notifs
-								else {
-									alertString = "No new notifications :(";
+									//No global notifs
+									else {
+										alertString = "No new notifications :(";
+										
+										//Update badge
+										crapi.badge({
+											title: alertString,
+											text: ""
+										});
+									}
 									
-									//Update badge
-									crapi.badge({
-										title: alertString,
-										text: ""
-									});
+									return alertString;
 								}
-								
-								return alertString;
-							}
-						});
+							});
+						}
 					}
 				}
 			}
@@ -246,11 +277,8 @@ function check_watchlist(email, update, callback) {
 			});
 			
 			function _complete() {
-				//Trace queued item
-				console.log("Queued item %s", link);
-				
-				//Increment counter
-				++wCt;
+				//Trace queued item and increment counter
+				console.log("Queued item %d of %d: %s", ++wCt, wLen, link);
 				
 				//If last index, run iteration
 				if (wCt == wLen) {
@@ -455,10 +483,6 @@ function check_watchlist(email, update, callback) {
 					}, function(nID){hashes.push(hash)});
 				}
 			});
-			
-			if (wChanged.length) //alert(results);
-			
-			console.debug("final iteration complete!");
 			
 			//End trace group
 			console.groupEnd();

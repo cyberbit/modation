@@ -18,11 +18,17 @@ function ModAPI() {
 	//Begin trace group
 	console.groupCollapsed("ModAPI :: Init");
 	
+	//Begin trace timing
+	console.time("ModAPI init");
+	
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(){};
 	
 	//Trace default callback
 	console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
+	
+	//End trace timing
+	console.timeEnd("ModAPI init");
 	
 	//End trace group
 	console.groupEnd();
@@ -38,6 +44,9 @@ ModAPI.prototype.login = function(callback) {
 	
 	//Begin trace group
 	console.groupCollapsed("ModAPI :: Login");
+	
+	//Begin trace timing
+	console.time("ModAPI login");
 	
 	//Trace callback
 	if (crapi.debug) console.trace("Stack trace");
@@ -59,6 +68,9 @@ ModAPI.prototype.login = function(callback) {
 					//Trace attempt 2
 					console.log("Attempt 2: %O", me);
 					
+					//End trace timing
+					console.timeEnd("ModAPI login");
+					
 					//End trace group
 					console.groupEnd();
 					
@@ -71,6 +83,9 @@ ModAPI.prototype.login = function(callback) {
 		
 		//Attempt 1 succeeded
 		else {
+			//End trace timing
+			console.timeEnd("ModAPI login");
+	
 			//End trace group
 			console.groupEnd();
 			
@@ -82,6 +97,9 @@ ModAPI.prototype.login = function(callback) {
 	function _me(callback) {
 		$.getJSON("http://api.soundation.com/me")
 			.fail(function(jqXHR, textStatus) {
+				//End trace timing
+				console.timeEnd("ModAPI login");
+	
 				//End trace group
 				console.groupEnd();
 				
