@@ -268,6 +268,7 @@ function watchlist_ui() {
 	var title = "Title";
 	var email = $(".email").text();
 	var isWatched = is_watched(link);
+	var isQueued = is_queued(link);
 				
 	//Is track
 	if (isTrack) {
@@ -281,6 +282,10 @@ function watchlist_ui() {
 	
 	if (isWatched) {
 		//alert("you are being watched");
+	}
+	
+	if (isQueued) {
+		//alert("you are queued to isplooooode.");
 	}
 	
 	_generate();
@@ -318,6 +323,11 @@ function watchlist_ui() {
 				//alert("first watch");
 				add_watchlist();
 			});
+		}
+		
+		//Is queued
+		if (isQueued) {
+			delete_queue();
 		}
 	}
 	
@@ -451,6 +461,42 @@ function watchlist_ui() {
 		}
 	}
 	
+	//Remove from queue
+	function delete_queue() {
+		var d = modationStorage;
+		
+		var queue = d[email]['watchlist-queue'];
+		var hasItem = false;
+		
+		$.each(queue, function(i, v) {
+			//Ensure no duplicates will be created
+			if (v['link'] == link) {
+				//Grab watchlist item
+				var watchlistItem = d[email]['watchlist'][v.index];
+				
+				//Iterate properties
+				for (var prop in v.state) watchlistItem[prop] = v.state[prop];
+				
+				//Push updated watchlist back into storage
+				d[email]['watchlist'][v.index] = watchlistItem;
+				
+				//Remove queue item
+				d[email]['watchlist-queue'].splice(i, 1);
+				
+				hasItem = true;
+				return false;
+			}
+			
+			return true;
+		});
+		
+		//Delete watchlist item and update
+		if (hasItem) {
+			console.info("Modation :: Queue cleared!");
+			update_storage(email, d[email]);
+		}
+	}
+	
 	//Add to watchlist old version
 	/*function add_watchlist() {
 		var d = modationStorage;
@@ -536,6 +582,26 @@ function watchlist_ui() {
 		});
 		
 		return isListed;
+	}
+	
+	//Check watchlist queue
+	function is_queued(link) {
+		var d = modationStorage;
+		
+		var queue = d[email]['watchlist-queue'];
+		var isQueued = false;
+		
+		//Iterate watchlist items
+		$.each(queue, function(i, v) {
+			if (v['link'] == link) {
+				isQueued = true;
+				return false;
+			}
+			
+			return true;
+		});
+		
+		return isQueued;
 	}
 }
 
