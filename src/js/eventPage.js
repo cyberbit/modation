@@ -114,7 +114,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 								console.time("Modation watchlist");
 								
 								//Check watchlist
-								check_watchlist(me.email, true, function(data) {
+								check_watchlist(me, true, function(data) {
 									//Re-generate alerts
 									var regenAlerts = _generateAlerts(data);
 									
@@ -239,9 +239,11 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 }*/
 
 //Check watchlist
-function check_watchlist(email, update, callback) {
+function check_watchlist(me, update, callback) {
 	if (typeof update == "undefined") update = true;
 	if (typeof callback == "undefined") callback = function(){};
+	
+	var email = me.email;
 	
 	//Begin trace group
 	console.group("Modation :: Check watchlist");
@@ -318,21 +320,6 @@ function check_watchlist(email, update, callback) {
 				//Grab first comment's action buttons to determine ID
 				var $cActions = $html.find(".comment .actions").children(".flag, .delete").first();
 				
-				//Comments exist
-				if ($cActions.length) {
-					var attr;
-					switch ($cActions.attr("class")) {
-						case "flag":
-							attr = $cActions.attr("onclick");
-							break;
-						case "delete":
-							attr = $cActions.attr("href");
-							break;
-					}
-					
-					if (typeof attr != "undefined") wNewItem['comment'] = attr.match(/(\d+)/g)[0];
-				}
-				
 				//Is track
 				if (isTrack) {
 					wNewItem['title'] = $html.find("#main .title").text();
@@ -346,6 +333,35 @@ function check_watchlist(email, update, callback) {
 					var groupInfo = $html.find("#group-info .info").text();
 					wNewItem['members'] = groupInfo.match(/(\d*) member/)[1];
 					wNewItem['following'] = groupInfo.match(/(\d*) follower/)[1];
+				}
+				
+				//Comments exist
+				if ($cActions.length) {
+					var attr;
+					switch ($cActions.attr("class")) {
+						case "flag":
+							attr = $cActions.attr("onclick");
+							break;
+						case "delete":
+							attr = $cActions.attr("href");
+							break;
+					}
+					
+					if (typeof attr != "undefined") {
+						wNewItem['comment'] = attr.match(/(\d+)/g)[0];
+						
+						//Storage for user links
+						var myLink = "/user/" + me.username;
+						var yourLink = $cActions.parents(".comment").find("h4 a").attr("href");
+						
+						//If self-comment detected, bypass notification queue
+						if (myLink == yourLink) {
+							console.info("Detected self-comment, bypassing queue for " + wNewItem['title']);
+							
+							//Save state directly to watchlist
+							d[email]['watchlist'][i]['comment'] = wNewItem['comment'];
+						}
+					}
 				}
 				
 				//Initialize checker things
