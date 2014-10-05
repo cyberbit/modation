@@ -298,7 +298,7 @@ function parseWatchlist() {
 			console.log(me);
 			
 			//Reset queue display
-			$("#modation-watchlist").find(".modation-watchlist-item, .empty").remove();
+			$("#modation-watchlist").find(".clear-notification, .modation-watchlist-item, .empty").remove();
 			
 			//Storage for queue
 			var queue = d[me.email]['watchlist-queue'];
@@ -340,6 +340,22 @@ function parseWatchlist() {
 					});
 				});
 				
+				//Add Clear All button, if needed
+				if ($("#modation-watchlist .modation-watchlist-item").length > 1) {
+					$("#modation-watchlist .modation-watchlist-header").append(_factory("modation-watchlist-clear-all").click(function() {
+						//Purge queue
+						purge_queue(me.email);
+						
+						//Hide and remove items, then parse watchlist again
+						$("#modation-watchlist .modation-watchlist-item").slideUp(400, function() {
+							$(this).remove();
+							
+							//Only slightly recursive
+							parseWatchlist();
+						});
+					}));
+				}
+				
 				_complete();
 			}
 			
@@ -374,4 +390,51 @@ function clear_queue(email, queueID) {
 			console.log("cleared queue item " + queueID);
 		});
 	});
+}
+
+//Purge entire queue
+function purge_queue(email) {
+	crapi.clone(function(d) {
+		//Iterate queue items
+		$.each(d[email]['watchlist-queue'], function(i, v) {
+			console.log("purgingizing queueueueue");
+			//Grab queue item
+			var queueItem = v;
+			
+			//Grab watchlist item
+			var watchlistItem = d[email]['watchlist'][queueItem.index];
+			
+			//Iterate properties
+			for (var prop in queueItem.state) watchlistItem[prop] = queueItem.state[prop];
+			
+			//Push updated watchlist back into storage
+			d[email]['watchlist'][queueItem.index] = watchlistItem;
+		});
+		
+		//Clear queue
+		d[email]['watchlist-queue'] = [];
+		
+		//Update watchlist
+		crapi.update(email, d[email], function() {
+			console.log("purged all queue items");
+		});
+	});
+}
+
+//Helper function for debugging
+if (crapi.debug) {
+	_wItem = function() {
+		//Reset queue display
+		$("#modation-watchlist").find(".empty").remove();
+		
+		//Add debug item
+		$("#modation-watchlist .wrapper").append(_factory("modation-watchlist-item").addClass("modation-watchlist-item-debug"));
+		
+		//Select added item
+		var $wItem = $("#modation-watchlist .modation-watchlist-item-debug").last();
+		
+		//Load added item
+		$wItem.find(".item-title").html('<a href="#">Debug Item</a>');
+		$wItem.find(".item-body").html('Body, Mind, Soul');
+	}
 }

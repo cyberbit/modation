@@ -113,22 +113,31 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 								//Begin trace timing
 								console.time("Modation watchlist");
 								
-								//Check watchlist
-								check_watchlist(me, true, function(data) {
-									//Re-generate alerts
-									var regenAlerts = _generateAlerts(data);
+								//Grab current user's profile
+								$.get("http://soundation.com/account/profile", function(html) {
+									//Storage for profile link
+									var profileLink = $(html).find(".public-url").text().replace("http://soundation.com", "")
 									
-									//Trace re-generated alerts
-									console.log("Re-generated alerts:", regenAlerts);
+									//Tweak user object to add profile link
+									me.profile = profileLink;
 									
-									//End trace timing
-									console.timeEnd("Modation watchlist");
-									
-									//End trace group
-									console.groupEnd();
-									
-									//Set alarm state
-									alarmRunning = false;
+									//Check watchlist
+									check_watchlist(me, true, function(data) {
+										//Re-generate alerts
+										var regenAlerts = _generateAlerts(data);
+										
+										//Trace re-generated alerts
+										console.log("Re-generated alerts:", regenAlerts);
+										
+										//End trace timing
+										console.timeEnd("Modation watchlist");
+										
+										//End trace group
+										console.groupEnd();
+										
+										//Set alarm state
+										alarmRunning = false;
+									});
 								});
 								
 								function _generateAlerts(data) {
@@ -351,7 +360,7 @@ function check_watchlist(me, update, callback) {
 						wNewItem['comment'] = attr.match(/(\d+)/g)[0];
 						
 						//Storage for user links
-						var myLink = "/user/" + me.username;
+						var myLink = me.profile;
 						var yourLink = $cActions.parents(".comment").find("h4 a").attr("href");
 						
 						//If self-comment detected, bypass notification queue
