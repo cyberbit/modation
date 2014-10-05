@@ -33,6 +33,26 @@ document.addEventListener('DOMContentLoaded', function () {
 	chrome.alarms.create("feed", {delayInMinutes: (modapi.manifest.debug ? 0 : 1), periodInMinutes: 1} );
 });
 
+//Handler for content script messager
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	/*console.log("request: %O", request);
+	console.log("sender: %O", sender);*/
+	
+	//Requested to pause everything
+	if (request.action == "modation-pause-everything") {
+		//Grab all tabs
+		chrome.tabs.query({url: "http://*.soundation.com/*"}, function(tabs) {
+			//Iterate tabs
+			$.each(tabs, function(i, tab) {
+				//Send pause message to tab
+				chrome.tabs.sendMessage(tab.id, {action: "modation-pause", guid: request.guid}, function(response) {
+					//console.log(response);
+				});
+			});
+		});
+	}
+});
+
 /* Handler for feed alarm */
 chrome.alarms.onAlarm.addListener(function(alarm) {
 	var views = chrome.extension.getViews({type: "popup"});

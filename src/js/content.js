@@ -10,16 +10,58 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
-//Initialize stuff without extra configuration
-preinit();
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+    for( var i=0; i < 10; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
+//Unique identifier for instance differentiation
+var guid = makeid();
+	
+//Storage for audio player
+var $player = (typeof player == "undefined" ? $({}) : $(player));
+	
 //Storage for cloned user settings
 var modationStorage = {};
 
-//Clone storage into modationStorage
-clone_storage(function() {
-	init();
-})
+//Wrapper
+$(function() {
+	//Initialize stuff without extra configuration
+	preinit();
+	
+	//Clone storage into modationStorage
+	clone_storage(function() {
+		init();
+	});
+	
+	//Handler for content script messager
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		/*console.log("request: %O", request);
+		console.log("sender: %O", sender);*/
+		
+		//Requested to pause everything
+		if (request.action == "modation-pause") {
+			//Pause requested by another page
+			if (request.guid != guid) {				
+				//Pause player
+				$player.trigger("pause");
+				
+				sendResponse({status: "paused", guid: guid});
+			}
+			
+			//Pause requested by current page
+			else {
+				sendResponse({status: "ignored", guid: guid});
+			}
+		}
+	});
+});
 
 /* ======== HELPERS ======== */
 
@@ -65,7 +107,6 @@ function init() {
 	
 	//Group page
 	if (location.href.match(/\/group\//)) {
-		console.log("groupie");
 		/*var commentActions = $(".comment .actions").children(".flag, .delete");
 		var commentIDs = [];
 		
@@ -116,13 +157,16 @@ function init() {
 	
 	//Track page
 	if (location.href.match(/\/user\/[\w-]*\/track\//)) {
-		console.log("trak");
 		watchlist_ui();
 	}
 	
 	//Player widget
 	if (location.href.match(/\player\//)) {
-		console.log("Player");
+		//Attach play event handler
+		$player.on("play", function() {
+			//Send pause everything message
+			chrome.runtime.sendMessage({action: "modation-pause-everything", guid: guid});
+		});
 	}
 }
 
