@@ -42,6 +42,10 @@
 		"all_frames": true
 	}],
 	
+	"web_accessible_resources": [
+		"content.html"
+	],
+	
 	"options_page": "options.html",
 
 	"short_name": "Modation"

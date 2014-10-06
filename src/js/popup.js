@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	parseNotifs2();
+	parseNotifs();
 	
 	initTabs();
 });
@@ -31,15 +31,11 @@ function initTabs() {
 }
 
 //Better get and parse notificaions-er
-function parseNotifs2() {
+function parseNotifs() {
 	//Grab storage
 	crapi.clone(function(d) {
-		console.log(d);
-		
 		//Login
 		modapi.login(function(me) {
-			console.log(me);
-			
 			var $parse = $("<strong>Unknown error</string>");
 			
 			//User is not logged in
@@ -107,7 +103,7 @@ function parseNotifs2() {
 							if (!$("#modation-notifications div.notifications h3 img").length) {
 								$("#modation-notifications div.notifications h3").append('<img src="img/loading.gif" style="float: right">');
 								$(this).fadeOut();
-								parseNotifs2();
+								parseNotifs();
 							}
 						});
 					}
@@ -120,7 +116,7 @@ function parseNotifs2() {
 							//Show loader
 							if (!$("#modation-notifications div.notifications h3 img").length) {
 								$("#modation-notifications div.notifications h3").append('<img src="img/loading.gif" style="float: right">');
-								parseNotifs2();
+								parseNotifs();
 							}
 						});
 					});
@@ -156,14 +152,11 @@ function parseNotifs2() {
 							
 							//Add others, if needed
 							if (others > 0) alertString += ", plus " + others + " other" + (others > 1 ? "s" : "");
-							
-							//Trace authors
-							console.log(alertString);
 						}
 						
 						//No Soundation notifs
 						else {
-							console.log("modation: no notifs");
+							//console.log("modation: no notifs");
 						}
 						
 						//Watchlist notifs handler
@@ -196,107 +189,13 @@ function parseNotifs2() {
 	});
 }
 
-//Get and parse notifications
-function parseNotifs() {
-	$.get("http://soundation.com/feed", function(html) {
-		//Remove images and form usable object
-		html = html.replace(/(<iframe\b.*?<\/iframe>)|(<img\b[^>]*>)/ig, '');
-		var $aside = $(html).find('aside');
-		$aside.attr("id", "modation-notifications");
-		var $parse = $("<strong>Unknown error</strong>");
-		
-		//Notification box is there
-		if ($aside.length) {
-			$parse = $aside;
-		}
-		
-		//Notification box is not there (potentially redirected)
-		else {
-			//Update badge
-			chrome.browserAction.setTitle({title:"Please login to view notifications"});
-			chrome.browserAction.setBadgeBackgroundColor({color:"#9a9a9a"});
-			chrome.browserAction.setBadgeText({text:"?"});
-			
-			//Form error notification
-			$parse = $(_factory("modation-notifications-login"));
-		}
-		
-		//Show parsed notification box
-		$('#modation-notifications').replaceWith($parse);
-		
-		$('#modation-notifications a').each(function() {
-			var href = $(this).attr('href');
-			$(this).attr('href', 'http://soundation.com' + href);
-			$(this).attr('target', '_blank');
-		});
-		var ct = 0;
-		$('#modation-notifications form[action*=clear_notification]').each(function() {
-			var action = $(this).attr('action');
-			$(this).attr('action', 'http://soundation.com' + action);
-			$(this).attr('target', 'clearcatcher' + ct);
-			$("#content").after('<iframe width="0" height="0" name="clearcatcher' + ct + '" style="display: none"></iframe>');
-			++ct;
-		});
-		if (ct > 1) {
-			$('#modation-notifications div.notifications h3').append('<span class="super clear-notification" id="superclear">Clear All</span>');
-			$('#superclear').click(function() {
-				$('#modation-notifications form[action*=clear_notification]').submit()
-					.parents('div.notifications div').slideUp();
-				if (!$('#modation-notifications div.notifications h3 img').length) {
-					$('#modation-notifications div.notifications h3').append('<img src="img/loading.gif" style="float: right">');
-					$(this).fadeOut();
-					parseNotifs();
-				}
-			});
-		}
-		$('#modation-notifications input.clear-notification').each(function() {
-			$(this).click(function() {
-				$(this).parents('div.notifications div').slideUp();
-				if (!$('#modation-notifications div.notifications h3 img').length) {
-					$('#modation-notifications div.notifications h3').append('<img src="img/loading.gif" style="float: right">');
-					parseNotifs();
-				}
-			});
-		});
-		var sCommunity = $(html).find("a[href='/feed']")[0].innerText;
-		var numAlerts = sCommunity.match(/(\d+)/);
-		if (numAlerts != null) {
-			var iTotal = 0, authors = [];
-			$aside.find('a.author').each(function() {
-				author = $(this).text();
-				if (authors.indexOf(author) == -1) authors.push(author);
-				++iTotal;
-			});
-			var iAuthors = authors.length, iOthers = iAuthors - 3, i = 0, authorString = iTotal + " new from ";
-			for (i = 0; i < 2 && i < (iAuthors - 1); ++i) {
-				authorString += authors[i] + ", ";
-			}
-			authorString += authors[i];
-			if (iOthers > 0) authorString += ", plus " + iOthers + " other" + (iOthers > 1 ? "s" : "");
-			console.log(authorString);
-			//console.log(numAlerts[0]);
-			chrome.browserAction.setTitle({title:authorString});
-			chrome.browserAction.setBadgeBackgroundColor({color:"#d00"});
-			chrome.browserAction.setBadgeText({text:numAlerts[0]});
-		} else {
-			console.log("modation: no notifs");
-			chrome.browserAction.setTitle({title:"No new notifications :("});
-			chrome.browserAction.setBadgeText({text:""})
-		}
-	});
-}
-
 //Get and parse watchlist
 function parseWatchlist() {
 	//Show loader
 	$("#modation-watchlist .loader").show();
 	
-	crapi.clone(function(d) {
-		console.log(d);
-		
-		modapi.login(function(me) {
-			console.log(me);
-			
+	crapi.clone(function(d) {		
+		modapi.login(function(me) {			
 			//Reset queue display
 			$("#modation-watchlist").find(".clear-notification, .modation-watchlist-item, .empty").remove();
 			
@@ -324,9 +223,7 @@ function parseWatchlist() {
 					wItem.find(".item-body").html(q.changes.join(", "));
 					
 					//Initialize clear handler
-					wItem.find(".clear-notification").click(function() {
-						console.log("clearing queue item " + i);
-						
+					wItem.find(".clear-notification").click(function() {						
 						//Clear queue item
 						clear_queue(me.email, i);
 						
@@ -386,9 +283,7 @@ function clear_queue(email, queueID) {
 		d[email]['watchlist-queue'].splice(queueID, 1);
 		
 		//Update watchlist
-		crapi.update(email, d[email], function() {
-			console.log("cleared queue item " + queueID);
-		});
+		crapi.update(email, d[email]);
 	});
 }
 
@@ -397,7 +292,6 @@ function purge_queue(email) {
 	crapi.clone(function(d) {
 		//Iterate queue items
 		$.each(d[email]['watchlist-queue'], function(i, v) {
-			console.log("purgingizing queueueueue");
 			//Grab queue item
 			var queueItem = v;
 			
@@ -415,9 +309,7 @@ function purge_queue(email) {
 		d[email]['watchlist-queue'] = [];
 		
 		//Update watchlist
-		crapi.update(email, d[email], function() {
-			console.log("purged all queue items");
-		});
+		crapi.update(email, d[email]);
 	});
 }
 

@@ -84,10 +84,11 @@
 				<div id="main" class="full-width">
 					<h2>Community</h2>
 					<div class="menu column">
-						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars (Beta)</a>
+						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars</a>
 						<a class="hand" data-menu="menu-group-mods">Group Mods (Beta)</a>
 						<a class="hand" data-menu="menu-player-downloads">Player Downloads</a>
-						<a class="hand" data-menu="menu-watchlist">Watchlist (Beta)</a>
+						<a class="hand" data-menu="menu-watchlist">Watchlist</a>
+						<a class="hand" data-menu="menu-dynamics">Dynamics</a>
 					</div>
 					<div class="menu column last">
 						<p><strong style="color: red">In this pre-release version, all mods (except watchlist) have been disabled due to fixes currently in work. They will be available with version 1.0.</strong></p>
@@ -115,7 +116,22 @@
 							<hr>
 							<div id="watchlist-container">
 							</div>
-							<!-- <button id="check-watchlist" class="nice-button blue">Check Watchlist</button> -->
+						</div>
+						<div id="menu-dynamics">
+							<label class="header">Recent Tracks</label>
+							<p class="field-help">Adds a Recent Tracks link to Community navigation for easy access.</p>
+							<label class="toggle-label">Enable Recent Tracks?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="recent_tracks" class="option toggle nice-button green">
+							<hr />
+							<label class="header">Profile Tips</label>
+							<p class="field-help">Shows user profile information in a tooltip when hovering over their name, similar to SoundCloud.</p>
+							<label class="toggle-label">Enable Profile Tips?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="profile_tips" class="option toggle nice-button green">
+							<hr />
+							<label class="header">Smart Player</label>
+							<p class="field-help">Automatically pauses a currently playing track if another is started.</p>
+							<label class="toggle-label">Enable Smart Player?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="smart_player" class="option toggle nice-button green">
 						</div>
 					</div>
 				</div>

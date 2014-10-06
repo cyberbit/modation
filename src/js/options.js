@@ -9,7 +9,10 @@ var optionDefaults = {
 	desktop_notifs: true,
 	sticky_sidebars: true,
 	group_mods: true,
-	player_downloads: true
+	player_downloads: true,
+	recent_tracks: true,
+	profile_tips: true,
+	smart_player: true
 };
 
 $(function() {
@@ -488,7 +491,8 @@ function restore_options() {
 		if (missing) {
 			console.log("is missing");
 			console.log("setting defaults...");
-			crapi.update(email, d[email], cb);
+			save_options();
+			//crapi.update(email, d[email], cb);
 		} else {
 			console.log("isn't missing");
 			cb();
