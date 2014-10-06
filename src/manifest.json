@@ -31,7 +31,12 @@
 	
 	"content_scripts": [{
 		"matches": ["http://soundation.com/*"],
-		"js": ["js/jquery.all.js", "js/crapi.js", "js/modapi.js", "js/content.js"], //Original source
+		"css": ["css/opentip.css", "css/content.css"],
+		"js": ["js/jquery.all.js",
+			   "js/opentip-jquery.custom.min.js",
+			   "js/crapi.js",
+			   "js/modapi.js",
+			   "js/content.js"], //Original source
 		//"js": ["js/jquery.all.js", "js/api.min.js", "js/content.min.js"], //Compiled source
 		//"run_at": "document_start",
 		"all_frames": true

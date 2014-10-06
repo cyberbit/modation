@@ -67,6 +67,46 @@ $(function() {
 
 //Initialization that is independent of user settings
 function preinit() {
+	//Define Opentip styles
+	Opentip.styles.profileTip = {
+		//Targeting
+		target: true,
+		tipJoint: "left",
+		
+		//Animation
+		hideDelay: .5,
+		
+		//Styles
+		background: "#eee",
+		borderRadius: 3,
+		borderColor: "#ddd",
+		
+		//Ajax
+		ajaxCallback: function(html) {
+			var $html = $(html);
+			var $userInfo = $html.find("#user-info");
+			
+			//Element cleanup
+			$userInfo.find(".report-user").remove();
+			
+			//Set container styles
+			$userInfo.css({
+				width: "350px",
+				margin: 0,
+				border: "none"
+			});
+			
+			//Grab HTML for tip
+			var userInfo = $userInfo[0].outerHTML;
+			
+			//Return formatted data to tip
+			return userInfo;
+		}
+	}
+	
+	//Adjust Opentips z-index
+	Opentip.lastZIndex = 676;
+	
 	//Add recent tracks link
 	if ($("body").hasClass("community")) {
 		$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
@@ -77,6 +117,45 @@ function preinit() {
 		$("nav.wrapper .current").removeClass("current");
 		$(".modation-recent-tracks").addClass("current");
 	}
+	
+	//Add profile hover tips
+	$('a[href*="/user/"]').not('[href*="/track/"], [href*=youtube]').each(function(i, e) {
+		//If an image is inside the link, tooltip the image
+		var $e = $(e);
+		var img = $e.children("img")[0];
+		var link = $(img ? $(img).closest("a") : $e).attr("href");
+		
+		var elem = img || e;
+			
+		//Add tooltips
+		var ot = $(elem).opentip("Just a moment...", {
+			style: "profileTip",
+			ajax: link,
+			ajaxID: link
+		});
+		
+		//Attach content handler
+		/*$.get(link, function(html) {
+			var $html = $(html);
+			var $userInfo = $html.find("#user-info");
+			
+			//Element cleanup
+			$userInfo.find(".report-user").remove();
+			
+			//Set container styles
+			$userInfo.css({
+				width: "350px",
+				margin: 0,
+				border: "none"
+			});
+			
+			//Grab HTML for tip
+			var userInfo = $userInfo[0].outerHTML;
+			
+			//Update opentip content
+			ot.setContent(userInfo);
+		});*/
+	});
 }
 
 function init() {
@@ -655,7 +734,7 @@ function clone_storage(callback) {
 	
 	chrome.storage.local.get(function(d) {
 		modationStorage = d;
-		console.log(modationStorage);
+		//console.log(modationStorage);
 		callback();
 	});
 }
