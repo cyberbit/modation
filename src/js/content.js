@@ -322,7 +322,7 @@ function super_pages(selector, id) {
 function watchlist_ui() {
 	var isGroup = location.href.match(/\/group\//);
 	var isTrack = location.href.match(/\/user\/[\w-]*\/track\//);
-	var link = location.href.replace("http://soundation.com/", '');
+	var link = location.href.replace("http://soundation.com/", '').split("?")[0];
 	var title = "Title";
 	var email = me.email;
 	var isWatched = is_watched(link);
