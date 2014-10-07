@@ -82,7 +82,7 @@ function preinit() {
 		$("body").append(d);
 	});
 	
-	//Define Opentip styles
+	//Profile tips
 	Opentip.styles.profileTip = {
 		//Targeting
 		target: true,
@@ -116,6 +116,43 @@ function preinit() {
 			
 			//Return formatted data to tip
 			return userInfo;
+		}
+	}
+	
+	//Group tips
+	Opentip.styles.groupTip = {
+		//Targeting
+		target: true,
+		tipJoint: "left",
+		
+		//Animation
+		hideDelay: .5,
+		
+		//Styles
+		background: "#eee",
+		borderRadius: 3,
+		borderColor: "#ddd",
+		
+		//Ajax
+		ajaxCallback: function(html) {
+			var $html = $(html);
+			var $groupInfo = $html.find("#group-info");
+			
+			//Element cleanup
+			$groupInfo.find(".join").remove();
+			
+			//Set container styles
+			$groupInfo.css({
+				width: "350px",
+				margin: 0,
+				border: "none"
+			});
+			
+			//Grab HTML for tip
+			var groupInfo = $groupInfo[0].outerHTML;
+			
+			//Return formatted data to tip
+			return groupInfo;
 		}
 	}
 	
@@ -153,6 +190,26 @@ function init() {
 			//Add tooltips
 			var ot = $(elem).opentip("Just a moment...", {
 				style: "profileTip",
+				ajax: link,
+				ajaxID: link
+			});
+		});
+	}
+	
+	//Group Tips
+	if (storage[me.email]["group_tips"]) {
+		//Add group hover tips
+		$('a[href*="/group/"]').not('[href*="/tracks"], [href*="/members"], [href*="?page="]').each(function(i, e) {
+			//If an image is inside the link, tooltip the image
+			var $e = $(e);
+			var img = $e.children("img")[0];
+			var link = $(img ? $(img).closest("a") : $e).attr("href");
+			
+			var elem = img || e;
+				
+			//Add tooltips
+			var ot = $(elem).opentip("Just a moment...", {
+				style: "groupTip",
 				ajax: link,
 				ajaxID: link
 			});

@@ -12,6 +12,7 @@ var optionDefaults = {
 	player_downloads: true,
 	recent_tracks: true,
 	profile_tips: true,
+	group_tips: true,
 	smart_player: true
 };
 
