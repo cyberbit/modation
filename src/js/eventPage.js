@@ -116,10 +116,25 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 								
 								var $html = $(html);
 								var $aside = $html.find('aside');
-								var asideHTML = $aside[0].outerHTML;
-								var asideHash = String(asideHTML.hashCode());
-								var feedLink = $html.find("a[href='/feed']")[0].innerText;
-								var feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+								var asideHash = "";
+								var feedAlerts = 0;
+								
+								//Parse feed
+								if ($aside.length) {
+									//Hash notifications for Chrome popup
+									var asideHTML = $aside[0].outerHTML;
+									asideHash = String(asideHTML.hashCode());
+									
+									//Grab number of feed notifications
+									var feedLink = $html.find("a[href='/feed']")[0].innerText;
+									feedAlerts = parseInt(feedLink.match(/(\d+)/)) || 0;
+								}
+								
+								//Unable to parse feed
+								else {
+									//Log failure
+									console.warn("Unable to parse feed notifications, continuing to watchlist");
+								}
 								
 								//Generate initial alerts
 								var initialAlerts = _generateAlerts(d[me.email]);
@@ -360,8 +375,17 @@ function check_watchlist(me, update, callback) {
 				else if (isGroup) {
 					wNewItem['title'] = $html.find("#group-info h2").html();
 					var groupInfo = $html.find("#group-info .info").text();
-					wNewItem['members'] = groupInfo.match(/(\d*) member/)[1];
-					wNewItem['following'] = groupInfo.match(/(\d*) follower/)[1];
+					
+					//Catch network errors (issue #31)
+					if (groupInfo) {
+						wNewItem['members'] = groupInfo.match(/(\d*) member/)[1];
+						wNewItem['following'] = groupInfo.match(/(\d*) follower/)[1];
+					}
+					
+					else {
+						//Log failure
+						console.warn("Network change detected, skipping group parse");
+					}
 				}
 				
 				//Comments exist
