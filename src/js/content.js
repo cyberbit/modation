@@ -137,22 +137,38 @@ function preinit() {
 		ajaxCallback: function(html) {
 			var $html = $(html);
 			var $groupInfo = $html.find("#group-info");
+			var content = "";
 			
-			//Element cleanup
-			$groupInfo.find(".join").remove();
+			//Parse group info
+			if ($groupInfo.length) {
+				//Element cleanup
+				$groupInfo.find(".join").remove();
+				
+				//Set container styles
+				$groupInfo.css({
+					width: "350px",
+					margin: 0,
+					border: "none"
+				});
+				
+				content = $groupInfo[0].outerHTML;
+			}
 			
-			//Set container styles
-			$groupInfo.css({
-				width: "350px",
-				margin: 0,
-				border: "none"
-			});
-			
-			//Grab HTML for tip
-			var groupInfo = $groupInfo[0].outerHTML;
+			//Unable to grab info
+			else {
+				var $main = $html.find("#main");
+				
+				//Catches unknown errors
+				content = "An unknown error occurred!";
+				
+				//Catches private groups
+				if ($main.find(".empty").text().toLowerCase().indexOf("private") != "-1") {
+					content = $main.find(".empty")[0].outerHTML;
+				}
+			}
 			
 			//Return formatted data to tip
-			return groupInfo;
+			return content;
 		}
 	}
 	
