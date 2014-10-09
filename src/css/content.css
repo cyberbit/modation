@@ -1,3 +1,82 @@
+/* Profile/Group Tips */
 .opentip-container {
     max-width: 1000px;
+}
+
+/* Player Downloads */
+#title-bar #downloads {
+    display: none;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAABmJLR0QAJAAkACTORThWAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gQHEDcJeUryZgAAAFtJREFUGNONjjEKwDAMA002TZ3yA/n1/pb8DndJg6Gh9MaTEDJbkGQ1SPLJhv1grJV5CrcnOesDknOYmWVmnpaWv/ZpSeoLktTP72JERFVVRMSr8AAA7u4A0P0NFStRvu/GlrMAAAAASUVORK5CYII=") no-repeat 13px 6px;
+    float: right;
+    padding: 0 0 0 28px;
+    color: white;
+    height: 19px;
+}
+
+#circleG {
+    position: relative;
+    top: 8px;
+    width: 10.5px;
+}
+
+.circleG {
+    background-color: #FFF;
+    float: left;
+    height: 2px;
+    margin-left: 1px;
+    width: 2px;
+    -webkit-animation-name: bounce_circleG;
+    -webkit-animation-duration:1.5s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-direction: linear;
+    -webkit-border-radius: 1px;
+}
+
+#circleG_1 { -webkit-animation-delay: .3s }
+#circleG_2 { -webkit-animation-delay: .7s }
+#circleG_3 { -webkit-animation-delay: .9s }
+
+@-webkit-keyframes bounce_circleG {
+    50% { background-color: #262627 }
+}
+
+/* Group Mods */
+.modation-group-mods {
+    display: none;
+    padding: 8px;
+    background: #e5f3d6;
+    border: 1px solid #709343;
+    border-radius: 2px;
+}
+
+div.row.group.minified {
+    padding: 4px;
+}
+
+div.img.minified,
+div.img.minified img {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+div.info.minified {
+    min-height: 20px !important;
+    margin-left: 24px !important;
+}
+
+p.last-activity.minified {
+    float: right;
+    display: inline;
+}
+
+p.last-activity.minified:before {
+    content: "(";
+}
+
+p.last-activity.minified:after {
+    content: ")";
+}
+
+div.admin.minified a {
+    margin-top: -2px !important;
 }

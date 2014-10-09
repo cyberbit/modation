@@ -10,12 +10,12 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
-function makeid()
-{
+//Generate unique string ID (via http://stackoverflow.com/a/1349426)
+function makeid() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for( var i=0; i < 10; i++ )
+    for (var i = 0; i < 10; i++)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
@@ -221,7 +221,8 @@ function init() {
 	
 	//Initialize group mods
 	if (storage[me.email]["group_mods"] && $("div#main:has(.group)").length) {
-		addJQuery(group_mods);
+		//addJQuery(group_mods);
+		group_mods();
 	}
 	
 	//Initialize player downloads
@@ -254,49 +255,6 @@ function _factory(key) {
 	return $(".modation-factory ." + key).clone();
 }
 
-//suggestion by @kennebec: http://stackoverflow.com/a/3620258/3402854
-function addCode(parent, code) {
-	var doc = parent[0]; //Get document from jQuery selector
-    var JS = doc.createElement('script');
-    JS.text = code;
-    doc.body.appendChild(JS);
-}
-
-function addLinkedCode(parent, src) {
-	var head = parent.find("head");
-	head.append("<script src='" + src + "'></script>");
-}
-
-function addCSS(parent, css, id) {
-	var noID = false;
-	if (typeof id == "undefined") noID = true;
-	var head = parent.find("head");
-	if (!noID && parent.find('style#' + id).length) return false;
-	head.append("<style " + (noID ? "" : "id='" + id + "'") + ">" + css + "</style>");
-	return true;
-}
-
-function addJQuery(callback) {
-    var includeFunctions = [toggleOldGroups, toggleOnlyAdminGroups, resetModLinks, minifyGroups];
-    var script = document.createElement("script");
-    script.setAttribute("src", "http://code.jquery.com/jquery-1.10.2.min.js");
-    script.addEventListener('load', function () {
-        var script = document.createElement("script");
-        var sIncludeFunctions = "";
-        includeFunctions.forEach(function (f) {
-            sIncludeFunctions += f.toString();
-        });
-        script.textContent = "window.jQ=jQuery.noConflict(true);(" + callback.toString() + ")();" + sIncludeFunctions;
-        document.body.appendChild(script);
-    }, false);
-    document.body.appendChild(script);
-}
-
-function getEmailHash() {
-	var email = $(".email").text();
-	return email.hashCode();
-}
-
 /* ======== COMMUNITY MODS ======== */
 
 /* Sticky Sidebars */
@@ -306,13 +264,103 @@ function sticky_sidebars() {
 
 /* Group Mods */
 function group_mods() {
-    var minifiedStyles = "div.row.group.minified { padding: 4px; } div.img.minified, div.img.minified img { width: 20px !important; height: 20px !important; } div.info.minified { min-height: 20px !important; margin-left: 24px !important; } p.last-activity.minified { float: right; display: inline; } p.last-activity.minified:before { content: \"(\"; } p.last-activity.minified:after { content: \")\"; } div.admin.minified a { margin-top: -2px !important; }";
-    var style = document.createElement("style");
-    style.textContent = minifiedStyles;
-    style.setAttribute("type", "text/css");
-    document.head.appendChild(style);
-    $("div#main h2").after("<div id=\"groupmods\" style=\"display: none; padding: 8px; background: #e5f3d6; border: 1px solid #709343; border-radius: 2px\">cyberbit's Group Mods: <p><a id=\"oldgroups\" href=\"javascript:;\" onclick=\"toggleOldGroups(0, this)\">Hide Old Groups</a> | <a id=\"admingroups\"href=\"javascript:;\" onclick=\"toggleOnlyAdminGroups(0, this)\">Show Only Admin Groups</a> | <a id=\"minifygroups\"href=\"javascript:;\" onclick=\"minifyGroups(1, this)\">Minify Groups</a></p></div>");
-	$("div#groupmods").fadeIn(2000);
+    $("div#main h2").after(_factory("modation-group-mods"));
+	$(".modation-group-mods").fadeIn(2000);
+	
+	var $groupMods = $(".modation-group-mods");
+	
+	//Toggle old groups
+	$groupMods.find(".old-groups").on("click", function() {
+		toggleOldGroups(0, this);
+	});
+	
+	//Toggle admin groups
+	$groupMods.find(".admin-groups").on("click", function() {
+		toggleOnlyAdminGroups(0, this);
+	});
+	
+	//Minify groups
+	$groupMods.find(".minify-groups").on("click", function() {
+		minifyGroups(1, this);
+	});
+
+	/* Group Mods - Toggle old groups */
+	function toggleOldGroups(iToggle, oFrom) {
+		resetModLinks(1, iToggle, oFrom);
+		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
+			elem = $(this).find("p.last-activity")[0];
+			if ((typeof elem === 'undefined' || elem.innerHTML.indexOf("year") >= 0 || elem.innerHTML.indexOf("month") >= 0 || elem.innerHTML.search("([5-9]|[123]\\d) days") >= 0) && !($(this).find("div.admin").length > 0)) {
+				node = $(this);
+				(iToggle ? node.slideDown(600) : node.slideUp(600));
+			} else {
+				node = $(this);
+				node.slideDown(600);
+			}
+		});
+		resetModLinks(2, 1, oFrom);
+	}
+	
+	/* Group Mods - Toggle only admin groups */
+	function toggleOnlyAdminGroups(iToggle, oFrom) {
+		resetModLinks(2, iToggle, oFrom);
+		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
+			if ($(this).find("div.admin").length === 0) {
+				node = $(this);
+				
+				if (iToggle) node.slideDown(600);
+				else node.slideUp(600);
+			}
+		});
+		if (iToggle) resetModLinks(1, iToggle, oFrom);
+	}
+	
+	/* Group Mods - Reset mod links */
+	function resetModLinks(iMode, iToggle, oFrom) {
+		//alert(iMode + " " + iToggle);
+		switch (iMode) {
+			case 0: //All links reset
+				//Reset old groups link
+				$(oFrom).closest(".old-groups").off("click").on("click", function() {
+					toggleOldGroups(iToggle ? 0 : 1, this);
+				}).html((iToggle ? "Hide" : "Show") + " Old Groups");
+				
+				//Reset admin groups link
+				$(oFrom).closest(".admin-groups").off("click").on("click", function() {
+					toggleOnlyAdminGroups(iToggle ? 0 : 1, this);
+				}).html((iToggle ? "Show Only Admin" : "Show All") + " Groups");
+				break;
+			case 1: //Old groups link reset
+				$(oFrom).closest(".old-groups").off("click").on("click", function() {
+					toggleOldGroups(iToggle ? 0 : 1, this);
+				}).html((iToggle ? "Hide" : "Show") + " Old Groups");
+				break;
+			case 2: //Admin groups link reset
+				$(oFrom).closest(".admin-groups").off("click").on("click", function() {
+					toggleOnlyAdminGroups(iToggle ? 0 : 1, this);
+				}).html((iToggle ? "Show Only Admin" : "Show All") + " Groups");
+				break;
+		}
+	}
+	
+	/* Group Mods - Minify groups */
+	function minifyGroups(iToggle, oFrom) {
+		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
+			isAdmin = $(this).find("div.admin").length > 0;
+			img = $(this).find("div.img")[0].outerHTML;
+			link = $(this).find("a.name")[0].outerHTML;
+			vLastActivity = $(this).find("p.last-activity");
+			lastActivity = (vLastActivity.length > 0 ? vLastActivity[0].outerHTML.replace("Last activity ", "").replace(" ago", "") : '');
+			minifiedContent = img + "<div class=\"info\">" + link + (isAdmin ? "<span id=\"spacer\" style=\"width: 80px; height: 20px; float:right;\"></span>" : "") + lastActivity;
+			if (isAdmin) {
+				adminButton = $(this).find("div.admin a")[0].outerHTML;
+				$(this).find("div.admin").html(adminButton);
+				admin = $(this).find("div.admin")[0].outerHTML;
+				minifiedContent += admin + "</div>";
+			}
+			$(this).html(minifiedContent);
+		});
+		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().find("div.row.group, div.img, div.info, p.last-activity, div.admin").addClass("minified");
+	}
 }
 
 /* Player Downloads */
@@ -320,8 +368,8 @@ function group_mods() {
 function player_downloads() {
 	$('iframe[src*="/player/"]').each(function() {
 		var playerFrame = $(this).contents();
-		addCSS(playerFrame, '#title-bar #downloads { display: none; background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAABmJLR0QAJAAkACTORThWAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gQHEDcJeUryZgAAAFtJREFUGNONjjEKwDAMA002TZ3yA/n1/pb8DndJg6Gh9MaTEDJbkGQ1SPLJhv1grJV5CrcnOesDknOYmWVmnpaWv/ZpSeoLktTP72JERFVVRMSr8AAA7u4A0P0NFStRvu/GlrMAAAAASUVORK5CYII=") no-repeat 13px 6px; float: right; padding: 0 0 0 28px; color: white; height: 19px;}');
-		addCSS(playerFrame, "#circleG{position:relative;top:8px;width:10.5px}.circleG{background-color:#FFF;float:left;height:2px;margin-left:1px;width:2px;-webkit-animation-name:bounce_circleG;-webkit-animation-duration:1.5s;-webkit-animation-iteration-count:infinite;-webkit-animation-direction:linear;-webkit-border-radius:1px}#circleG_1{-webkit-animation-delay:.3s}#circleG_2{-webkit-animation-delay:.7s}#circleG_3{-webkit-animation-delay:.9s}@-webkit-keyframes bounce_circleG{50%{background-color:#262627}}");
+		//addCSS(playerFrame, '#title-bar #downloads { display: none; background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAABmJLR0QAJAAkACTORThWAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gQHEDcJeUryZgAAAFtJREFUGNONjjEKwDAMA002TZ3yA/n1/pb8DndJg6Gh9MaTEDJbkGQ1SPLJhv1grJV5CrcnOesDknOYmWVmnpaWv/ZpSeoLktTP72JERFVVRMSr8AAA7u4A0P0NFStRvu/GlrMAAAAASUVORK5CYII=") no-repeat 13px 6px; float: right; padding: 0 0 0 28px; color: white; height: 19px;}');
+		//addCSS(playerFrame, "#circleG{position:relative;top:8px;width:10.5px}.circleG{background-color:#FFF;float:left;height:2px;margin-left:1px;width:2px;-webkit-animation-name:bounce_circleG;-webkit-animation-duration:1.5s;-webkit-animation-iteration-count:infinite;-webkit-animation-direction:linear;-webkit-border-radius:1px}#circleG_1{-webkit-animation-delay:.3s}#circleG_2{-webkit-animation-delay:.7s}#circleG_3{-webkit-animation-delay:.9s}@-webkit-keyframes bounce_circleG{50%{background-color:#262627}}");
 		playerFrame.find("span#likes").before('<span id="downloads"><div id="circleG"><div id="circleG_1" class="circleG"></div><div id="circleG_2" class="circleG"></div><div id="circleG_3" class="circleG"></div></div></span>');
 		playerFrame.find("span#downloads").fadeIn(500);
 		var trackPage = playerFrame.find("a").attr("href");
@@ -493,7 +541,7 @@ function watchlist_ui() {
 			//Reapply handlers
 			_handle(true);
 			
-			update_storage(email, d[email]);
+			crapi.update(email, d[email]);
 		}
 	}
 	
@@ -520,7 +568,7 @@ function watchlist_ui() {
 			//Reapply handlers
 			_handle(false);
 			
-			update_storage(email, d[email]);
+			crapi.update(email, d[email]);
 		}
 	}
 	
@@ -556,7 +604,7 @@ function watchlist_ui() {
 		//Delete watchlist item and update
 		if (hasItem) {
 			console.info("Modation :: Queue cleared!");
-			update_storage(email, d[email]);
+			crapi.update(email, d[email]);
 		}
 	}
 	
@@ -599,89 +647,4 @@ function watchlist_ui() {
 		
 		return isQueued;
 	}
-}
-
-//Get local storage copy
-function clone_storage(callback) {
-	if (typeof callback == "undefined") callback = function(){};
-	
-	chrome.storage.local.get(function(d) {
-		storage = d;
-		//console.log(storage);
-		callback();
-	});
-}
-
-//Update storage for provided key
-function update_storage(key, value) {
-	var updatedStorage = {};
-	updatedStorage[key] = value;
-	
-	//Update storage
-	chrome.storage.local.set(updatedStorage, clone_storage);
-}
-
-/* Group Mods - Toggle old groups */
-function toggleOldGroups(iToggle, oFrom) {
-    resetModLinks(1, iToggle, oFrom);
-    jQ(oFrom).parents("#groupmods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
-        elem = jQ(this).find("p.last-activity")[0];
-        if ((typeof elem === 'undefined' || elem.innerHTML.indexOf("year") >= 0 || elem.innerHTML.indexOf("month") >= 0 || elem.innerHTML.search("([5-9]|[123]\\d) days") >= 0) && !(jQ(this).find("div.admin").length > 0)) {
-            node = jQ(this);
-            (iToggle ? node.slideDown(600) : node.slideUp(600));
-        } else {
-            node = jQ(this);
-            node.slideDown(600);
-        }
-    });
-    resetModLinks(2, 1, oFrom);
-}
-
-/* Group Mods - Toggle only admin groups */
-function toggleOnlyAdminGroups(iToggle, oFrom) {
-    resetModLinks(2, iToggle, oFrom);
-    jQ(oFrom).parents("#groupmods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
-        if (jQ(this).find("div.admin").length === 0) {
-            node = jQ(this);
-            (iToggle ? node.slideDown(600) : node.slideUp(600));
-        }
-    });
-    (iToggle ? resetModLinks(1, iToggle, oFrom) : null);
-}
-
-/* Group Mods - Reset mod links */
-function resetModLinks(iMode, iToggle, oFrom) {
-	//alert(iMode + " " + iToggle);
-    switch (iMode) {
-        case 0: //All links reset
-            jQ(oFrom).closest("a#oldgroups").attr("onclick", "toggleOldGroups(" + (iToggle ? "0" : "1") + ", this)").html((iToggle ? "Hide" : "Show") + " Old Groups");
-            jQ(oFrom).closest("a#admingroups").attr("onclick", "toggleOnlyAdminGroups(" + (iToggle ? "0" : "1") + ", this)").html((iToggle ? "Show Only Admin" : "Show All") + " Groups");
-            break;
-        case 1: //Old groups link reset
-            jQ(oFrom).closest("a#oldgroups").attr("onclick", "toggleOldGroups(" + (iToggle ? "0" : "1") + ", this)").html((iToggle ? "Hide" : "Show") + " Old Groups");
-            break;
-        case 2: //Admin groups link reset
-            jQ(oFrom).closest("a#admingroups").attr("onclick", "toggleOnlyAdminGroups(" + (iToggle ? "0" : "1") + ", this)").html((iToggle ? "Show Only Admin" : "Show All") + " Groups");
-            break;
-    }
-}
-
-/* Group Mods - Minify groups */
-function minifyGroups(iToggle, oFrom) {
-    jQ(oFrom).parents("#groupmods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
-        isAdmin = jQ(this).find("div.admin").length > 0;
-        img = jQ(this).find("div.img")[0].outerHTML;
-        link = jQ(this).find("a.name")[0].outerHTML;
-        vLastActivity = jQ(this).find("p.last-activity");
-        lastActivity = (vLastActivity.length > 0 ? vLastActivity[0].outerHTML.replace("Last activity ", "").replace(" ago", "") : '');
-        minifiedContent = img + "<div class=\"info\">" + link + (isAdmin ? "<span id=\"spacer\" style=\"width: 80px; height: 20px; float:right;\"></span>" : "") + lastActivity;
-        if (isAdmin) {
-            adminButton = jQ(this).find("div.admin a")[0].outerHTML;
-            jQ(this).find("div.admin").html(adminButton);
-            admin = jQ(this).find("div.admin")[0].outerHTML;
-            minifiedContent += admin + "</div>";
-        }
-        jQ(this).html(minifiedContent);
-    });
-    jQ(oFrom).parents("#groupmods").nextAll('.list-container').first().find("div.row.group, div.img, div.info, p.last-activity, div.admin").addClass("minified");
 }
