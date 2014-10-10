@@ -5,11 +5,16 @@
 		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css">
 		<link href="http://assets.soundation.com/assets/account.css" media="screen" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-		<link href="css/options.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="css/options.min.css" media="screen" rel="stylesheet" type="text/css">
 		<title>Modation Settings</title>
 		<script src="js/jquery.all.js"></script>
+		<!-- Original source --><!--
 		<script src="js/crapi.js"></script>
-		<script src="js/options.js"></script>
+		<script src="js/modapi.js"></script>
+		<script src="js/options.js"></script>-->
+		<!-- Compiled source -->
+		<script src="js/api.min.js"></script>
+		<script src="js/options.min.js"></script>
 	</head>
 	<body class="account edit_account">
 		<header>
@@ -79,11 +84,11 @@
 				<div id="main" class="full-width">
 					<h2>Community</h2>
 					<div class="menu column">
-						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars (Beta)</a>
+						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars</a>
 						<a class="hand" data-menu="menu-group-mods">Group Mods (Beta)</a>
 						<a class="hand" data-menu="menu-player-downloads">Player Downloads</a>
-						<!-- <a class="hand" data-menu="menu-super-pages">Super Pages (Beta)</a> -->
-						<a class="hand" data-menu="menu-watchlist">Watchlist (Beta)</a>
+						<a class="hand" data-menu="menu-watchlist">Watchlist</a>
+						<a class="hand" data-menu="menu-dynamics">Dynamics</a>
 					</div>
 					<div class="menu column last">
 						<div id="menu-sticky-sidebars" class="current">
@@ -104,71 +109,38 @@
 							<label class="toggle-label">Enable Player Downloads?</label>&nbsp;&nbsp;
 							<input type="checkbox" id="player_downloads" class="option toggle nice-button green">
 						</div>
-						<!-- Removed for now due to buggyness -->
-						<!-- <div id="menu-super-pages">
-							<label class="header">Super Pages (Beta)</label>
-							<p class="field-help">Modifies page navigation on track comments, group lists, messages, etc. to be dynamic (stays on the same page rather than jumping from page to page; significantly faster load times than before) </p>
-							<label class="toggle-label">Enable Super Pages?</label>&nbsp;&nbsp;
-							<input type="radio" name="super_pages_global" id="super_pages_global_on" class="toggle nice-button green" value="on">
-							<input type="radio" name="super_pages_global" id="super_pages_global_off" class="toggle nice-button red" value="off">
-							<blockquote>
-								<input type="radio" name="super_pages_track_comments" id="super_pages_track_comments_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_track_comments" id="super_pages_track_comments_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Track Comments</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_account_tracks" id="super_pages_account_tracks_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_account_tracks" id="super_pages_account_tracks_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Account Tracks List</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_product_list" id="super_pages_product_list_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_product_list" id="super_pages_product_list_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Product List</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_feed" id="super_pages_feed_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_feed" id="super_pages_feed_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Feed</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_tracks" id="super_pages_tracks_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_tracks" id="super_pages_tracks_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Tracks</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_groups" id="super_pages_groups_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_groups" id="super_pages_groups_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Groups</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_user_tracks" id="super_pages_user_tracks_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_user_tracks" id="super_pages_user_tracks_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">User Tracks</label>&nbsp;&nbsp;<br>
-								<input type="radio" name="super_pages_group_comments" id="super_pages_group_comments_on" class="toggle nano nice-button green" value="on">
-								<input type="radio" name="super_pages_group_comments" id="super_pages_group_comments_off" class="toggle nano nice-button red" value="off">
-								<label class="toggle-label">Group Comments</label>&nbsp;&nbsp;<br>
-							</blockquote>
-						</div> -->
 						<div id="menu-watchlist">
 							<label class="header">Watchlist (Beta)</label>
 							<p class="field-help">Monitors changes in groups and tracks for added comments.</p>
 							<hr>
 							<div id="watchlist-container">
 							</div>
-							<button id="check-watchlist" class="nice-button blue">Check Watchlist</button>
+						</div>
+						<div id="menu-dynamics">
+							<label class="header">Recent Tracks</label>
+							<p class="field-help">Adds a Recent Tracks link to Community navigation for easy access.</p>
+							<label class="toggle-label">Enable Recent Tracks?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="recent_tracks" class="option toggle nice-button green">
+							<hr />
+							<label class="header">Profile Tips</label>
+							<p class="field-help">Shows user profile information in a tooltip when hovering over their name, similar to SoundCloud.</p>
+							<label class="toggle-label">Enable Profile Tips?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="profile_tips" class="option toggle nice-button green">
+							<hr />
+							<label class="header">Group Tips</label>
+							<p class="field-help">Shows group information in a tooltip when hovering over its name.</p>
+							<label class="toggle-label">Enable Group Tips?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="group_tips" class="option toggle nice-button green">
+							<hr />
+							<label class="header">Smart Player</label>
+							<p class="field-help">Automatically pauses a currently playing track if another is started.</p>
+							<label class="toggle-label">Enable Smart Player?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="smart_player" class="option toggle nice-button green">
 						</div>
 					</div>
 				</div>
 				<br style="clear:both">
 			</div>
-			<!-- old community tab
-			<div class="main-wrapper" id="tab-community">
-				<div id="main" class="full-width">
-					<h2>Community</h2>
-					<div class="column">
-						/* Content used to be here!!! */
-					</div>
-					<div class="column last">
-						<p>&nbsp;</p>
-						<p>&nbsp;</p>
-						<p>Various mods to enhance the Soundation community experience.</p>
-						<p>Note that all of these are still in beta; there may be bugs or things that just don't work right. Please report these to improve functionality in the future!</p>
-						<p>&nbsp;</p>
-						<p>&nbsp;</p>
-					</div>
-				</div>
-				<br style="clear:both">
-			</div>
-			-->
 			<div class="main-wrapper" id="tab-tracks">
 				<div id="main" class="tracks">
 					<h2>Tracks</h2>
@@ -196,7 +168,7 @@
 					</p>
 					<hr />
 					<h2>Readme</h2>
-					<p>Read the readme <a href="https://github.com/cyberbit/modation/blob/v0.5.1/README.md" target="_blank">here</a>.</p>
+					<p>Read the readme <a href="https://github.com/cyberbit/modation/blob/v1.0/README.md" target="_blank">here</a>.</p>
 					<hr />
 					<h2>Changelog</h2>
 					<p>Futher release information can be found on the <a href="https://github.com/cyberbit/modation/releases" target="_blank">GitHub</a> page.</p>
