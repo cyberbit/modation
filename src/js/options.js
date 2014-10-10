@@ -39,14 +39,12 @@ $(function() {
 function initOptions() {
 	$("#check-login").click(login);
 	$(".option").change(save_options);
-	console.debug("options initialized");
 }
 
 //Initialize track manager
 function initTracks() {
 	$("#track-filter").hide();
 	$("#download-tracks").click(getTracks);
-	console.debug("track manager initialized");
 }
 
 //Initialize watchlist
@@ -55,7 +53,6 @@ function initWatchlist() {
 		$("#watchlist-container .wItem").addClass("load");
 		check_watchlist(true, refresh_watchlist);
 	});
-	console.debug("watchlist initialized");
 }
 
 //Initialize pages
@@ -73,7 +70,6 @@ function initPages() {
 			}
 		});
 	});
-	console.debug("pages initialized");
 }
 
 //Get a factory item
@@ -434,7 +430,6 @@ function progress(tab, val) {
 
 function status(msg) {
 	msg = (typeof msg == "undefined" ? "Something happened." : msg);
-	console.log('status');
 	showNotificationBar(msg, 1300, "#15842f", "white");
 }
 
@@ -454,9 +449,6 @@ function restore_options() {
 			d[email] = {};
 		}
 		
-		//Trace storage
-		console.log(d);
-		
 		//Storage for options
 		var options = $(".option");
 		
@@ -471,8 +463,6 @@ function restore_options() {
 		//Iterate through options
 		options.each(function() {
 			var id = $(this).attr("id");
-			
-			console.log("i am option " + id);
 			
 			//Add unsaved options to storage
 			if (!(id in d[email])) {
@@ -490,12 +480,10 @@ function restore_options() {
 		
 		//Set defaults, if needed
 		if (missing) {
-			console.log("is missing");
-			console.log("setting defaults...");
+			console.info("Some settings missing, setting defaults...");
 			save_options();
-			//crapi.update(email, d[email], cb);
+			crapi.update(email, d[email], cb);
 		} else {
-			console.log("isn't missing");
 			cb();
 		}
 	});

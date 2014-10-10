@@ -459,13 +459,13 @@ function watchlist_ui() {
 		title = $("#group-info h2").html();
 	}
 	
-	if (isWatched) {
+	/*if (isWatched) {
 		//alert("you are being watched");
 	}
 	
 	if (isQueued) {
 		//alert("you are queued to isplooooode.");
-	}
+	}*/
 	
 	_generate();
 	
