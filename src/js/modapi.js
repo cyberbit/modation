@@ -1,4 +1,4 @@
-/**
+/*!
  * ModAPI (Modation API)
  *
  * @author cyberbit (D.J. Marcolesco) dj.marcolesco@outlook.com
