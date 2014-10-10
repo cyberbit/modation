@@ -1,7 +1,9 @@
 {
 	"manifest_version": 2,
-	"name": "Modation Dev",
-	"version": "0.5.2",
+	"name": "Modation",
+	"version": "1.0",
+	//"version_suffix": "beta",
+	//"debug": true,
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/icon16.png",
@@ -11,7 +13,7 @@
 
 	"author": "cyberbit",
 	"permissions": [
-		"http://soundation.com/*",
+		"http://*.soundation.com/*",
 		"alarms",
 		"notifications",
 		"storage"
@@ -29,8 +31,21 @@
 	
 	"content_scripts": [{
 		"matches": ["http://soundation.com/*"],
-		"js": ["js/jquery.all.js", "js/content.js"]
+		//"css": ["css/opentip.css", "css/content.css"], //Original source
+		"css": ["css/opentip.min.css", "css/content.min.css"], //Compiled source
+		/*"js": ["js/jquery.all.js",
+			   "js/opentip-jquery.custom.min.js",
+			   "js/crapi.js",
+			   "js/modapi.js",
+			   "js/content.js"],*/ //Original source
+		"js": ["js/jquery.all.js", "js/opentip-jquery.custom.min.js", "js/api.min.js", "js/content.min.js"], //Compiled source
+		//"run_at": "document_start",
+		"all_frames": true
 	}],
+	
+	"web_accessible_resources": [
+		"content.html"
+	],
 	
 	"options_page": "options.html",
 

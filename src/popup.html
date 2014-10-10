@@ -2,15 +2,27 @@
 <html>
 	<head>
 		<title>Modation Notifs</title>
-		<link href="http://assets.soundation.com/assets/reset.css" media="screen" rel="stylesheet" type="text/css">
-		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css">
-		<link href="http://assets.soundation.com/assets/community.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="http://assets.soundation.com/assets/reset.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="http://assets.soundation.com/assets/community.css" media="screen" rel="stylesheet" type="text/css" />
 		<script src="js/jquery.all.js"></script>
-		<script src="js/popup.js"></script>
+		<!-- Original souce --><!--
+		<script src="js/crapi.js"></script>
+		<script src="js/modapi.js"></script>
+		<script src="js/popup.js"></script>-->
+		<!-- Compiled source -->
+		<script src="js/api.min.js"></script>
+		<script src="js/popup.min.js"></script>
 		<style>
 			body { background: #f5f5f5; }
+			.hand { cursor: pointer; }
+			nav { background: #eee; border-bottom: solid 1px #ddd; padding: .3em .5em; }
+			nav li { display: inline-block; }
+			nav a { display: inline-block; padding: .15em .5em; border-radius: 4px; }
+			nav a:hover { text-decoration: none; }
+			nav a.active { background: #C52F24; color: white; }
 			aside { float: none; margin: 0px; }
-			#modation-watchlist { display: none; }
+			aside .wrap { width: 190px; }
 			.factory { display: none; }
 			.community .main-wrapper { width: auto; min-height: 0; background: #f5f5f5; padding: 8px; }
 			#content { width: auto; min-height: 0; border-bottom: none; }
@@ -19,22 +31,32 @@
 	</head>
 	<body class="community feed show">
 		<div id="content">
+			<nav id="modation-nav">
+				<ul>
+					<li><a class="hand active" data-tab="modation-notifications">Notifications</a></li>
+					<li><a class="hand" data-tab="modation-watchlist">Watchlist</a></li>
+				</ul>
+			</nav>
 			<div class="main-wrapper">
-				<aside id="modation-notifications">
-					<div class="container">
-						<div class="wrapper notifications last">
-							<h3>Notifications</h3>
-							<span class="empty"><img src="img/loading.gif"> Just a moment...</span>
+				<div class="content" id="modation-notifications-container">
+					<aside id="modation-notifications">
+						<div class="container">
+							<div class="wrapper notifications last">
+								<h3>Notifications</h3>
+								<span class="empty"><img src="img/loading.gif"> Just a moment...</span>
+							</div>
 						</div>
-					</div>
-				</aside>
-				<aside id="modation-watchlist">
-					<div class="container">
-						<div class="wrapper notifications last">
-							<h3>Watchlist</h3>
+					</aside>
+				</div>
+				<div class="content" id="modation-watchlist-container">
+					<aside id="modation-watchlist">
+						<div class="container">
+							<div class="wrapper notifications last">
+								<h3 class="modation-watchlist-header">Watchlist<img class="loader" src="img/loading.gif" style="float: right"></h3>
+							</div>
 						</div>
-					</div>
-				</aside>
+					</aside>
+				</div>
 			</div>
 		</div>
 		<div class="factory">
@@ -42,11 +64,17 @@
 				<div class="container">
 					<div class="wrapper notifications last">
 						<h3>You are not logged in</h3>
-						<span class="empty">Please <a href="/feed">login</a> to view notifications.</span>
+						<span class="empty">Please <a href="http://soundation.com/feed" target="_blank">login</a> to view notifications.</span>
 					</div>
 				</div>
 			</aside>
+			<div class="modation-watchlist-item">
+				<form><div><a class="clear-notification">Clear</a></div></form>
+				<h3 class="item-title wrap">Item Title</h3>
+				<span class="item-body"></span>
+			</div>
+			<span class="modation-watchlist-empty empty">Nothing to report.</span>
+			<span class="modation-watchlist-clear-all super clear-notification">Clear All</span>
 		</div>
-		<!-- <iframe width="0" height="0" name="clearcatcher" style="display: none"></iframe> -->
 	</body>
 </html>

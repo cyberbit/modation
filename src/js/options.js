@@ -4,15 +4,59 @@ var tracks = [];
 var pages = [];
 var trackInfo = [];
 
-$(document).ready(function() {
-	$('#pdalogincheck').click(getLogin);
-	$('#download_tracks').click(getTracks);
-	$('#watchlist_check').click(function() {
+//Storage for option defaults
+var optionDefaults = {
+	desktop_notifs: true,
+	sticky_sidebars: true,
+	group_mods: true,
+	player_downloads: true,
+	recent_tracks: true,
+	profile_tips: true,
+	group_tips: true,
+	smart_player: true
+};
+
+$(function() {
+	//Initialize all the things
+	initOptions();
+	initTracks();
+	initWatchlist();
+	initPages();
+	
+	//Hash parsing for tabs
+	$(window).on("hashchange", function() {
+		parseHash();
+	});
+	
+	//Pick initial menu
+	selectMenu("tab-community", "menu-sticky-sidebars");
+	
+	//Login
+	login();
+});
+
+//Initialize options handler
+function initOptions() {
+	$("#check-login").click(login);
+	$(".option").change(save_options);
+}
+
+//Initialize track manager
+function initTracks() {
+	$("#track-filter").hide();
+	$("#download-tracks").click(getTracks);
+}
+
+//Initialize watchlist
+function initWatchlist() {
+	$("#check-watchlist").click(function() {
 		$("#watchlist-container .wItem").addClass("load");
 		check_watchlist(true, refresh_watchlist);
 	});
-	$('.main-wrapper:not(#tab-tracks) input').on("change", save_options);
-	$('#track-filter').hide();
+}
+
+//Initialize pages
+function initPages() {
 	$('header .sub a').click(function() {
 		var tab = $(this).attr("data-tab");
 		location.hash = "#" + $(this).attr("data-hash");
@@ -26,13 +70,7 @@ $(document).ready(function() {
 			}
 		});
 	});
-	$(window).on("hashchange", function() {
-		parseHash();
-	});
-	
-	selectMenu("tab-community", "menu-sticky-sidebars");
-	getLogin();
-});
+}
 
 //Get a factory item
 function _factory(key) {
@@ -57,8 +95,8 @@ function selectTab(id) {
 		$('.main-wrapper').hide();
 		$('#' + id).show();
 		if (id == "tab-about") {
-			var manifest = getManifest();
-			$('#modation_version').html("Version: <strong>" + manifest.version + "</strong>");
+			var manifest = crapi.manifest();
+			$('#modation_version').html("Version: <strong>" + manifest.version + (manifest.version_suffix ? "-" + manifest.version_suffix : "") + "</strong>");
 			$('#modation_author').html("Author: <strong>" + manifest.author + "</strong>");
 			getChangelog();
 		}
@@ -66,8 +104,6 @@ function selectTab(id) {
 }
 
 function selectMenu(parentID, id, callback) {
-	//console.log("parent:" + parentID);
-	//console.log("id:" + id);
 	if (typeof callback == "undefined") callback = function(){};
 	
 	if (!$('#' + parentID + ' [data-menu="' + id + '"]').is(".current")) {
@@ -80,37 +116,66 @@ function selectMenu(parentID, id, callback) {
 	callback(id);
 }
 
-//Grab email and resore settings
-function getLogin() {
-	if (!$('#logincheck .loader').length) {
-		$('#pdalogincheck').before('<img class="loader" src="img/loadingf5t.gif">');
-		$('#logincheck .loader').hide();
-		$('#logincheck .loader').fadeIn(150);
-	}
-	$('header .sub a:not(.current)').addClass("disabled");
-	$.get("http://soundation.com/account/profile", function(html) {
-		html = html.replace(/<img\b[^>]*>/ig, '');
-		var oHtml = $(html);
-		var email = oHtml.find('.email').text();
-		if (email == "") {
-			save = false;
-			$(".cover").fadeIn(150);
-			error('<strong>Please <a href="http://soundation.com/feed" target="_new" style="color: #de5931">login</a> to change settings!</strong><br><input class="nice-button orange noshadow" id="pdalogincheckagain" type="button" style="padding: 5px 8px;" value="Double-check">');
-			$("#pdalogincheckagain").click(function() {$("#pdalogincheck").click()});
-		} else {
+//Login to settings
+function login() {
+	//Grab loader
+	$loader = $("#logincheck .loader");
+	
+	//Show loader
+	$loader.fadeIn(150);
+	
+	//Disable navigation
+	$("header .sub a:not(.current)").addClass("disabled");
+	
+	//Grab current user
+	$.getJSON("http://api.soundation.com/me", function(data) {
+		var me = data.data;
+		
+		//If successful, do stuff
+		if (data.success) {
+			//Hide notif bar, if needed
 			if (!save) {
 				$('#notification-bar').animate({top: "-" + (58 + 1) + "px"}, "fast", "easeOutQuart", function() {
 					$(this).remove();
 				});
 			}
+			
+			//Enable option saving
 			save = true;
+			
+			//Demodalize
 			$(".cover").fadeOut(150);
-			$('#email').val(email);
-			restore_options(email);
-			$('header .sub a').removeClass("disabled");
+			
+			//Set email
+			$("#email").val(me.email);
+			
+			//Restore options
+			restore_options();
+			
+			//Enable navigation
+			$("header .sub a").removeClass("disabled");
+			
+			//Load (bookmarked) page
 			$(window).trigger("hashchange");
 		}
-		$('#logincheck .loader').fadeOut(150, function(){$(this).remove();});
+		
+		//Not successful
+		else {
+			//Disable option saving
+			save = false;
+			
+			//Modalize
+			$(".cover").fadeIn(150);
+			
+			//Show error
+			error('<strong>Uh oh, looks like you are not logged in! <a href="http://soundation.com/feed" target="_blank" style="color: #de5931">Login</a></strong><br><input class="nice-button orange noshadow" id="check-login-again" type="button" style="padding: 5px 8px;" value="Double-check">');
+			
+			//Bind double-check button
+			$("#check-login-again").click(login);
+		}
+		
+		//Hide loader
+		$loader.fadeOut(150);
 	});
 }
 
@@ -165,7 +230,7 @@ function getTrackPage(page) {
 }
 
 function getChangelog() {
-	$('#tab-about h3').after('<span class="loader">Grabbing current information... <img src="img/loadingf5t.gif"></span>');
+	$('#modation_changelog').before('<span class="loader">Grabbing current information... <img src="img/loadingf5t.gif"></span>');
 	$.get("http://soundation.com/group/modation", function(html) {
 		var oHtml = $(html);
 		var changelog = oHtml.find('h3:contains("Changelog") + div').html();
@@ -174,55 +239,51 @@ function getChangelog() {
 	});
 }
 
-function getManifest() {
-	return chrome.runtime.getManifest();
-}
-
 function editTrack(id, page) {
 	if (!$('#tab-tracks aside').length) {
-		$('#tab-tracks').prepend('<aside style="display: none">\
-			<div class="container">\
-				<div class="aside-cover"><img src="img/loadingealarget.gif"></div>\
-				<div class="wrapper"><h3>Modation Track Editor</h3></div>\
-				<form accept-charset="UTF-8" enctype="multipart/form-data" id="edit_mixdown">\
-					<div class="wrapper">\
-						<input name="_method" type="hidden" value="put">\
-						<input id="token" name="authenticity_token" type="hidden" value="">\
-						<label for="mixdown_title">Title</label>\
-						<input id="mixdown_title" maxlength="100" name="mixdown[title]" size="100" type="text" style="width: 93%">\
-						<label for="mixdown_description">Description</label>\
-						<textarea id="mixdown_description" maxlength="255" name="mixdown[description]" style="width: 93%; height: 75px; resize: vertical"></textarea>\
-						<label for="mixdown_genre_id" style="padding-right: 3px">Genre:</label>\
-						<select id="mixdown_genre_id" name="mixdown[genre_id]" style="margin: 0">\
-							<option value="">None</option>\
-							<option value="1">Blues</option>\
-							<option value="2">Classical</option>\
-							<option value="3">Country</option>\
-							<option value="4">DJ Effects</option>\
-							<option value="5">Electronica</option>\
-							<option value="6">Funk</option>\
-							<option value="7">Hip Hop/Urban</option>\
-							<option value="8">Jazz</option>\
-							<option value="9">Latin</option>\
-							<option value="10">Reggae</option>\
-							<option value="11">Rock</option>\
-							<option value="12">World</option>\
-						</select>\
-					</div>\
-					<div class="wrapper" style="text-align: center">\
-						<input name="mixdown[published]" type="hidden" value="0">\
-						<input id="mixdown_published" class="toggle visible nice-button green" name="mixdown[published]" type="checkbox" value="1">\
-						<input name="mixdown[allow_comments]" type="hidden" value="0">\
-						<input id="mixdown_allow_comments" class="toggle comments nice-button orange" name="mixdown[allow_comments]" type="checkbox" value="1">\
-						<input name="mixdown[allow_download]" type="hidden" value="0">\
-						<input id="mixdown_allow_download" class="toggle download nice-button blue" name="mixdown[allow_download]" type="checkbox" value="1">\
-					</div>\
-				</form>\
-				<div class="wrapper last" style="text-align: center">\
-					<a id="save" class="nice-button orange large">Save</a>\
-				</div>\
-			</div>\
-		</aside>');
+		$('#tab-tracks').prepend('<aside style="display: none">' +
+			'<div class="container">' +
+				'<div class="aside-cover"><img src="img/loadingealarget.gif"></div>' +
+				'<div class="wrapper"><h3>Modation Track Editor</h3></div>' +
+				'<form accept-charset="UTF-8" enctype="multipart/form-data" id="edit_mixdown">' +
+					'<div class="wrapper">' +
+						'<input name="_method" type="hidden" value="put">' +
+						'<input id="token" name="authenticity_token" type="hidden" value="">' +
+						'<label for="mixdown_title">Title</label>' +
+						'<input id="mixdown_title" maxlength="100" name="mixdown[title]" size="100" type="text" style="width: 93%">' +
+						'<label for="mixdown_description">Description</label>' +
+						'<textarea id="mixdown_description" maxlength="255" name="mixdown[description]" style="width: 93%; height: 75px; resize: vertical"></textarea>' +
+						'<label for="mixdown_genre_id" style="padding-right: 3px">Genre:</label>' +
+						'<select id="mixdown_genre_id" name="mixdown[genre_id]" style="margin: 0">' +
+							'<option value="">None</option>' +
+							'<option value="1">Blues</option>' +
+							'<option value="2">Classical</option>' +
+							'<option value="3">Country</option>' +
+							'<option value="4">DJ Effects</option>' +
+							'<option value="5">Electronica</option>' +
+							'<option value="6">Funk</option>' +
+							'<option value="7">Hip Hop/Urban</option>' +
+							'<option value="8">Jazz</option>' +
+							'<option value="9">Latin</option>' +
+							'<option value="10">Reggae</option>' +
+							'<option value="11">Rock</option>' +
+							'<option value="12">World</option>' +
+						'</select>' +
+					'</div>' +
+					'<div class="wrapper" style="text-align: center">' +
+						'<input name="mixdown[published]" type="hidden" value="0">' +
+						'<input id="mixdown_published" class="toggle visible nice-button green" name="mixdown[published]" type="checkbox" value="1">' +
+						'<input name="mixdown[allow_comments]" type="hidden" value="0">' +
+						'<input id="mixdown_allow_comments" class="toggle comments nice-button orange" name="mixdown[allow_comments]" type="checkbox" value="1">' +
+						'<input name="mixdown[allow_download]" type="hidden" value="0">' +
+						'<input id="mixdown_allow_download" class="toggle download nice-button blue" name="mixdown[allow_download]" type="checkbox" value="1">' +
+					'</div>' +
+				'</form>' +
+				'<div class="wrapper last" style="text-align: center">' +
+					'<a id="save" class="nice-button orange large">Save</a>' +
+				'</div>' +
+			'</div>' +
+		'</aside>');
 		$('#tab-tracks aside').fadeIn();
 	}
 	$('#edit_mixdown').off("submit");
@@ -333,64 +394,29 @@ function getTrack(id, parent) {
 	return $('a[href*="/tracks/' + id + '/edit"]').parents('div.track');
 }
 
-// Saves options to localStorage.
 function save_options() {
-	chrome.storage.local.get(email, function(d) {
-		var emailSettings = d[email];
+	crapi.clone(function(d) {
+		//Storage for email
+		var email = $("#email").val();
 		
+		//Storage for account options
+		var o = d[email];
+		
+		//Save options, if needed
 		if (save) {
-			var email = $('#email').val();
-			var desktop_notifs = $('[name^="desktop_notifs"]:checked').val();
-			var sticky_sidebars = $('[name^="sticky_sidebars"]:checked').val();
-			var group_mods = $('[name^="group_mods"]:checked').val();
-			var player_downloads = $('[name^="player_downloads"]:checked').val();
-			var super_pages_global = $('[name^="super_pages_global"]:checked').val();
-			var super_pages_track_comments = $('[name^="super_pages_track_comments"]:checked').val();
-			var super_pages_account_tracks = $('[name^="super_pages_account_tracks"]:checked').val();
-			var super_pages_product_list = $('[name^="super_pages_product_list"]:checked').val();
-			var super_pages_feed = $('[name^="super_pages_feed"]:checked').val();
-			var super_pages_tracks = $('[name^="super_pages_tracks"]:checked').val();
-			var super_pages_groups = $('[name^="super_pages_groups"]:checked').val();
-			var super_pages_user_tracks = $('[name^="super_pages_user_tracks"]:checked').val();
-			var super_pages_group_comments = $('[name^="super_pages_group_comments"]:checked').val();
-			/*var watchlist = [];
-			watchlist.push({
-				"title": "Team Soundation",
-				"link": "group/team-soundation",
-				"following": 0,
-				"comments": 85502,
-				//"changed": 1402191771040
-			});
-			watchlist.push({
-				"title": "Distant by cyberbit",
-				"link": "user/cyberbit/track/distant",
-				"comments": 83881,
-				"likes": 5,
-				"downloads": 2,
-				//"changed": 1402191771040
-			});
-			watchlist.push({
-				"link": "user/foobar/track/htied"
-			});*/
-			emailSettings["desktop_notifs"] = desktop_notifs;
-			emailSettings["sticky_sidebars"] = sticky_sidebars;
-			emailSettings["group_mods"] = group_mods;
-			emailSettings["player_downloads"] = player_downloads;
-			emailSettings["super_pages_global"] = super_pages_global;
-			emailSettings["super_pages_track_comments"] = super_pages_track_comments;
-			emailSettings["super_pages_account_tracks"] = super_pages_account_tracks;
-			emailSettings["super_pages_product_list"] = super_pages_product_list;
-			emailSettings["super_pages_feed"] = super_pages_feed;
-			emailSettings["super_pages_tracks"] = super_pages_tracks;
-			emailSettings["super_pages_groups"] = super_pages_groups;
-			emailSettings["super_pages_user_tracks"] = super_pages_user_tracks;
-			emailSettings["super_pages_group_comments"] = super_pages_group_comments;
-			
-			update_storage(email, emailSettings, function() {
-				// Update status to let user know options were saved.
-				status("Settings saved.");
+			$(".option").each(function() {
+				//Storage for ID
+				var id = $(this).attr("id");
+				
+				//Store option state for ID
+				o[id] = $(this).is(":checked");
 			});
 		}
+		
+		//Update storage
+		crapi.update(email, o, function() {
+			status("Settings saved.");
+		});
 	});
 }
 
@@ -404,7 +430,6 @@ function progress(tab, val) {
 
 function status(msg) {
 	msg = (typeof msg == "undefined" ? "Something happened." : msg);
-	
 	showNotificationBar(msg, 1300, "#15842f", "white");
 }
 
@@ -414,57 +439,52 @@ function error(msg) {
 	showNotificationBar(msg, 0, "#842f15", "white", 58);
 }
 
-// Restores options to saved values from localStorage.
-function restore_options(email) {
-	chrome.storage.local.get(email, function(d) {
-		var emailSettings = d[email];
+//Restores options and sets defaults
+function restore_options() {
+	var email = $("#email").val();
+	
+	crapi.clone(function(d) {
+		//Initialize user, if needed
+		if (typeof d[email] == "undefined") {
+			d[email] = {};
+		}
 		
-		//set up defaults (need more fool-proof method)
-		if ($.isEmptyObject(emailSettings)) {
-			$('#desktop_notifs_on').prop("checked", true);
-			$('#sticky_sidebars_on').prop("checked", true);
-			$('#group_mods_on').prop("checked", true);
-			$('#player_downloads_on').prop("checked", true);
-			$('#super_pages_global_on').prop("checked", true);
-			$('#super_pages_track_comments_on').prop("checked", true);
-			$('#super_pages_account_tracks_on').prop("checked", true);
-			$('#super_pages_product_list_on').prop("checked", true);
-			$('#super_pages_feed_on').prop("checked", true);
-			$('#super_pages_tracks_on').prop("checked", true);
-			$('#super_pages_groups_on').prop("checked", true);
-			$('#super_pages_user_tracks_on').prop("checked", true);
-			$('#super_pages_group_comments_on').prop("checked", true);
-			save_options();
-		} else {
-			//Parse desktop notification settings
-			var desktop_notifs = emailSettings["desktop_notifs"];
-			var sticky_sidebars = emailSettings["sticky_sidebars"];
-			var group_mods = emailSettings["group_mods"];
-			var player_downloads = emailSettings["player_downloads"];
-			var super_pages_global = emailSettings["super_pages_global"];
-			var super_pages_track_comments = emailSettings["super_pages_track_comments"];
-			var super_pages_account_tracks = emailSettings["super_pages_account_tracks"];
-			var super_pages_product_list = emailSettings["super_pages_product_list"];
-			var super_pages_feed = emailSettings["super_pages_feed"];
-			var super_pages_tracks = emailSettings["super_pages_tracks"];
-			var super_pages_groups = emailSettings["super_pages_groups"];
-			var super_pages_user_tracks = emailSettings["super_pages_user_tracks"];
-			var super_pages_group_comments = emailSettings["super_pages_group_comments"];
-			$('#desktop_notifs_' + desktop_notifs).prop("checked", true);
-			$('#sticky_sidebars_' + sticky_sidebars).prop("checked", true);
-			$('#group_mods_' + group_mods).prop("checked", true);
-			$('#player_downloads_' + player_downloads).prop("checked", true);
-			$('#super_pages_global_' + super_pages_global).prop("checked", true);
-			$('#super_pages_track_comments_' + super_pages_track_comments).prop("checked", true);
-			$('#super_pages_account_tracks_' + super_pages_account_tracks).prop("checked", true);
-			$('#super_pages_product_list_' + super_pages_product_list).prop("checked", true);
-			$('#super_pages_feed_' + super_pages_feed).prop("checked", true);
-			$('#super_pages_tracks_' + super_pages_tracks).prop("checked", true);
-			$('#super_pages_groups_' + super_pages_groups).prop("checked", true);
-			$('#super_pages_user_tracks_' + super_pages_user_tracks).prop("checked", true);
-			$('#super_pages_group_comments_' + super_pages_group_comments).prop("checked", true);
-			
+		//Storage for options
+		var options = $(".option");
+		
+		//Storage for missing settings counter
+		var missing = 0;
+		
+		//Storage for completion callback
+		var cb = function() {
 			status("Settings restored.");
+		};
+		
+		//Iterate through options
+		options.each(function() {
+			var id = $(this).attr("id");
+			
+			//Add unsaved options to storage
+			if (!(id in d[email])) {
+				d[email][id] = (id in optionDefaults ? optionDefaults[id] : true);
+				missing++;
+			}
+			
+			//Apply option to element
+			$("#" + id).attr("checked", d[email][id]);
+		});
+		
+		//Default for watchlist?
+		if (typeof d[email]['watchlist'] == "undefined") d[email]['watchlist'] = [];
+		if (typeof d[email]['watchlist-queue'] == "undefined") d[email]['watchlist-queue'] = [];
+		
+		//Set defaults, if needed
+		if (missing) {
+			console.info("Some settings missing, setting defaults...");
+			save_options();
+			crapi.update(email, d[email], cb);
+		} else {
+			cb();
 		}
 	});
 }
@@ -480,7 +500,7 @@ function check_watchlist(update, callback) {
 	var wFailed = [];
 	
 	chrome.storage.local.get(email, function(d) {
-		var watchlist = d[email]["watchlist"];
+		var watchlist = d[email]["watchlist"] || {};
 		var wLen = watchlist.length;
 		var wCt = 0;
 		
@@ -724,8 +744,8 @@ function delete_watchlist(link, callback) {
 function refresh_watchlist() {
 	var email = $('#email').val();
 	
-	chrome.storage.local.get(email, function(d) {
-		var watchlist = d[email]["watchlist"];
+	chrome.storage.local.get(email, function(d) {		
+		var watchlist = d[email]["watchlist"] || {};
 		
 		//Save container for future use
 		var $wContainer = $("#watchlist-container");
@@ -775,11 +795,11 @@ function refresh_watchlist() {
 }
 
 String.prototype.hashCode = function(){
-    var hash = 0, i, char;
+    var hash = 0, i, c;
     if (this.length == 0) return hash;
     for (i = 0, l = this.length; i < l; i++) {
-        char  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+char;
+        c  = this.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+c;
         hash |= 0; // Convert to 32bit integer
     }
     return hash;
