@@ -264,6 +264,11 @@ function init() {
 			chrome.runtime.sendMessage({action: "modation-pause-everything", guid: guid});
 		});
 	}
+	
+	//Feed
+	if (location.href.match(/\/feed/)) {
+		feed_actions();
+	}
 }
 
 //Get a factory item
@@ -397,6 +402,25 @@ function player_downloads() {
 				playerFrame.find("span#downloads").html(oDownloads);
 				playerFrame.find("#downloads_count").fadeIn(200);
 			});
+		});
+	});
+}
+
+//Feed Actions
+function feed_actions() {
+	$(".feed-item.user, .feed-item.group").each(function() {
+		var $content = $(this).find(".feed-content");
+		var track = $content.find("a[href*=track]").first().attr("href");
+		
+		//Prepend feed actions
+		$content.find(".track").before(_factory("modation-feed-actions"));
+		
+		//Grab track page
+		$.get(track, function(html) {
+			var $html = $(html);
+			var liked = $html.find("#like a img").attr("src").indexOf("broken") != -1;
+			
+			console.log("track %o is %o", track, liked);
 		});
 	});
 }
