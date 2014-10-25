@@ -235,19 +235,26 @@ function init() {
 	//Initialize sticky sidebars
 	if (storage[me.email]["sticky_sidebars"]) sticky_sidebars();
 	
-	//Initialize group mods
-	if (storage[me.email]["group_mods"] && $("div#main:has(.group)").length) {
-		//addJQuery(group_mods);
-		group_mods();
-	}
-	
 	//Initialize player downloads
 	if (storage[me.email]["player_downloads"]) player_downloads();
 	
 	//Group page
-	if (location.href.match(/\/group\//)) {		
+	if (location.href.match(/\/group\//)) {
 		//Generate watchlist UI
 		watchlist_ui();
+	
+		//Initialize group mods
+		if (storage[me.email]["group_mods"]) {
+			//group_mods();
+		}
+	}
+	
+	//Group list page
+	if (location.href.match(/\/groups/)) {
+		//Initialize group mods
+		if (storage[me.email]["group_mods"]) {
+			group_mods();
+		}
 	}
 	
 	//Track page
@@ -263,11 +270,9 @@ function init() {
 			//Send pause everything message
 			chrome.runtime.sendMessage({action: "modation-pause-everything", guid: guid});
 		});
-	}
-	
-	//Feed
-	if (location.href.match(/\/feed/)) {
-		feed_actions();
+		
+		//Player actions
+		player_actions();
 	}
 }
 
@@ -406,21 +411,57 @@ function player_downloads() {
 	});
 }
 
-//Feed Actions
-function feed_actions() {
-	$(".feed-item.user, .feed-item.group").each(function() {
-		var $content = $(this).find(".feed-content");
-		var track = $content.find("a[href*=track]").first().attr("href");
+//Player Actions
+function player_actions() {
+	var $titleBar = $("#title-bar");
+	var $a = $titleBar.find("a[href*=track]");
+	var link = $a.attr("href");
+	
+	//Grab likes text as like button
+	var $likeBtn = $titleBar.find("#likes");
+	
+	//Grab images
+	var likesIcon = chrome.runtime.getURL("img/likes-icon.png");
+	var likesIconPink = chrome.runtime.getURL("img/likes-icon-pink-2.png");
+	
+	//Grab track page
+	$.get(link, function(html) {
+		var $html = $(html);
+		var $like = $html.find("#like a");
+		var likeLink = $like.attr("href");
+		var liked = $like.find("img").attr("src").indexOf("broken") != -1;
 		
-		//Prepend feed actions
-		$content.find(".track").before(_factory("modation-feed-actions"));
-		
-		//Grab track page
-		$.get(track, function(html) {
-			var $html = $(html);
-			var liked = $html.find("#like a img").attr("src").indexOf("broken") != -1;
+		//Modify like button
+		$likeBtn.addClass("player-action " + (liked ? "liked" : ""));
+		$likeBtn.data("liked", liked);
+		$likeBtn.click(function() {
+			var $me = $(this);
+			var likes = parseInt($me.text());
 			
-			console.log("track %o is %o", track, liked);
+			//Trace click
+			console.log("you %o track %o", $me.data("liked") ? "unlike" : "like", $a.text());
+			
+			//Disable button
+			$me.addClass("disabled");
+			
+			//Like track
+			if (!$me.data("liked")) {
+				$me.text(likes + 1).data("liked", true).addClass("liked");
+			}
+			
+			//Unlike track
+			else {
+				$me.text(likes - 1).data("liked", false).removeClass("liked");
+			}
+			
+			//Request like
+			$.getJSON(likeLink, function(datum) {
+				//Trace datum
+				console.log("like: %o", datum);
+				
+				//Enable button
+				$me.removeClass("disabled");
+			});
 		});
 	});
 }
