@@ -235,9 +235,6 @@ function init() {
 	//Initialize sticky sidebars
 	if (storage[me.email]["sticky_sidebars"]) sticky_sidebars();
 	
-	//Initialize player downloads
-	if (storage[me.email]["player_downloads"]) player_downloads();
-	
 	//Group page
 	if (location.href.match(/\/group\//)) {
 		//Generate watchlist UI
@@ -389,36 +386,19 @@ function group_mods() {
 	}
 }
 
-/* Player Downloads */
-//Could eventually move to content scripts inside iframes
-function player_downloads() {
-	$('iframe[src*="/player/"]').each(function() {
-		var playerFrame = $(this).contents();
-		//addCSS(playerFrame, '#title-bar #downloads { display: none; background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAABmJLR0QAJAAkACTORThWAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gQHEDcJeUryZgAAAFtJREFUGNONjjEKwDAMA002TZ3yA/n1/pb8DndJg6Gh9MaTEDJbkGQ1SPLJhv1grJV5CrcnOesDknOYmWVmnpaWv/ZpSeoLktTP72JERFVVRMSr8AAA7u4A0P0NFStRvu/GlrMAAAAASUVORK5CYII=") no-repeat 13px 6px; float: right; padding: 0 0 0 28px; color: white; height: 19px;}');
-		//addCSS(playerFrame, "#circleG{position:relative;top:8px;width:10.5px}.circleG{background-color:#FFF;float:left;height:2px;margin-left:1px;width:2px;-webkit-animation-name:bounce_circleG;-webkit-animation-duration:1.5s;-webkit-animation-iteration-count:infinite;-webkit-animation-direction:linear;-webkit-border-radius:1px}#circleG_1{-webkit-animation-delay:.3s}#circleG_2{-webkit-animation-delay:.7s}#circleG_3{-webkit-animation-delay:.9s}@-webkit-keyframes bounce_circleG{50%{background-color:#262627}}");
-		playerFrame.find("span#likes").before('<span id="downloads"><div id="circleG"><div id="circleG_1" class="circleG"></div><div id="circleG_2" class="circleG"></div><div id="circleG_3" class="circleG"></div></div></span>');
-		playerFrame.find("span#downloads").fadeIn(500);
-		var trackPage = playerFrame.find("a").attr("href");
-		$.get(trackPage, function(data) {
-			playerFrame.find(".circleG").fadeOut(200, function() {
-				$(this).remove();
-				var downloads = $(data).find("span.downloads").text();
-				var oDownloads = '<span id="downloads_count" style="display: none">' + downloads + '</span>';
-				playerFrame.find("span#downloads").html(oDownloads);
-				playerFrame.find("#downloads_count").fadeIn(200);
-			});
-		});
-	});
-}
-
 //Player Actions
 function player_actions() {
 	var $titleBar = $("#title-bar");
 	var $a = $titleBar.find("a[href*=track]");
 	var link = $a.attr("href");
 	
-	//Grab likes text as like button
+	//Grab buttons
 	var $likeBtn = $titleBar.find("#likes");
+	var $downloadsBtn = _factory("modation-player-downloads");
+	
+	//Add downloads
+	$likeBtn.before($downloadsBtn);
+	$downloadsBtn.fadeIn(500);
 	
 	//Grab images
 	var likesIcon = chrome.runtime.getURL("img/likes-icon.png");
@@ -428,8 +408,35 @@ function player_actions() {
 	$.get(link, function(html) {
 		var $html = $(html);
 		var $like = $html.find("#like a");
+		var downloads = $html.find("span.downloads").text();
+		var $downloadsContent = $('<span class="modation-player-downloads-content"></span>').text(downloads).hide()
+		var downloadsContent = $downloadsContent[0].outerHTML;
 		var likeLink = $like.attr("href");
 		var liked = $like.find("img").attr("src").indexOf("broken") != -1;
+		
+		//Show downloads
+		$downloadsBtn.find("#circleG").fadeOut(200, function() {
+			$(this).remove();
+			
+			$downloadsBtn.html(downloadsContent);
+			$downloadsBtn.find(".modation-player-downloads-content").fadeIn(200);
+		});
+		
+		//Modify downloads button
+		$downloadsBtn.addClass("player-action");
+		$downloadsBtn.click(function() {
+			var $me = $(this);
+			var downloads = parseInt($me.text());
+			
+			//Trace click
+			console.log("you downloaded track %o", $a.text());
+			
+			//Increment downloads counter
+			$me.text(downloads + 1);
+			
+			//Download track
+			location = link + "/download";
+		});
 		
 		//Modify like button
 		$likeBtn.addClass("player-action " + (liked ? "liked" : ""));
