@@ -80,3 +80,23 @@ p.last-activity.minified:after {
 div.admin.minified a {
     margin-top: -2px !important;
 }
+
+/* Player Actions */
+.player-action {
+    cursor: pointer;
+}
+
+#title-bar #likes.player-action.liked {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAAAXNSR0ICQMB9xQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUATWljcm9zb2Z0IE9mZmljZX/tNXEAAAB3SURBVCjPY5AUFJTeWFu18fO6Nd82N9RtMVZSMgDRID5IHCTPsKulZdf/bVv+48IH29sPMHxeu/ozPkXfNq7/SZxJSqKiKk8WzXuCTQFIHCTP0NjYiFUhTAFIHqwIpnB1VflqkAIQDVOAogjMYWDgBEqqgmhkcQBC9K4e4p4JAgAAAABJRU5ErkJggg==");
+}
+
+.factory {
+    display: none;
+}
+
+.disabled {
+    pointer-events: none;
+    -webkit-user-select: none;
+    -webkit-filter: grayscale(1) opacity(.6);
+    transition: all .3s;
+}
