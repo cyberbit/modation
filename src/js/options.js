@@ -139,16 +139,21 @@ function initStorage() {
 		
 		//Action confirmed
 		if (result) {
-			//Show notification
-			error('<strong>Storage pasted! Please refresh your browser to load these changes.</strong><br><input class="nice-button orange noshadow" id="reload-browser" type="button" style="padding: 5px 8px;" value="Refresh now">');
+			var parsedStorage = $.parseJSON(atob($(".storage-paste").val()));
 			
-			//Bind double-check button
-			$("#reload-browser").click(function() {
-				crapi.reload();
+			//Replace storage
+			crapi.updateAll(parsedStorage, function() {
+				//Show notification
+				error('<strong>Storage pasted! Please refresh your browser to load these changes.</strong><br><input class="nice-button orange noshadow" id="reload-browser" type="button" style="padding: 5px 8px;" value="Refresh now">');
+				
+				//Bind double-check button
+				$("#reload-browser").click(function() {
+					crapi.reload();
+				});
+				
+				//Modalize
+				$(".cover").fadeIn(150);
 			});
-			
-			//Modalize
-			$(".cover").fadeIn(150);
 		}
 	})
 }
