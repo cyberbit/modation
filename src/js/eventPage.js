@@ -259,7 +259,8 @@ function check_watchlist(me, update, callback) {
 	var wFailed = [];
 	
 	crapi.clone(function(d) {
-		var watchlist = d[email]["watchlist"];
+		//Use empty array if no watchlist (issue #42)
+		var watchlist = d[email]["watchlist"] || [];
 		var wLen = watchlist.length;
 		var wCt = 0;
 		
