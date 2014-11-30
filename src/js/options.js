@@ -292,6 +292,7 @@ function login() {
 	});
 }
 
+//Loads track manager list
 function getTracks() {
 	$(".track").fadeOut(400, function() { $(this).remove(); });
 	$("#track-filter, #filter-result").fadeOut();
@@ -322,6 +323,7 @@ function getTracks() {
 	});
 }
 
+//Grabs page of tracks
 function getTrackPage(page) {
 	var pageTracks = [];
 	pages.push(page);
@@ -342,6 +344,7 @@ function getTrackPage(page) {
 	});
 }
 
+//Grabs information from Modation group
 function getChangelog() {
 	$('#modation_changelog').before('<span class="loader">Grabbing current information... <img src="img/loadingf5t.gif"></span>');
 	$.get("http://soundation.com/group/modation", function(html) {
@@ -352,6 +355,7 @@ function getChangelog() {
 	});
 }
 
+//Opens track edit form
 function editTrack(id, page) {
 	if (!$('#tab-tracks aside').length) {
 		$('#tab-tracks').prepend('<aside style="display: none">' +
@@ -431,6 +435,7 @@ function editTrack(id, page) {
 	$('#save').on("click.save", function() { saveTrack(id, page) });
 }
 
+//Saves track
 function saveTrack(id, page) {
 	$('#tab-tracks aside').addClass("disabled");
 	$('#tab-tracks .aside-cover').fadeIn(200);
@@ -445,6 +450,7 @@ function saveTrack(id, page) {
 	});
 }
 
+//Grabs tracks from page
 function enumerateTrackList() {
 	var allTracks = [];
 	for (var i = 1; i < tracks.length; i++) {
@@ -480,6 +486,7 @@ function enumerateTrackList() {
 	});
 }
 
+//Update track data
 function updateTrack(id) {
 	var page = getTrack(id).wrapInner('<div class="inner-wrap"></div>').prepend('<div class="track-cover"><img src="img/loadingealarget.gif" style="border-bottom: none"></div>').find('input[type="hidden"]').val()
 	var trackContainer = getTrack(id);
@@ -502,11 +509,13 @@ function updateTrack(id) {
 	});
 }
 
+//Get track list item by id
 function getTrack(id, parent) {
 	if (typeof parent != "undefined") return parent.find('a[href*="/tracks/' + id + '/edit"]').parents('div.track');
 	return $('a[href*="/tracks/' + id + '/edit"]').parents('div.track');
 }
 
+//Save options
 function save_options() {
 	crapi.clone(function(d) {
 		//Storage for email
@@ -533,19 +542,23 @@ function save_options() {
 	});
 }
 
+//Update progress bar status
 function progressStatus(tab, msg) {
 	$("#" + tab + " .progressStatus").text(msg);
 }
 
+//Update progress bar
 function progress(tab, val) {
 	$("#" + tab + " #progress").progressbar("value", val);
 }
 
+//Show status notification
 function status(msg) {
 	msg = (typeof msg == "undefined" ? "Something happened." : msg);
 	showNotificationBar(msg, 1300, "#15842f", "white");
 }
 
+//Show error notification
 function error(msg) {
 	msg = (typeof msg == "undefined" ? "Something <strong>bad</strong> happened." : msg);
 	
@@ -843,6 +856,7 @@ function delete_watchlist(link, callback) {
 	});
 }
 
+//Loads watchlist form
 function refresh_watchlist() {
 	var email = $('#email').val();
 	
@@ -896,6 +910,7 @@ function refresh_watchlist() {
 	});
 }
 
+//Display notification bar
 function showNotificationBar(message, duration, bgColor, txtColor, height) {
 	/*set default values*/
 	fallbackHeight = 25;
