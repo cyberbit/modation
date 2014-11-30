@@ -80,7 +80,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 						if (!me) {
 							//Log failure
 							console.warn("Could not login to Soundation");
-						
+							
 							//End trace timing
 							console.timeEnd("Modation feed notifications");
 							
@@ -538,16 +538,6 @@ function check_watchlist(me, update, callback) {
 		}
 	});
 }
-
-//Update storage for provided key
-//Deprecated as of v1.0
-/*function update_storage(key, value) {
-	var updatedStorage = {};
-	updatedStorage[key] = value;
-	
-	//Update storage
-	chrome.storage.local.set(updatedStorage);
-}*/
 
 /* Check if desktop notifications should be shown */
 function doNotifs(hash) {

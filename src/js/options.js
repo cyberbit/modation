@@ -814,18 +814,6 @@ function check_watchlist(update, callback) {
 		}
 	});
 }
-
-//Update storage for provided key
-//Deprecated as of v1.1
-/*function update_storage(key, value, callback) {
-	if (typeof callback == "undefined") callback = function(){};
-	
-	var updatedStorage = {};
-	updatedStorage[key] = value;
-	
-	//Update storage
-	chrome.storage.local.set(updatedStorage, callback);
-}*/
 	
 //Remove from watchlist
 function delete_watchlist(link, callback) {
