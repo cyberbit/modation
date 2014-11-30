@@ -144,11 +144,11 @@ function initStorage() {
 			//Replace storage
 			crapi.updateAll(parsedStorage, function() {
 				//Show notification
-				error('<strong>Storage pasted! Please refresh your browser to load these changes.</strong><br><input class="nice-button orange noshadow" id="reload-browser" type="button" style="padding: 5px 8px;" value="Refresh now">');
+				error('<strong>Storage pasted! Please reload Modation to load these changes.</strong><br><input class="nice-button orange noshadow" id="reload-browser" type="button" style="padding: 5px 8px;" value="Reload now">');
 				
 				//Bind double-check button
 				$("#reload-browser").click(function() {
-					crapi.reload();
+					chrome.runtime.reload();
 				});
 				
 				//Modalize
