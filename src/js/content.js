@@ -268,8 +268,10 @@ function init() {
 			chrome.runtime.sendMessage({action: "modation-pause-everything", guid: guid});
 		});
 		
-		//Player actions
-		player_actions();
+		//Add player actions
+		if (storage[me.email]["player_actions"]) {
+			player_actions();
+		}
 	}
 }
 

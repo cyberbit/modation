@@ -113,7 +113,7 @@
 					<div class="menu column">
 						<a class="hand current" data-menu="menu-sticky-sidebars">Sticky Sidebars</a>
 						<a class="hand" data-menu="menu-group-mods">Group Mods (Beta)</a>
-						<a class="hand" data-menu="menu-player-downloads">Player Downloads</a>
+						<!--<a class="hand" data-menu="menu-player-downloads">Player Downloads</a>-->
 						<a class="hand" data-menu="menu-watchlist">Watchlist</a>
 						<a class="hand" data-menu="menu-dynamics">Dynamics</a>
 					</div>
@@ -130,12 +130,13 @@
 							<label class="toggle-label">Enable Group Mods?</label>&nbsp;&nbsp;
 							<input type="checkbox" id="group_mods" class="option toggle nice-button green">
 						</div>
-						<div id="menu-player-downloads">
+                        <!-- Deprecated as of v1.1 -->
+						<!--<div id="menu-player-downloads">
 							<label class="header">Player Downloads</label>
 							<p class="field-help">Shows the number of downloads on a track in the track players.</p>
 							<label class="toggle-label">Enable Player Downloads?</label>&nbsp;&nbsp;
 							<input type="checkbox" id="player_downloads" class="option toggle nice-button green">
-						</div>
+						</div>-->
 						<div id="menu-watchlist">
 							<label class="header">Watchlist</label>
 							<p class="field-help">Monitors changes in groups and tracks for added comments.</p>
@@ -163,6 +164,11 @@
 							<p class="field-help">Automatically pauses a currently playing track if another is started.</p>
 							<label class="toggle-label">Enable Smart Player?</label>&nbsp;&nbsp;
 							<input type="checkbox" id="smart_player" class="option toggle nice-button green">
+                            <hr />
+							<label class="header">Player Actions</label>
+							<p class="field-help">Adds clickable like and download buttons on a track in the track player.</p>
+							<label class="toggle-label">Enable Player Actions?</label>&nbsp;&nbsp;
+							<input type="checkbox" id="player_actions" class="option toggle nice-button green">
 						</div>
 					</div>
 				</div>

@@ -9,11 +9,11 @@ var optionDefaults = {
 	desktop_notifs: true,
 	sticky_sidebars: true,
 	group_mods: true,
-	player_downloads: true,
 	recent_tracks: true,
 	profile_tips: true,
 	group_tips: true,
-	smart_player: true
+	smart_player: true,
+	player_actions: true
 };
 
 $(function() {
