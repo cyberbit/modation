@@ -116,7 +116,7 @@ aside form .genre label, aside form .type label {
 	width: 70%;
 }
 
-#tab-tracks #progressStatus {
+.progressStatus {
 	text-align: center;
 	font-size: 10px;
 }
@@ -281,6 +281,21 @@ header .sub a:hover {
 .menu.column a.current {
 	color: white;
 	background: url("../img/columnnav2.png") no-repeat top left;
+}
+
+/**
+ * Typography
+ */
+.pull-right {
+	float: right !important;
+}
+
+.text-danger {
+	color: #dd4b39;
+}
+
+.text-success {
+	color: #74ad34;
 }
 
 /* Current tab styling...? */

@@ -1,14 +1,3 @@
-String.prototype.hashCode = function(){
-    var hash = 0, i, c;
-    if (this.length == 0) return hash;
-    for (i = 0, l = this.length; i < l; i++) {
-        c  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+c;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-};
-
 //Switch for alarm state
 var alarmRunning = false;
 
@@ -256,32 +245,6 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 	});
 });
 
-//Add to watchlist
-//Deprecated as of v1.0
-/*function add_watchlist(email, link) {
-	chrome.storage.local.get(email, function(d) {
-		var watchlist = d[email]['watchlist'];
-		var newItem = true;
-		
-		$.each(watchlist, function(i, v) {
-			//Ensure no duplicates will be created
-			if (v['link'] == link) {
-				newItem = false;
-				return false;
-			}
-			
-			return true;
-		});
-		
-		//Add new watchlist item and update
-		if (newItem) {
-			d[email]['watchlist'].push({link: link});
-			
-			update_storage(email, d[email]);
-		}
-	});
-}*/
-
 //Check watchlist
 function check_watchlist(me, update, callback) {
 	if (typeof update == "undefined") update = true;
@@ -300,42 +263,56 @@ function check_watchlist(me, update, callback) {
 		var wLen = watchlist.length;
 		var wCt = 0;
 		
-		//Trace watchlist queueing start
-		console.group("Queueing watchlist...");
-		
-		//Count up invalid links and adjust wLen accordingly
-		$.each(watchlist, function(i, v) {
-			var link = v['link'];
+		//Skip empty watchlist iteration (issue #42)
+		if (wLen) {
+			//Trace watchlist queueing start
+			console.group("Queueing watchlist...");
 			
-			$.get("http://soundation.com/" + link, function(html) {
-				v['html'] = html;
-				//console.log("link " + link + " success, pushing to wParsed");
-				wParsed[i] = v;
-			}).fail(function() {
-				//console.log("link " + link + " failed, pushing to wFailed");
-				v['fail'] = true;
-				wParsed[i] = v;
-				wFailed[i] = v;
-			}).done(function() {
-				delete v['fail'];
-			}).always(function() {
-				_complete();
-			});
-			
-			function _complete() {
-				//Trace queued item and increment counter
-				console.log("Queued item %d of %d: %s", ++wCt, wLen, link);
+			//Count up invalid links and adjust wLen accordingly
+			$.each(watchlist, function(i, v) {
+				var link = v['link'];
 				
-				//If last index, run iteration
-				if (wCt == wLen) {
-					//End trace group
-					console.groupEnd();
+				$.get("http://soundation.com/" + link, function(html) {
+					v['html'] = html;
+					//console.log("link " + link + " success, pushing to wParsed");
+					wParsed[i] = v;
+				}).fail(function() {
+					//console.log("link " + link + " failed, pushing to wFailed");
+					v['fail'] = true;
+					wParsed[i] = v;
+					wFailed[i] = v;
+				}).done(function() {
+					delete v['fail'];
+				}).always(function() {
+					_complete();
+				});
+				
+				function _complete() {
+					//Trace queued item and increment counter
+					console.log("Queued item %d of %d: %s", ++wCt, wLen, link);
 					
-					//Iterate items
-					_iterate();
+					//If last index, run iteration
+					if (wCt == wLen) {
+						//End trace group
+						console.groupEnd();
+						
+						//Iterate items
+						_iterate();
+					}
 				}
-			}
-		});
+			});
+		}
+		
+		//Watchlist is empty
+		else {
+			console.info("Watchlist is empty, bypassing watchlist check");
+			
+			//End trace group
+			console.groupEnd();
+			
+			//Run callback
+			callback(d[email]);
+		}
 		
 		//Iterate watchlist items
 		function _iterate() {

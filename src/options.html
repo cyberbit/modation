@@ -5,16 +5,16 @@
 		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css">
 		<link href="http://assets.soundation.com/assets/account.css" media="screen" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-		<link href="css/options.min.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="css/options.css" media="screen" rel="stylesheet" type="text/css">
 		<title>Modation Settings</title>
 		<script src="js/jquery.all.js"></script>
-		<!-- Original source --><!--
+		<!-- Original source -->
 		<script src="js/crapi.js"></script>
 		<script src="js/modapi.js"></script>
-		<script src="js/options.js"></script>-->
-		<!-- Compiled source -->
+		<script src="js/options.js"></script>
+		<!-- Compiled source --><!--
 		<script src="js/api.min.js"></script>
-		<script src="js/options.min.js"></script>
+		<script src="js/options.min.js"></script>-->
 	</head>
 	<body class="account edit_account">
 		<header>
@@ -29,6 +29,7 @@
 				<nav class="wrapper">
 					<span>My Account</span>
 					<a class="hand current" data-tab="tab-general" data-hash="general">General Settings</a>
+					<a class="hand" data-tab="tab-storage" data-hash="storage">Storage</a>
 					<a class="hand" data-tab="tab-notifs" data-hash="notifs">Notifications</a>
 					<a class="hand" data-tab="tab-community" data-hash="community">Community</a>
 					<a class="hand" data-tab="tab-tracks" data-hash="tracks">Tracks</a>
@@ -53,9 +54,35 @@
 					<div class="column last">
 						<p>&nbsp;</p>
 						<p>&nbsp;</p>
-						<p>Check your login status here. If you see any errors on other pages, hit Login Check to reload the settings.</p>
+						<p>Check your login status here. If you see any errors on other pages, hit Check Login to reload the settings.</p>
 						<p>If you manage multiple users, settings will apply individually to each.</p>
 						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+					</div>
+				</div>
+				<br style="clear:both">
+			</div>
+			<div class="main-wrapper" id="tab-storage">
+				<div id="main" class="full-width">
+					<h2>Storage</h2>
+					<div class="column">
+						<label class="header">Storage usage</label>
+						<p class="field-help">Current status of Modation synced storage</p>
+						<div id="progressContainer"></div>
+						<hr />
+						<label class="header">Storage transfer</label>
+						<p class="field-help">Use the form below to copy your data from one device to another.</p>
+						<p>Copy from here:</p>
+						<textarea class="storage-copy" style="height: 75px; resize: none; background: #eeeeee;" readonly></textarea>
+						<p>Paste here:<span class="storage-status pull-right"></span></p>
+						<textarea class="storage-paste" style="height: 75px;"></textarea>
+						<a class="storage-confirm nice-button red disabled" style="float: right">Confirm</a>
+					</div>
+					<div class="column last">
+						<p>&nbsp;</p>
+						<p>If you choose to sync Chrome, your watchlist queue, mod settings, and other Modation data is already syncronized across all your devices.</p>
+                        <p>If you choose <strong>not</strong> to sync Chrome, this page allows you to transfer your data from one device to another.</p>
+						<p>The bar to the left shows how much of this storage you are currently using.</p>
 						<p>&nbsp;</p>
 					</div>
 				</div>

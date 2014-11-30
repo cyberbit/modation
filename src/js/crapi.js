@@ -1,4 +1,19 @@
 /*!
+ * App Helpers
+ */
+String.prototype.hashCode = function(){
+    var hash = 0, i, c;
+    if (this.length == 0) return hash;
+    for (i = 0, l = this.length; i < l; i++) {
+        c  = this.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+c;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};
+
+
+/*!
  * CrAPI (Chrome API Helper)
  *
  * @author cyberbit (D.J. Marcolesco) dj.marcolesco@outlook.com
@@ -15,6 +30,11 @@ crapi = new CrAPI();
  * @name 
  */
 CrAPI.prototype.manifest = function() { return chrome.runtime.getManifest(); }
+
+/**
+ * Reload the current page
+ */
+CrAPI.prototype.reload = function() { location.reload(); }
 
 /**
  * Quick-access debug switch
@@ -66,6 +86,36 @@ function CrAPI() {
 }
 
 /**
+ * Grab storage solution (sync or local)
+ *
+ * $returns	{StorageArea}	Storage solution from chrome.storage
+ */
+CrAPI.prototype.storage = function(type) {
+	type = typeof type == "undefined" ? "sync" : type;
+	
+	//Parse type
+	switch (type) {
+		//Local storage
+		case "local":
+			return chrome.storage.local;
+			break;
+		
+		//Synced storage
+		case "sync":
+			return chrome.storage.sync;
+			break;
+		
+		//Unknown type
+		default:
+			return false;
+			break;
+	}
+	
+	//Something weird happened
+	return -1;
+}
+
+/**
  * Clone local storage
  *
  * @param	{function}	callback	Revieves cloned storage and returns modified storage
@@ -84,10 +134,10 @@ CrAPI.prototype.clone = function(callback) {
 	if (crapi.debug) console.trace("Stack trace");
 	
 	//Grab storage
-	chrome.storage.local.get(function(d) {
+	this.storage().get(function(d) {
 		//Trace storage
 		console.log("Storage: %O", d);
-	
+		
 		//Begin trace timing
 		console.timeEnd("CrAPI clone");
 		
@@ -122,10 +172,10 @@ CrAPI.prototype.update = function(key, value, callback) {
 	updatedStorage[key] = value;
 	
 	//Update storage
-	chrome.storage.local.set(updatedStorage, function() {
+	this.storage().set(updatedStorage, function() {
 		//Trace updated storage
 		console.log("New storage: %O", updatedStorage);
-	
+		
 		//End trace timing
 		console.timeEnd("CrAPI update");
 		
@@ -156,10 +206,10 @@ CrAPI.prototype.updateAll = function(items, callback) {
 	if (crapi.debug) console.trace("Stack trace");
 	
 	//Update storage
-	chrome.storage.local.set(items, function() {
+	this.storage().set(items, function() {
 		//Trace updated storage
 		console.log("New storage: %O", items);
-	
+		
 		//End trace timing
 		console.timeEnd("CrAPI update all");
 		

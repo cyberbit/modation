@@ -414,6 +414,11 @@ function player_actions() {
 		var likeLink = $like.attr("href");
 		var liked = $like.find("img").attr("src").indexOf("broken") != -1;
 		
+		//Storage for button titles
+		var downloadsTitle = "Download";
+		var likeText = "Like this track", unlikeText = "You like this track";
+		var likesTitle = liked ? unlikeText : likeText;
+		
 		//Show downloads
 		$downloadsBtn.find("#circleG").fadeOut(200, function() {
 			$(this).remove();
@@ -424,22 +429,49 @@ function player_actions() {
 		
 		//Modify downloads button
 		$downloadsBtn.addClass("player-action");
-		$downloadsBtn.click(function() {
-			var $me = $(this);
-			var downloads = parseInt($me.text());
+		
+		//Track is publicly downloadable
+		if ($html.find("a[href*='/download']").length) {
+			//Set button title
+			downloadsTitle = "Download " + $html.find(".title").text();
 			
-			//Trace click
-			console.log("you downloaded track %o", $a.text());
+			//Add downloads handler
+			$downloadsBtn.click(function() {
+				var $me = $(this);
+				var downloads = parseInt($me.text());
+				
+				//Trace click
+				console.log("you downloaded track %o", $a.text());
+				
+				//Increment downloads counter
+				$me.text(downloads + 1);
+				
+				//Download track
+				location = link + "/download";
+			});
+		}
+		
+		//Track is not publicly downloadable
+		else {
+			//Set button title
+			downloadsTitle = "Downloads have been disabled for this track";
 			
-			//Increment downloads counter
-			$me.text(downloads + 1);
+			//Disable button
+			$downloadsBtn.addClass("disabled");
 			
-			//Download track
-			location = link + "/download";
-		});
+			//Fix cursor events
+			$downloadsBtn.css({
+				"cursor": "default",
+				"pointer-events": "all"
+			});
+		}
+		
+		//Set downloads button title
+		$downloadsBtn.attr("title", downloadsTitle);
 		
 		//Modify like button
 		$likeBtn.addClass("player-action " + (liked ? "liked" : ""));
+		$likeBtn.attr("title", likesTitle);
 		$likeBtn.data("liked", liked);
 		$likeBtn.click(function() {
 			var $me = $(this);
@@ -453,12 +485,12 @@ function player_actions() {
 			
 			//Like track
 			if (!$me.data("liked")) {
-				$me.text(likes + 1).data("liked", true).addClass("liked");
+				$me.text(likes + 1).data("liked", true).addClass("liked").attr("title", unlikeText);
 			}
 			
 			//Unlike track
 			else {
-				$me.text(likes - 1).data("liked", false).removeClass("liked");
+				$me.text(likes - 1).data("liked", false).removeClass("liked").attr("title", likeText);
 			}
 			
 			//Request like

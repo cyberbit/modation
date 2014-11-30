@@ -19,6 +19,7 @@ var optionDefaults = {
 $(function() {
 	//Initialize all the things
 	initOptions();
+	initStorage();
 	initTracks();
 	initWatchlist();
 	initPages();
@@ -39,6 +40,117 @@ $(function() {
 function initOptions() {
 	$("#check-login").click(login);
 	$(".option").change(save_options);
+}
+
+//Initialize storage handler
+function initStorage() {
+	var $tab = $("#tab-storage");
+	var $copyBox = $(".storage-copy");
+	var $confirm = $(".storage-confirm");
+	
+	//Initialize progress container
+	$tab.find("#progressContainer").html('<div><div class="progressStatus">&nbsp;</div><div id="progress"></div><div>');
+	
+	//Grab progress elements
+	var $progress = $tab.find("#progress");
+	var $status = $tab.find(".progressStatus");
+	
+	//Format progress bar
+	$status.text("Loading...");
+	$progress.progressbar({value: false});
+	$progress.height(20);
+	
+	//Divisor for storage display
+	var divisor = 1024; //KiB
+	
+	//Grab storage information
+	var quota = crapi.storage().QUOTA_BYTES;
+	var quotaFixed = (quota / divisor).toFixed(2);
+	
+	//Grab usage
+	crapi.storage().getBytesInUse(function(bytes) {
+		var bytesFixed = (bytes / divisor).toFixed(2);
+		var percent = (100 * bytes / quota).toFixed(2);
+		
+		//Format progress bar
+		$status.text(bytesFixed + " of " + quotaFixed + " KiB (" + percent + "%)");
+		progress("tab-storage", parseFloat(percent))
+	});
+	
+	//Grab and display current data
+	crapi.clone(function(d) {
+		$copyBox.text(btoa(JSON.stringify(d)));
+	});
+	
+	//Copy box handler
+	$copyBox.click(function() {
+		this.select();
+	});
+	
+	//Paste box handler
+	$(".storage-paste").on("input change", function() {
+		var $this = $(this);
+		var parsedStorage = {};
+		var status = "No data";
+		var pre = "", context = "empty";
+		
+		//Pasted storage exists
+		if ($this.val()) {
+			pre = "text-";
+			
+			//Attempt conversion of data
+			try {
+				parsedStorage = $.parseJSON(atob($this.val()));
+				
+				//Conversion succeeded
+				status = "Looks good!";
+				context = "success";
+				
+				//Enable button
+				$confirm.removeClass("disabled");
+			}
+			
+			//Conversion failed
+			catch (e) {
+				status = "Invalid storage, try again!";
+				context = "danger";
+				
+				//Disable button
+				$confirm.addClass("disabled");
+			}
+		}
+		
+		//Pasted storage does not exist
+		else {
+			//Disable button
+			$confirm.addClass("disabled");
+		}
+		
+		//Update status
+		$(".storage-status")
+			.removeClass("empty text-danger text-success")
+			.addClass(pre + context)
+			.text(status);
+	});
+	
+	//Confirm button handler
+	$confirm.click(function() {
+		var result = confirm("Are you sure you wish to overwrite your saved storage? This action is not reversible!\n\nPress OK to confirm.");
+		
+		//Action confirmed
+		if (result) {
+			//Show notification
+			error('<strong>Storage pasted! Please refresh your browser to load these changes.</strong><br><input class="nice-button orange noshadow" id="reload-browser" type="button" style="padding: 5px 8px;" value="Refresh now">');
+			
+			//Bind double-check button
+			$("#reload-browser").click(function() {
+				crapi.reload();
+			});
+			
+			//Modalize
+			$(".cover").fadeIn(150);
+		}
+	})
 }
 
 //Initialize track manager
@@ -81,6 +193,7 @@ function _factory(key) {
 function parseHash() {
 	if (location.hash === "") location.hash = "#general";
 	if (location.hash === "#general") selectTab("tab-general");
+	if (location.hash === "#storage") selectTab("tab-storage");
 	if (location.hash === "#notifs") selectTab("tab-notifs");
 	if (location.hash === "#community") selectTab("tab-community");
 	if (location.hash === "#tracks") selectTab("tab-tracks");
@@ -188,7 +301,7 @@ function getTracks() {
 		$(this).remove();
 	});
 	if (!$('#tab-tracks #progress').length) {
-		$("#tab-tracks #progressContainer").html('<div><div id="progressStatus">&nbsp;</div><div id="progress"></div><div>');
+		$("#tab-tracks #progressContainer").html('<div><div class="progressStatus">&nbsp;</div><div id="progress"></div><div>');
 		$("#tab-tracks #progress").parent().hide();
 		$("#tab-tracks #progress").progressbar({
 			value: false
@@ -421,7 +534,7 @@ function save_options() {
 }
 
 function progressStatus(tab, msg) {
-	$("#" + tab + " #progressStatus").text(msg);
+	$("#" + tab + " .progressStatus").text(msg);
 }
 
 function progress(tab, val) {
@@ -499,7 +612,7 @@ function check_watchlist(update, callback) {
 	var wParsed = [];
 	var wFailed = [];
 	
-	chrome.storage.local.get(email, function(d) {
+	crapi.clone(function(d) {
 		var watchlist = d[email]["watchlist"] || {};
 		var wLen = watchlist.length;
 		var wCt = 0;
@@ -696,14 +809,15 @@ function check_watchlist(update, callback) {
 			console.log(wChanged);
 			
 			console.debug("final iteration complete!");
-			if (update) update_storage(email, d[email], callback);
+			if (update) crapi.update(email, d[email], callback);
 			else callback();
 		}
 	});
 }
 
 //Update storage for provided key
-function update_storage(key, value, callback) {
+//Deprecated as of v1.1
+/*function update_storage(key, value, callback) {
 	if (typeof callback == "undefined") callback = function(){};
 	
 	var updatedStorage = {};
@@ -711,7 +825,7 @@ function update_storage(key, value, callback) {
 	
 	//Update storage
 	chrome.storage.local.set(updatedStorage, callback);
-}
+}*/
 	
 //Remove from watchlist
 function delete_watchlist(link, callback) {
@@ -719,7 +833,7 @@ function delete_watchlist(link, callback) {
 	
 	var email = $("#email").val();
 	
-	chrome.storage.local.get(email, function(d) {
+	crapi.clone(function(d) {
 		var watchlist = d[email]['watchlist'];
 		var hasItem = false;
 		
@@ -736,7 +850,7 @@ function delete_watchlist(link, callback) {
 		
 		//Delete watchlist item and update
 		if (hasItem) {
-			update_storage(email, d[email], callback);
+			crapi.update(email, d[email], callback);
 		}
 	});
 }
@@ -744,7 +858,7 @@ function delete_watchlist(link, callback) {
 function refresh_watchlist() {
 	var email = $('#email').val();
 	
-	chrome.storage.local.get(email, function(d) {		
+	crapi.clone(function(d) {		
 		var watchlist = d[email]["watchlist"] || {};
 		
 		//Save container for future use
@@ -793,17 +907,6 @@ function refresh_watchlist() {
 		});
 	});
 }
-
-String.prototype.hashCode = function(){
-    var hash = 0, i, c;
-    if (this.length == 0) return hash;
-    for (i = 0, l = this.length; i < l; i++) {
-        c  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+c;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-};
 
 function showNotificationBar(message, duration, bgColor, txtColor, height) {
 	/*set default values*/
