@@ -106,8 +106,13 @@ ModAPI.prototype.login = function(callback) {
 				//Log failure
 				console.error("Unable to connect to Soundation API");
 			}).success(function(data) {
+				var me = data.data || data;
+				
+				//Inject success
+				me.success = data.success;
+				
 				//Run callback
-				callback(data.data);
+				callback(me);
 			});
 	}
 };

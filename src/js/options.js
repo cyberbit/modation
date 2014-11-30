@@ -241,11 +241,9 @@ function login() {
 	$("header .sub a:not(.current)").addClass("disabled");
 	
 	//Grab current user
-	$.getJSON("http://api.soundation.com/me", function(data) {
-		var me = data.data;
-		
+	modapi.login(function(me) {
 		//If successful, do stuff
-		if (data.success) {
+		if (me.success) {
 			//Hide notif bar, if needed
 			if (!save) {
 				$('#notification-bar').animate({top: "-" + (58 + 1) + "px"}, "fast", "easeOutQuart", function() {
