@@ -36,7 +36,7 @@
 		"js": ["js/jquery.all.js",
 			   "js/opentip-jquery.custom.min.js",
 			   "js/isotope.pkgd.min.js",
-			   "js/jquery.caretposition.js",
+			   "js/jquery.caretposition.custom.js",
 			   "js/jquery.sew.min.js",
 			   "js/crapi.js",
 			   "js/modapi.js",

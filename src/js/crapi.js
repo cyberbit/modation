@@ -12,6 +12,12 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
+Array.prototype.unique = function() {
+    return this.reduce(function(p, c) {
+        if (p.indexOf(c) < 0) p.push(c);
+        return p;
+    }, []);
+};
 
 /*!
  * CrAPI (Chrome API Helper)

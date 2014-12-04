@@ -279,6 +279,11 @@ function init() {
 		//Initialize dynamic feed
 		dynamic_feed();
 	}
+	
+	//Comment Tags
+	if (storage[me.email]["comment_tags"]) {
+		comment_tags();
+	}
 }
 
 //Get a factory item
@@ -532,6 +537,43 @@ function dynamic_feed() {
 			gutter: 10
 		}
 	});
+}
+
+//Comment Tags
+function comment_tags() {
+	$comment = $("#comment textarea");
+	
+	//Comment box exists
+	if ($comment.length) {
+		//Storage for unique names on page
+		var names = $(".comment .content h4").map(function() {
+			return $(this).text();
+		}).get().unique();
+		
+		//Storage for parsed names
+		var namesParsed = [];
+		$.each(names, function(i, v) {
+			namesParsed.push({val: v});
+		});
+		
+		//Trace names
+		console.log("names: %o", namesParsed);
+		
+		//Initialize inline select
+		$comment.sew({values: namesParsed});
+	}
+	
+	//Element factory for names
+	function _elemFactory(elem, e) {
+		//Grab tag template
+		$tag = _factory("modation-tag");
+		
+		//Set data
+		$tag.find(".modation-tag-val").text(e.val);
+		$tag.find(".modation-tag-meta").text(e.meta);
+		
+		elem.append($tag);
+	}
 }
 
 /* Super Pages Super Handler */

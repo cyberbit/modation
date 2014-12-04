@@ -13,7 +13,8 @@ var optionDefaults = {
 	profile_tips: true,
 	group_tips: true,
 	smart_player: true,
-	player_actions: true
+	player_actions: true,
+	comment_tags: true
 };
 
 $(function() {
