@@ -77,7 +77,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 						console.time("Modation feed notifications");
 						
 						//User is not logged in
-						if (!me) {
+						if (!me.success) {
 							//Log failure
 							console.warn("Could not login to Soundation");
 							

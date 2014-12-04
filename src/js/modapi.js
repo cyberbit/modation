@@ -57,7 +57,7 @@ ModAPI.prototype.login = function(callback) {
 		console.log("Attempt 1: %O", me);
 		
 		//Attempt 1 failed
-		if (!me) {
+		if (!me.success) {
 			//Log failure
 			console.warn("Attempt 1 failed! Pinging Soundation...");
 			

@@ -38,16 +38,6 @@ preinit();
 
 //Wrapper
 $(function() {
-	modapi.login(function(mi) {
-		me = mi;
-		
-		crapi.clone(function(d) {
-			storage = d;
-			
-			init();
-		});
-	});
-	
 	//Handler for content script messager
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		/*console.log("request: %O", request);
@@ -80,6 +70,16 @@ function preinit() {
 	
 	$.get(chrome.extension.getURL("content.html"), function(d) {
 		$("body").append(d);
+		
+		modapi.login(function(mi) {
+			me = mi;
+			
+			crapi.clone(function(d) {
+				storage = d;
+				
+				init();
+			});
+		});
 	});
 	
 	//Profile tips
@@ -272,6 +272,12 @@ function init() {
 		if (storage[me.email]["player_actions"]) {
 			player_actions();
 		}
+	}
+	
+	//Feed
+	if (location.href.match(/\/feed/)) {
+		//Initialize dynamic feed
+		dynamic_feed();
 	}
 }
 
@@ -504,6 +510,27 @@ function player_actions() {
 				$me.removeClass("disabled");
 			});
 		});
+	});
+}
+
+//Dynamic Feed
+function dynamic_feed() {
+	//Hide sidebar
+	$("aside").hide();
+	
+	//Format containers
+	//$(".main-wrapper").width(1080);
+	$("#main").width("100%");
+	$(".feed-item").width(430);
+	$(".feed-item.news").width(890);
+	
+	//Initialize Isotope
+	$("#main").isotope({
+		itemSelector: ".feed-item",
+		masonry: {
+			columnWidth: 450,
+			gutter: 10
+		}
 	});
 }
 

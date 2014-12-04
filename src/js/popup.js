@@ -39,7 +39,7 @@ function parseNotifs() {
 			var $parse = $("<strong>Unknown error</string>");
 			
 			//User is not logged in
-			if (!me) {
+			if (!me.success) {
 				crapi.badge({
 					title: "Please login to view notifications",
 					color: "gray",
@@ -195,12 +195,22 @@ function parseWatchlist() {
 	$("#modation-watchlist .loader").show();
 	
 	crapi.clone(function(d) {		
-		modapi.login(function(me) {			
+		modapi.login(function(me) {
+			//Storage for queue
+			var queue = [];
+			
+			//User is not logged in
+			if (!me.success) {
+				console.warn("Could not login to Soundation, bypassing watchlist check")
+			}
+			
+			//User is logged in
+			else {
+				queue = d[me.email]['watchlist-queue'];
+			}
+			
 			//Reset queue display
 			$("#modation-watchlist").find(".clear-notification, .modation-watchlist-item, .empty").remove();
-			
-			//Storage for queue
-			var queue = d[me.email]['watchlist-queue'];
 			
 			//Queue is empty
 			if (!queue.length) {

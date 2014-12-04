@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation Dev",
-	"version": "1.0",
+	"version": "1.1",
 	//"version_suffix": "beta",
 	"debug": true,
 
@@ -35,6 +35,9 @@
 		/*"css": ["css/opentip.min.css", "css/content.min.css"],*/ //Compiled source
 		"js": ["js/jquery.all.js",
 			   "js/opentip-jquery.custom.min.js",
+			   "js/isotope.pkgd.min.js",
+			   "js/jquery.caretposition.js",
+			   "js/jquery.sew.min.js",
 			   "js/crapi.js",
 			   "js/modapi.js",
 			   "js/content.js"], //Original source
