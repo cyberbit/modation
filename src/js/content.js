@@ -278,6 +278,7 @@ function init() {
 	if (location.href.match(/\/feed/)) {
 		//Initialize dynamic feed
 		dynamic_feed();
+		small_feed();
 	}
 	
 	//Comment Tags
@@ -537,6 +538,19 @@ function dynamic_feed() {
 			gutter: 10
 		}
 	});
+}
+
+//Small feed
+function small_feed() {
+	//Hide comments
+	$("#main > div > div > h4").hide();
+	$(".feed-item .comment").hide();
+	$("#main > div > div > strong > a").hide();
+	$("#main > div > div > a").hide();
+	$(".feed-item.user .feed-content").contents().filter(function(){
+   return (this.nodeType == 3);
+}).remove();
+	$("#main").isotope();
 }
 
 //Comment Tags
