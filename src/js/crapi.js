@@ -54,16 +54,17 @@ CrAPI.prototype.debug = crapi.manifest().debug;
  */
 function CrAPI() {
 	//Begin trace group
-	console.groupCollapsed("CrAPI :: Init");
+	//console.groupCollapsed("CrAPI :: Init");
+	console.log("%cCrAPI%c :: Init", "font-weight: bold; color: green", "");
 	
 	//Begin trace timing
-	console.time("CrAPI init");
+	//console.time("CrAPI init");
 	
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(d){return (typeof d != "undefined" ? d : false)};
 	
 	//Trace default callback
-	console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
+	//console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
 	
 	//Quick badge colors
 	this.badgeColors = {
@@ -72,7 +73,7 @@ function CrAPI() {
 	};
 	
 	//Trace badge colors
-	console.log("badgeColors: %O", this.badgeColors);
+	//console.log("badgeColors: %O", this.badgeColors);
 	
 	//Default badge options
 	this.badgeOptions = {
@@ -82,13 +83,13 @@ function CrAPI() {
 	};
 	
 	//Trace badge options
-	console.log("badgeOptions: %O", this.badgeOptions);
+	//console.log("badgeOptions: %O", this.badgeOptions);
 	
 	//End trace timing
-	console.timeEnd("CrAPI init");
+	//console.timeEnd("CrAPI init");
 	
 	//End trace group
-	console.groupEnd();
+	//console.groupEnd();
 }
 
 /**
@@ -131,7 +132,7 @@ CrAPI.prototype.clone = function(callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	//Begin trace group
-	console.groupCollapsed("CrAPI :: Clone storage");
+	//console.groupCollapsed("CrAPI :: Clone storage");
 	
 	//Begin trace timing
 	console.time("CrAPI clone");
@@ -142,13 +143,13 @@ CrAPI.prototype.clone = function(callback) {
 	//Grab storage
 	this.storage().get(function(d) {
 		//Trace storage
-		console.log("Storage: %O", d);
+		console.log("CrAPI :: Clone storage: %O", d);
 		
 		//Begin trace timing
 		console.timeEnd("CrAPI clone");
 		
 		//End trace group
-		console.groupEnd();
+		//console.groupEnd();
 		
 		//Run callback
 		callback(d);
@@ -166,7 +167,7 @@ CrAPI.prototype.update = function(key, value, callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	//Begin trace group
-	console.groupCollapsed("CrAPI :: Update storage");
+	//console.groupCollapsed("CrAPI :: Update storage");
 	
 	//Begin trace timing
 	console.time("CrAPI update");
@@ -180,13 +181,13 @@ CrAPI.prototype.update = function(key, value, callback) {
 	//Update storage
 	this.storage().set(updatedStorage, function() {
 		//Trace updated storage
-		console.log("New storage: %O", updatedStorage);
+		console.log("CrAPI :: Update storage: %O", updatedStorage);
 		
 		//End trace timing
 		console.timeEnd("CrAPI update");
 		
 		//End trace group
-		console.groupEnd();
+		//console.groupEnd();
 		
 		//Run callback
 		callback(value);
@@ -203,7 +204,7 @@ CrAPI.prototype.updateAll = function(items, callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	//Begin trace group
-	console.groupCollapsed("CrAPI :: Update all storage");
+	//console.groupCollapsed("CrAPI :: Update all storage");
 	
 	//Begin trace timing
 	console.time("CrAPI update all");
@@ -220,7 +221,7 @@ CrAPI.prototype.updateAll = function(items, callback) {
 		console.timeEnd("CrAPI update all");
 		
 		//End trace group
-		console.groupEnd();
+		//console.groupEnd();
 		
 		//Run callback
 		callback();
@@ -234,7 +235,7 @@ CrAPI.prototype.updateAll = function(items, callback) {
  */
 CrAPI.prototype.badge = function(matrix) {
 	//Begin trace group
-	console.groupCollapsed("CrAPI :: Update badge");
+	//console.groupCollapsed("CrAPI :: Update badge");
 	
 	//Begin trace timing
 	console.time("CrAPI badge");
@@ -259,5 +260,5 @@ CrAPI.prototype.badge = function(matrix) {
 	console.timeEnd("CrAPI badge");
 	
 	//End trace group
-	console.groupEnd();
+	//console.groupEnd();
 }

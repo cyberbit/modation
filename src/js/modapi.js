@@ -16,22 +16,23 @@ modapi.manifest = crapi.manifest();
  */
 function ModAPI() {
 	//Begin trace group
-	console.groupCollapsed("ModAPI :: Init");
+	//console.groupCollapsed("ModAPI :: Init");
+	console.log("%cModAPI%c :: Init", "font-weight: bold; color: #f60", "");
 	
 	//Begin trace timing
-	console.time("ModAPI init");
+	//console.time("ModAPI init");
 	
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(){};
 	
 	//Trace default callback
-	console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
+	//console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
 	
 	//End trace timing
-	console.timeEnd("ModAPI init");
+	//console.timeEnd("ModAPI init");
 	
 	//End trace group
-	console.groupEnd();
+	//console.groupEnd();
 }
 
 /**
@@ -43,7 +44,7 @@ ModAPI.prototype.login = function(callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
 	//Begin trace group
-	console.groupCollapsed("ModAPI :: Login");
+	//console.groupCollapsed("ModAPI :: Login");
 	
 	//Begin trace timing
 	console.time("ModAPI login");
@@ -72,7 +73,7 @@ ModAPI.prototype.login = function(callback) {
 					console.timeEnd("ModAPI login");
 					
 					//End trace group
-					console.groupEnd();
+					//console.groupEnd();
 					
 					//Pass user object to callback
 					//Any failure here should be handled in the callback
@@ -87,7 +88,7 @@ ModAPI.prototype.login = function(callback) {
 			console.timeEnd("ModAPI login");
 	
 			//End trace group
-			console.groupEnd();
+			//console.groupEnd();
 			
 			//Pass user object to callback
 			callback(me);
@@ -101,7 +102,7 @@ ModAPI.prototype.login = function(callback) {
 				console.timeEnd("ModAPI login");
 	
 				//End trace group
-				console.groupEnd();
+				//console.groupEnd();
 				
 				//Log failure
 				console.error("Unable to connect to Soundation API");
