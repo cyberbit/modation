@@ -277,7 +277,9 @@ function init() {
 	//Feed
 	if (location.href.match(/\/feed/)) {
 		//Initialize dynamic feed
-		dynamic_feed();
+		if (storage[me.email]["dynamic_feed"]) {
+			dynamic_feed();
+		}
 		
 		//Initialize small feed
 		if (storage[me.email]["small_feed"]) {
