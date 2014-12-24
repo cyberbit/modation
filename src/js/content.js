@@ -278,7 +278,11 @@ function init() {
 	if (location.href.match(/\/feed/)) {
 		//Initialize dynamic feed
 		dynamic_feed();
-		small_feed();
+		
+		//Initialize small feed
+		if (storage[me.email]["small_feed"]) {
+			small_feed();
+		}
 	}
 	
 	//Comment Tags
@@ -542,14 +546,17 @@ function dynamic_feed() {
 
 //Small feed
 function small_feed() {
-	//Hide comments
-	$("#main > div > div > h4").hide();
-	$(".feed-item .comment").hide();
-	$("#main > div > div > strong > a").hide();
-	$("#main > div > div > a").hide();
-	$(".feed-item.user .feed-content").contents().filter(function(){
-   return (this.nodeType == 3);
-}).remove();
+	//Grab user feed item contents
+	var $contents = $(".feed-item.user, .feed-item.group").find(".feed-content");
+	
+	//Remove any text not in a container
+	$contents.contents().filter(function() {
+		return (this.nodeType == 3);
+	}).remove();
+	
+	//Hide everything else except for the track and time
+	$contents.contents().not(".time, .track").hide();
+	
 	$("#main").isotope();
 }
 
