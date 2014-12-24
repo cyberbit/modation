@@ -272,6 +272,9 @@ function init() {
 		if (storage[me.email]["player_actions"]) {
 			player_actions();
 		}
+		
+		//Initialize small player
+		small_player();
 	}
 	
 	//Feed
@@ -560,6 +563,38 @@ function small_feed() {
 	$contents.contents().not(".time, .track").hide();
 	
 	$("#main").isotope();
+}
+
+//Small player
+function small_player() {
+	//Grab elements
+	var $play = $("#play-button");
+	var $wfArea = $("#wf-area");
+	var wf = waveform;
+	var wfLoaded = loadedPart;
+	
+	//Hide logo
+	$("#textlogo").hide();
+	
+	//Modify play button
+	$play.css({
+		position: "absolute",
+		left: "14px",
+		top: "26px",
+		"z-index": "100"
+	});
+	
+	//Modify waveform area
+	$wfArea.css({
+		"margin-left": "100px"
+	});
+	
+	//Grab new width
+	var width = $wfArea.width();
+	
+	//Modify waveform
+	wf.width = width;
+	wfLoaded.width = width;
 }
 
 //Comment Tags
