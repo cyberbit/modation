@@ -278,6 +278,11 @@ function init() {
 	if (location.href.match(/\/feed/)) {
 		//Initialize dynamic feed
 		dynamic_feed();
+		
+		//Initialize small feed
+		if (storage[me.email]["small_feed"]) {
+			small_feed();
+		}
 	}
 	
 	//Comment Tags
@@ -537,6 +542,22 @@ function dynamic_feed() {
 			gutter: 10
 		}
 	});
+}
+
+//Small feed
+function small_feed() {
+	//Grab user feed item contents
+	var $contents = $(".feed-item.user, .feed-item.group").find(".feed-content");
+	
+	//Remove any text not in a container
+	$contents.contents().filter(function() {
+		return (this.nodeType == 3);
+	}).remove();
+	
+	//Hide everything else except for the track and time
+	$contents.contents().not(".time, .track").hide();
+	
+	$("#main").isotope();
 }
 
 //Comment Tags
