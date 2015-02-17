@@ -101,6 +101,70 @@ div.admin.minified a {
     transition: all .3s;
 }
 
+input[type=range].vertical {
+    -webkit-transform: rotate(270deg);
+    -webkit-backface-visibility: hidden;
+}
+
+.volume {
+    position: absolute;
+    z-index: 100;
+    top: 70px;
+    left: -31px;
+    width: 90px;
+}
+
+input[type=range] {
+    /*removes default webkit styles*/
+    -webkit-appearance: none;
+    
+    /*fix for FF unable to apply focus style bug */
+    /*border: 1px solid white;*/
+    
+    /*required for proper track sizing in FF*/
+    /*width: 300px;*/
+}
+input[type=range]::-webkit-slider-runnable-track {
+    /*width: 300px;*/
+    height: 7px;
+    background: #333;
+    border: none;
+    /*border-radius: 3px;*/
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: #f60;
+    margin-top: -2px;
+}
+input[type=range]:focus {
+    outline: none;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+    /*background: rgba(221, 221, 221, .6);*/
+}
+
+.smart-player #play-button .overlay {
+    display: none;
+}
+
+.smart-player #play-button {
+    background: none;
+}
+
+.smart-player #play-button-icon {
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.smart-player #play-button:hover #play-button-icon {
+    opacity: 1;
+    /*transition: opacity .2s;*/
+}
+
 /* Comment Tags */
 
 

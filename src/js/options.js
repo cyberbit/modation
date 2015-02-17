@@ -15,7 +15,8 @@ var optionDefaults = {
 	smart_player: true,
 	player_actions: true,
 	comment_tags: true,
-	dynamic_feed: true
+	dynamic_feed: false,
+	small_feed: false
 };
 
 $(function() {

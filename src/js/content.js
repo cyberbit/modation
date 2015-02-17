@@ -10,6 +10,15 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
+//Isotope options for feed
+var isotope_feed = {
+	itemSelector: ".feed-item",
+	masonry: {
+		columnWidth: 450,
+		gutter: 10
+	}
+};
+
 //Generate unique string ID (via http://stackoverflow.com/a/1349426)
 function makeid() {
     var text = "";
@@ -263,18 +272,20 @@ function init() {
 	//Player widget
 	if (location.href.match(/\player\//)) {
 		//Attach play event handler, if needed
-		if (storage[me.email]["smart_player"]) $player.on("play", function() {
-			//Send pause everything message
-			chrome.runtime.sendMessage({action: "modation-pause-everything", guid: guid});
-		});
+		if (storage[me.email]["smart_player"]) {
+			$player.on("play", function() {
+				//Send pause everything message
+				chrome.runtime.sendMessage({action: "modation-pause-everything", guid: guid});
+			});
+			
+			//Initialize small player
+			small_player();
+		}
 		
 		//Add player actions
 		if (storage[me.email]["player_actions"]) {
 			player_actions();
 		}
-		
-		//Initialize small player
-		small_player();
 	}
 	
 	//Feed
@@ -415,6 +426,9 @@ function player_actions() {
 	var $a = $titleBar.find("a[href*=track]");
 	var link = $a.attr("href");
 	
+	//Modify title link
+	$("#title-bar > a").width(240);
+	
 	//Grab buttons
 	var $likeBtn = $titleBar.find("#likes");
 	var $downloadsBtn = _factory("modation-player-downloads");
@@ -540,13 +554,7 @@ function dynamic_feed() {
 	$(".feed-item.news").width(890);
 	
 	//Initialize Isotope
-	$("#main").isotope({
-		itemSelector: ".feed-item",
-		masonry: {
-			columnWidth: 450,
-			gutter: 10
-		}
-	});
+	$("#main").isotope(isotope_feed);
 }
 
 //Small feed
@@ -562,16 +570,24 @@ function small_feed() {
 	//Hide everything else except for the track and time
 	$contents.contents().not(".time, .track").hide();
 	
-	$("#main").isotope();
+	$("#main").isotope(isotope_feed);
 }
 
 //Small player
 function small_player() {
+	//Tag body for CSS changes
+	$("body").addClass("smart-player");
+	
 	//Grab elements
 	var $play = $("#play-button");
 	var $wfArea = $("#wf-area");
-	var wf = waveform;
-	var wfLoaded = loadedPart;
+	var $picture = $("#picture img");
+	var wf = $("#waveform")[0];
+	var wfLoaded = $("#loaded-part")[0];
+	
+	//Grab canvas contexts
+	var wfCtx = wf.getContext("2d");
+	var wfLoadedCtx = wfLoaded.getContext("2d");
 	
 	//Hide logo
 	$("#textlogo").hide();
@@ -579,7 +595,7 @@ function small_player() {
 	//Modify play button
 	$play.css({
 		position: "absolute",
-		left: "14px",
+		left: "25px",
 		top: "26px",
 		"z-index": "100"
 	});
@@ -589,12 +605,64 @@ function small_player() {
 		"margin-left": "100px"
 	});
 	
+	//Load high-quality thumbnail
+	var src = $picture.attr("src");
+	var srcLarge = src.replace(/\/(small)\//, "/large/");
+	$picture.attr("src", "");
+	
+	//Modify picture
+	$picture.css({
+		width: "150px",
+		height: "150px",
+		top: "3px",
+		position: "absolute",
+		clip: "rect(23px, 149px, 121px, 1px)",
+		background: "linear-gradient(to right, transparent 56%, rgba(34, 34, 34, .7) 79%, rgb(34, 34, 34)), url(" + srcLarge + ") no-repeat"
+	});
+	
+	$picture.on("error", function() {
+		$(this).css({
+			"background-size": "150px",
+			display: "inline"
+		});
+	});
+	
+	//Generate volume control
+	var $volume = _factory("modation-player-volume")
+	
+	//Add volume control
+	$play.after($volume);
+	
+	//Volume handler
+	$volume.on("input", function(e) {
+		var vol = $(this).val();
+		
+		//console.log("vol: %o to %o", player.volume, vol);
+		
+		player.volume = vol;
+	});
+	
 	//Grab new width
-	var width = $wfArea.width();
+	var width = $wfArea.width() - 1;
 	
 	//Modify waveform
+	$(wf).width(width);
 	wf.width = width;
+	
+	//Modify waveform clip mask
+	$(wfLoaded).width(width);
 	wfLoaded.width = width;
+	
+	//Grab waveform image link
+	var link = $("body").html().match(/setImageSrc\(\"(.*)\"\)/)[1];
+	
+	//Generate image
+	var image = new Image;
+	image.src = link;
+	
+	//Draw image
+	wfCtx.drawImage(image, 0, 0, image.width - 1, image.height, 0, 0, wf.width, wf.height);
+	wfLoadedCtx.drawImage(image, 0, 0, image.width - 1, image.height, 0, 0, wfLoaded.width, wfLoaded.height);
 }
 
 //Comment Tags
