@@ -2,9 +2,10 @@
 <html>
 	<head>
 		<title>Modation Notifs</title>
-		<link href="http://assets.soundation.com/assets/reset.css" media="screen" rel="stylesheet" type="text/css" />
-		<link href="http://assets.soundation.com/assets/common.css" media="screen" rel="stylesheet" type="text/css" />
-		<link href="http://assets.soundation.com/assets/community.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300,700" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100" rel="stylesheet" type="text/css" />
+		<link href="https://soundation.com/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
 		<script src="js/jquery.all.js"></script>
 		<!-- Original souce -->
 		<script src="js/crapi.js"></script>
@@ -14,29 +15,43 @@
 		<script src="js/api.min.js"></script>
 		<script src="js/popup.min.js"></script>-->
 		<style>
-			body { background: #f5f5f5; }
-			.hand { cursor: pointer; }
-			nav { background: #eee; border-bottom: solid 1px #ddd; padding: .3em .5em; }
-			nav li { display: inline-block; }
-			nav a { display: inline-block; padding: .15em .5em; border-radius: 4px; }
-			nav a:hover { text-decoration: none; }
-			nav a.active { background: #C52F24; color: white; }
-			aside { float: none; margin: 0px; }
-			aside .wrap { width: 190px; }
+			/*body { background: #f5f5f5; }*/
+			/*.hand { cursor: pointer; }*/
+			/*nav { background: #eee; border-bottom: solid 1px #ddd; padding: .3em .5em; }*/
+			/*nav li { display: inline-block; }*/
+			/*nav a { display: inline-block; padding: .15em .5em; border-radius: 4px; }*/
+			/*nav a:hover { text-decoration: none; }*/
+			/*nav a.active { background: #C52F24; color: white; }*/
+			/*aside { float: none; margin: 0px; }*/
+			/*aside .wrap { width: 190px; }*/
 			.factory { display: none; }
-			.community .main-wrapper { width: auto; min-height: 0; background: #f5f5f5; padding: 8px; }
-			#content { width: auto; min-height: 0; border-bottom: none; }
-			aside .notifications .super.clear-notification { position: relative; float: right; padding-left: 4px; }
+			/*.community .main-wrapper { width: auto; min-height: 0; background: #f5f5f5; padding: 8px; }*/
+			/*#content { width: auto; min-height: 0; border-bottom: none; }*/
+			/*aside .notifications .super.clear-notification { position: relative; float: right; padding-left: 4px; }*/
+			.inner { width: 340px; }
+			body > main > .inner { min-height: 0; }
+			body > main > .inner aside { padding-bottom: 0; padding-top: 10px; }
+			.community.feed .notifications .clear-all { top: 13px; }
 		</style>
 	</head>
 	<body class="community feed show">
-		<div id="content">
-			<nav id="modation-nav">
+		<main>
+			<!--<nav id="modation-nav">
 				<ul>
 					<li><a class="hand active" data-tab="modation-notifications">Notifications</a></li>
 					<li><a class="hand" data-tab="modation-watchlist">Watchlist</a></li>
 				</ul>
-			</nav>
+			</nav>-->
+			<div class="inner">
+				<aside id="modation-notifications">
+					<h3>Notifications</h3>
+					<div class="notifications">
+						<div class="notification"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> Just a moment...</div>
+					</div>
+				</aside>
+			</div>
+		</main>
+		<!--<div id="content">
 			<div class="main-wrapper">
 				<div class="content" id="modation-notifications-container">
 					<aside id="modation-notifications">
@@ -58,7 +73,7 @@
 					</aside>
 				</div>
 			</div>
-		</div>
+		</div>-->
 		<div class="factory">
 			<aside class="modation-notifications-login">
 				<div class="container">

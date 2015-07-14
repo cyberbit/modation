@@ -55,7 +55,7 @@ function parseNotifs() {
 			
 			//User is logged in
 			else {
-				$.get("http://soundation.com/feed", function(html) {
+				$.get(global.path.feed, function(html) {
 					//Parse HTML to remove images and timing values
 					html = html.replace(/(<iframe\b.*?<\/iframe>)|(<img\b[^>]*>)/ig, '');
 					
@@ -77,7 +77,7 @@ function parseNotifs() {
 					//Iterate all links
 					$("#modation-notifications a").each(function() {
 						var href = $(this).attr("href");
-						$(this).attr("href", "http://soundation.com" + href);
+						$(this).attr("href", global.path.home + href);
 						$(this).attr("target", "_blank");
 					});
 					
@@ -85,7 +85,7 @@ function parseNotifs() {
 					var ct = 0;
 					$("#modation-notifications form[action*=clear_notification]").each(function() {
 						var action = $(this).attr("action");
-						$(this).attr("action", "http://soundation.com" + action);
+						$(this).attr("action", global.path.home + action);
 						$(this).attr("target", "clearcatcher" + ct);
 						$("#content").after('<iframe width="0" height="0" name="clearcatcher' + ct + '" style="display: none"></iframe>');
 						++ct;
@@ -122,8 +122,8 @@ function parseNotifs() {
 					});
 					
 					function _generateAlerts(data) {
-						var watchlistAlerts = data['watchlist-queue'].length;
-						var alerts = feedAlerts + watchlistAlerts;
+						//var watchlistAlerts = data['watchlist-queue'].length;
+						var alerts = feedAlerts;// + watchlistAlerts;
 						var alertString = "";
 						
 						//Soundation notifs handler
@@ -139,7 +139,7 @@ function parseNotifs() {
 							//Initialize author string
 							var authorCount = authors.length
 							var others = authorCount - 3;
-							alertString = authorCount + " new from ";
+							alertString = feedAlerts + " new from ";
 							
 							//Iterate authors
 							var i = 0;
@@ -160,9 +160,9 @@ function parseNotifs() {
 						}
 						
 						//Watchlist notifs handler
-						if (watchlistAlerts) {
+						/*if (watchlistAlerts) {
 							alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
-						}
+						}*/
 						
 						//Global notifs handler
 						if (alerts) {

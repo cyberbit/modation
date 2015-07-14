@@ -2,7 +2,7 @@
  * ModAPI (Modation API)
  *
  * @author cyberbit (D.J. Marcolesco) dj.marcolesco@outlook.com
- * @version 0.1
+ * @version 2.0
  */
 
 //Global identifier for ModAPI class
@@ -11,28 +11,29 @@ modapi = new ModAPI();
 //Clone manifest (will move to CrAPI)
 modapi.manifest = crapi.manifest();
 
+//URI constants
+var protocol = "https://";
+var domain = "soundation.com";
+
+//Define global variables
+var global = {
+	path: {
+		home: protocol + domain,
+		login: protocol + domain + "?login=yes",
+		feed: protocol + domain + "/feed",
+		api: protocol + "api." + domain + "/me",
+		profile: protocol + domain + "/account/profile"
+	}
+};
+
 /**
  * Contains helper functions specific to Modation
  */
 function ModAPI() {
-	//Begin trace group
-	//console.groupCollapsed("ModAPI :: Init");
 	console.log("%cModAPI%c :: Init", "font-weight: bold; color: #f60", "");
-	
-	//Begin trace timing
-	//console.time("ModAPI init");
 	
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(){};
-	
-	//Trace default callback
-	//console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
-	
-	//End trace timing
-	//console.timeEnd("ModAPI init");
-	
-	//End trace group
-	//console.groupEnd();
 }
 
 /**
@@ -43,38 +44,43 @@ function ModAPI() {
 ModAPI.prototype.login = function(callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
-	//Begin trace group
-	//console.groupCollapsed("ModAPI :: Login");
+	console.log("%cModAPI%c :: Login", "font-weight: bold; color: #f60", "");
 	
-	//Begin trace timing
-	console.time("ModAPI login");
-	
-	//Trace callback
-	if (crapi.debug) console.trace("Stack trace");
+	//Ping Soundation to set session cookie
+	$.get(global.path.home, function(html) {
+		var parsedHtml = html.deres();
+		var $html = $(parsedHtml);
+		var profileLink = $html.find(".user-link").attr("href");
+		var token = $html.filter("[name=csrf-token]").attr("content");
+		
+		//Grab Soundation user
+		_me(function(me) {
+			//Inject additional properties
+			me.link = profileLink;
+			
+			//Globalize token
+			global.token = token;
+			
+			//Pass user object to callback
+			//Any failure here should be handled in the callback
+			callback(me);
+		});
+	});
 	
 	//Grab Soundation user (attempt 1)
-	_me(function(me) {
-		//Trace attempt 1
-		console.log("Attempt 1: %O", me);
-		
+	/*_me(function(me) {
 		//Attempt 1 failed
 		if (!me.success) {
 			//Log failure
 			console.warn("Attempt 1 failed! Pinging Soundation...");
 			
 			//Ping Soundation to set session cookie
-			$.get("http://soundation.com").always(function() {
-				//Grab Soundation user (attempt 2)
+			$.get(global.path.home).always(function() {
+				var args = arguments;
+				
+				console.log("login args: %o", args);
+				
 				_me(function(me) {
-					//Trace attempt 2
-					console.log("Attempt 2: %O", me);
-					
-					//End trace timing
-					console.timeEnd("ModAPI login");
-					
-					//End trace group
-					//console.groupEnd();
-					
 					//Pass user object to callback
 					//Any failure here should be handled in the callback
 					callback(me);
@@ -84,28 +90,16 @@ ModAPI.prototype.login = function(callback) {
 		
 		//Attempt 1 succeeded
 		else {
-			//End trace timing
-			console.timeEnd("ModAPI login");
-	
-			//End trace group
-			//console.groupEnd();
-			
 			//Pass user object to callback
 			callback(me);
 		}
-	});
+	});*/
 	
 	function _me(callback) {
-		$.getJSON("http://api.soundation.com/me")
+		$.getJSON(global.path.api)
 			.fail(function(jqXHR, textStatus) {
-				//End trace timing
-				console.timeEnd("ModAPI login");
-	
-				//End trace group
-				//console.groupEnd();
-				
 				//Log failure
-				console.error("Unable to connect to Soundation API");
+				console.error("%cModAPI%c :: Unable to connect to Soundation API", "font-weight: bold; color: #f60", "");
 			}).success(function(data) {
 				var me = data.data || data;
 				
@@ -117,3 +111,10 @@ ModAPI.prototype.login = function(callback) {
 			});
 	}
 };
+
+/**
+ * Get current authenticity token
+ *
+ * @returns	{string}	Authenticity token
+ */
+ModAPI.prototype.token = function() { return global.token; }

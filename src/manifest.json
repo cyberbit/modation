@@ -1,19 +1,19 @@
 {
 	"manifest_version": 2,
 	"name": "Modation Dev",
-	"version": "1.1",
+	"version": "2.0",
 	//"version_suffix": "beta",
 	"debug": true,
 
 	"description": "Soundation, amplified.",
-	"icons": { "16": "img/icon16.png",
-		"19": "img/icon19.png",
-		"48": "img/icon48.png",
-		"128": "img/icon128.png" },
+	"icons": { "16": "img/newicon16.png",
+		"19": "img/newicon19.png",
+		"48": "img/newicon48.png",
+		"128": "img/newicon128.png" },
 
 	"author": "cyberbit",
 	"permissions": [
-		"http://*.soundation.com/*",
+		"https://*.soundation.com/*",
 		"alarms",
 		"notifications",
 		"storage"
@@ -25,12 +25,12 @@
 	},
 
 	"browser_action": {
-		"default_icon": "img/icon19.png",
+		"default_icon": "img/newicon.png",
 		"default_popup": "popup.html"
 	},
 	
 	"content_scripts": [{
-		"matches": ["http://soundation.com/*"],
+		"matches": ["https://*.soundation.com/*"],
 		"css": ["css/opentip.css", "css/content.css"], //Original source
 		/*"css": ["css/opentip.min.css", "css/content.min.css"],*/ //Compiled source
 		"js": ["js/jquery.all.js",
@@ -38,8 +38,10 @@
 			   "js/isotope.pkgd.min.js",
 			   "js/jquery.caretposition.custom.js",
 			   "js/jquery.sew.min.js",
+			   "js/moment.min.js",
 			   "js/crapi.js",
 			   "js/modapi.js",
+			   "js/AprilApril.min.js",
 			   "js/content.js"], //Original source
 		/*"js": ["js/jquery.all.js", "js/opentip-jquery.custom.min.js", "js/api.min.js", "js/content.min.js"],*/ //Compiled source
 		//"run_at": "document_start",
@@ -50,7 +52,7 @@
 		"content.html"
 	],
 	
-	"options_page": "options.html",
+	"options_page": "newoptions.html",
 
 	"short_name": "Modation"
 }

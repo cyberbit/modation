@@ -292,7 +292,7 @@ function init() {
 	if (location.href.match(/\/feed/)) {
 		//Initialize dynamic feed
 		if (storage[me.email]["dynamic_feed"]) {
-			dynamic_feed();
+			//dynamic_feed();
 		}
 		
 		//Initialize small feed
@@ -304,6 +304,16 @@ function init() {
 	//Comment Tags
 	if (storage[me.email]["comment_tags"]) {
 		comment_tags();
+	}
+	
+	//Chrome studio
+	if (location.href.match(/chrome.soundation.com/)) {
+		afdStudio();
+	}
+	
+	//Rest of the site
+	else {
+		afdCommunity();
 	}
 }
 
@@ -964,4 +974,46 @@ function watchlist_ui() {
 		
 		return isQueued;
 	}
+}
+
+function isAfd() {
+	var afd = moment();
+	afd.month(3); //April
+	afd.date(1); //1st
+	
+	return moment().isSame(afd, "day");
+}
+
+function afdStudio() {
+	if (!isAfd()) return;
+	
+	//Set up page
+	$("html, body").height("100%");
+	
+	$("html").on("click", "button, a", function(e) {
+		var $this = $(this);
+		
+		$this.toggleClass("afd-mirror");
+	});
+	
+	//Set up AprilApril
+	var april = new AprilApril({
+		rotate: true
+	});
+	
+	//:D
+	//april.fool();
+}
+
+function afdCommunity() {
+	if (!isAfd()) return;
+	
+	//Set up AprilApril
+	var april = new AprilApril({
+		replaceImages: true,
+		scrambleLinks: true
+	});
+	
+	//:D
+	april.fool();
 }

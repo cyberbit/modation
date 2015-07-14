@@ -12,12 +12,34 @@ String.prototype.hashCode = function(){
     return hash;
 };
 
+String.prototype.deres = function() {
+	return this.replace(/img[^>]*>/g, "");
+}
+
 Array.prototype.unique = function() {
     return this.reduce(function(p, c) {
         if (p.indexOf(c) < 0) p.push(c);
         return p;
     }, []);
 };
+
+//Add/replace handler
+function handle(target, event, callback, trigger) {
+    if (typeof trigger == "undefined") trigger = false;
+    
+    var $target = $(target);
+    
+    $target.off(event);
+    $target.on(event, callback);
+}
+
+//Hide context, show view
+function showView(context, view, fade) {
+    if (typeof fade == "undefined") fade = 170;
+    
+    $(context).fadeOut(fade);
+    $(view).delay(fade).fadeIn(fade);
+}
 
 /*!
  * CrAPI (Chrome API Helper)
@@ -50,30 +72,36 @@ CrAPI.prototype.reload = function() { location.reload(); }
 CrAPI.prototype.debug = crapi.manifest().debug;
 
 /**
+ * (Un)set write lock
+ */
+CrAPI.prototype.lock = function(state) {
+	if (typeof state == "undefined") state = "";
+	
+	localStorage.crapi_locked = state;
+}
+
+/**
+ * Get lock state
+ */
+CrAPI.prototype.locked = function() {
+	console.log("lock checked");
+	return localStorage.crapi_locked;
+}
+
+/**
  * Contains workarounds for tricky bits in the Chrome API
  */
 function CrAPI() {
-	//Begin trace group
-	//console.groupCollapsed("CrAPI :: Init");
 	console.log("%cCrAPI%c :: Init", "font-weight: bold; color: green", "");
-	
-	//Begin trace timing
-	//console.time("CrAPI init");
 	
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(d){return (typeof d != "undefined" ? d : false)};
-	
-	//Trace default callback
-	//console.log("DEFAULT_CALLBACK: %O", this.DEFAULT_CALLBACK);
 	
 	//Quick badge colors
 	this.badgeColors = {
 		gray: "#9a9a9a",
 		red: "#d00"
 	};
-	
-	//Trace badge colors
-	//console.log("badgeColors: %O", this.badgeColors);
 	
 	//Default badge options
 	this.badgeOptions = {
@@ -82,14 +110,10 @@ function CrAPI() {
 		text: false
 	};
 	
-	//Trace badge options
-	//console.log("badgeOptions: %O", this.badgeOptions);
-	
-	//End trace timing
-	//console.timeEnd("CrAPI init");
-	
-	//End trace group
-	//console.groupEnd();
+	//Storage lock state
+	if (typeof localStorage.crapi_locked == "undefined") {
+		localStorage.crapi_locked = false;
+	}
 }
 
 /**
@@ -131,25 +155,10 @@ CrAPI.prototype.storage = function(type) {
 CrAPI.prototype.clone = function(callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
-	//Begin trace group
-	//console.groupCollapsed("CrAPI :: Clone storage");
-	
-	//Begin trace timing
-	console.time("CrAPI clone");
-	
-	//Trace callback
-	if (crapi.debug) console.trace("Stack trace");
-	
 	//Grab storage
 	this.storage().get(function(d) {
 		//Trace storage
-		console.log("CrAPI :: Clone storage: %O", d);
-		
-		//Begin trace timing
-		console.timeEnd("CrAPI clone");
-		
-		//End trace group
-		//console.groupEnd();
+		console.log("%cCrAPI%c :: Clone storage: %O", "font-weight: bold; color: green", "", d);
 		
 		//Run callback
 		callback(d);
@@ -166,32 +175,36 @@ CrAPI.prototype.clone = function(callback) {
 CrAPI.prototype.update = function(key, value, callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
-	//Begin trace group
-	//console.groupCollapsed("CrAPI :: Update storage");
+	var _this = this;
 	
-	//Begin trace timing
-	console.time("CrAPI update");
-	
-	//Trace callback
-	if (crapi.debug) console.trace("Stack trace");
-	
-	var updatedStorage = {};
-	updatedStorage[key] = value;
-	
-	//Update storage
-	this.storage().set(updatedStorage, function() {
-		//Trace updated storage
-		console.log("CrAPI :: Update storage: %O", updatedStorage);
+	//Storage not locked
+	if (!_this.locked()) {
+		var updatedStorage = {};
+		updatedStorage[key] = value;
 		
-		//End trace timing
-		console.timeEnd("CrAPI update");
+		//Lock storage
+		_this.lock("Update storage");
 		
-		//End trace group
-		//console.groupEnd();
+		//Update storage
+		_this.storage().set(updatedStorage, function() {
+			//Unlock storage
+			_this.lock();
+			
+			//Trace updated storage
+			console.log("%cCrAPI%c :: Update storage: %O", "font-weight: bold; color: green", "", updatedStorage);
+			
+			//Run callback
+			callback(value);
+		});
+	}
+	
+	//Storage locked
+	else {
+		console.error("%cCrAPI%c :: Storage locked: %o", "font-weight: bold; color: green", "", this.locked);
 		
 		//Run callback
-		callback(value);
-	});
+		callback(false);
+	}
 }
 
 /**
@@ -203,29 +216,33 @@ CrAPI.prototype.update = function(key, value, callback) {
 CrAPI.prototype.updateAll = function(items, callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
 	
-	//Begin trace group
-	//console.groupCollapsed("CrAPI :: Update all storage");
+	var _this = this;
 	
-	//Begin trace timing
-	console.time("CrAPI update all");
-	
-	//Trace callback
-	if (crapi.debug) console.trace("Stack trace");
-	
-	//Update storage
-	this.storage().set(items, function() {
-		//Trace updated storage
-		console.log("New storage: %O", items);
+	//Storage not locked
+	if (!_this.locked()) {
+		//Lock storage
+		_this.lock("Update all");
 		
-		//End trace timing
-		console.timeEnd("CrAPI update all");
-		
-		//End trace group
-		//console.groupEnd();
+		//Update storage
+		_this.storage().set(items, function() {
+			//Unlock storage
+			_this.lock();
+			
+			//Trace updated storage
+			console.log("%cCrAPI%c :: Update all: %O", "font-weight: bold; color: green", "", items);
+			
+			//Run callback
+			callback();
+		});
+	}
+	
+	//Storage locked
+	else {
+		console.error("%cCrAPI%c :: Storage locked: %o", "font-weight: bold; color: green", "", this.locked);
 		
 		//Run callback
-		callback();
-	});
+		callback(false);
+	}
 }
 
 /**
@@ -234,31 +251,10 @@ CrAPI.prototype.updateAll = function(items, callback) {
  * @param	{object}	matrix		Badge options
  */
 CrAPI.prototype.badge = function(matrix) {
-	//Begin trace group
-	//console.groupCollapsed("CrAPI :: Update badge");
-	
-	//Begin trace timing
-	console.time("CrAPI badge");
-	
-	//Trace callback
-	if (crapi.debug) console.trace("Stack trace");
-	
 	var options = $.extend({}, this.badgeOptions, matrix);
 	var color = (typeof this.badgeColors[options.color] != "undefined" ? this.badgeColors[options.color] : options.color);
-	
-	//Trace options
-	console.log("Options: %O", options);
-	
-	//Trace color
-	console.log("Color:", color);
 	
 	if (options.title !== false) chrome.browserAction.setTitle({title: options.title});
 	if (color !== false) chrome.browserAction.setBadgeBackgroundColor({color: color});
 	if (options.text !== false) chrome.browserAction.setBadgeText({text: options.text});
-	
-	//End trace timing
-	console.timeEnd("CrAPI badge");
-	
-	//End trace group
-	//console.groupEnd();
 }

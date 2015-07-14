@@ -198,3 +198,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background: #4183C4;
     text-decoration: none;
 }
+
+.afd-mirror {
+    -webkit-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+}
