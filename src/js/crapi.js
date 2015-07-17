@@ -112,7 +112,7 @@ function CrAPI() {
 	
 	//Storage lock state
 	if (typeof localStorage.crapi_locked == "undefined") {
-		localStorage.crapi_locked = false;
+		localStorage.crapi_locked = "";
 	}
 }
 

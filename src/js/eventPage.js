@@ -27,8 +27,28 @@ function initInstall() {
 	localStorage.installed = now;
 	localStorage.version = modapi.manifest.version;
 	
-	//Open about page
-	chrome.tabs.create({url: "newoptions.html#about"});
+	//Show new install notification
+	var notif = {
+		type: "basic",
+		iconUrl: "img/newiconflat128.png",
+		title: "Modation has updated!",
+		message: "Click here to see what's new."
+	};
+	
+	//Storage for notif ID
+	var id = "modation_update";
+	
+	//Update notification, or create if needed
+	chrome.notifications.update(id, notif, function (updated) {
+		if (!updated) chrome.notifications.create(id, notif);
+		
+		//Update notification data
+		notifData[id] = {
+			notif: notif,
+			link: "http://cyberbit.github.io/modation/",
+			actions: []
+		};
+	});
 }
 
 //Initialize alarms
@@ -51,7 +71,7 @@ function initNotifs() {
 		
 		//Notification data exists
 		if (data) {
-			console.log("clicked notification: %o, traveling to %o", data.notif, data.link);
+			//console.log("clicked notification: %o, traveling to %o", data.notif, data.link);
 			
 			//Follow link and clear notification
 			_follow(data.link, notifId);
@@ -66,12 +86,12 @@ function initNotifs() {
 		if (data) {
 			var btn = data.actions[i];
 			
-			console.log("clicked button: %o", btn);
+			//console.log("clicked button: %o", btn);
 			
 			//Confirmation required
 			if (btn.data.confirm) {
 				if (confirm(btn.data.confirm)) {
-					console.log("action confirmed");
+					//console.log("action confirmed");
 					
 					//Follow link and clear notification
 					_follow(data.link, notifId, i);
@@ -89,7 +109,7 @@ function initNotifs() {
 	//Close handler
 	chrome.notifications.onClosed.addListener(function(notifId, user) {
 		if (user) {
-			console.log("closed by user: %o", notifData[notifId]);
+			//console.log("closed by user: %o", notifData[notifId]);
 			
 			//Clear notification
 			_clear(notifId);
@@ -111,7 +131,16 @@ function initNotifs() {
 		}
 		
 		//Follow link
-		chrome.tabs.create({url: link});
+		chrome.windows.getCurrent(function(window) {
+			//Create tab
+			chrome.tabs.create({
+				windowId: window.id,
+				url: link
+			});
+			
+			//Focus window
+			chrome.windows.update(window.id, {focused: true});
+		});
 		
 		//Clear notification
 		_clear(id);
@@ -119,7 +148,9 @@ function initNotifs() {
 	
 	function _clear(id) {
 		chrome.notifications.clear(id);
-		$.post(notifData[id].clear, {_method: "delete", authenticity_token: modapi.token()});
+		
+		//Clear remote notification, if needed
+		if (notifData[id].clear) $.post(notifData[id].clear, {_method: "delete", authenticity_token: modapi.token()});
 	}
 }
 
@@ -177,10 +208,46 @@ function alarmHandler(alarm) {
 						console.warn("Could not login to Soundation");
 						
 						//Update badge
-						crapi.badge({
+						/*crapi.badge({
 							title: "Please login to view notifications",
 							color: "gray",
 							text: "?"
+						});*/
+						
+						var actions = [
+							{
+								title: "Login with Facebook",
+								link: global.path.home + "/users/auth/facebook",
+								data: {}
+							},
+							{
+								title: "Login with Google",
+								link: global.path.home + "/users/auth/google_oauth2",
+								data: {}
+							}
+						];
+						
+						var notif = {
+							type: "basic",
+							iconUrl: "img/newiconflat128.png",
+							title: "Login to Soundation",
+							message: "Click here to login, or use one of the buttons below.",
+							buttons: actions.map(function(v) { return {title: v.title}; })
+						};
+						
+						//Storage for notif ID
+						var id = "modation_login";
+						
+						//Update notification, or create if needed
+						chrome.notifications.update(id, notif, function (updated) {
+							if (!updated) chrome.notifications.create(id, notif);
+							
+							//Update notification data
+							notifData[id] = {
+								notif: notif,
+								link: global.path.login,
+								actions: actions
+							};
 						});
 						
 						//Set alarm state
@@ -270,7 +337,7 @@ function alarmHandler(alarm) {
 				
 				//Report error and stop running
 				catch (e) {
-					console.err("Unknown error occurred: %o", e);
+					console.error("Unknown error occurred: %o", e);
 					
 					//Set alarm state
 					alarmRunning = false;
