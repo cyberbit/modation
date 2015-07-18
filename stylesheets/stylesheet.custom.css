@@ -372,6 +372,15 @@ h2 {
     background-color: #ed8a55
 }
 
+.whats-new a {
+    color: inherit;
+    font-weight: bold;
+}
+
+.whats-new a:hover {
+    text-decoration: underline;
+}
+
 .main {
     color: #444;
     background-color: #f5f3ed
