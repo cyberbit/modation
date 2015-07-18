@@ -1,0 +1,28 @@
+{% extends "default.twig" %}
+
+{% block content %}
+    <section class="page-header">
+        <h1 class="no-margin"><img class="img-responsive" src="{{ baseUrl }}/img/newiconflat.png"></h1>
+        <h1 class="project-name">{{ title }} <span class="version">v{{ version }}</span></h1>
+        <h2 class="project-tagline">{{ tagline }}</h2>
+        <a class="btn" href="https://chrome.google.com/webstore/detail/modation/mceoomlpmmmghcdfammgcjnhdnnambef">Download</a>
+        <a class="btn" href="{{ projectUrl }}">View on GitHub</a>
+    </section>
+    <section class="main-content whats-new">
+        <div class="inner">
+            {% include "whats-new.twig" %}
+        </div>
+    </section>
+    <section class="main-content main">
+        <div class="inner">
+            {{ content|raw }}
+        </div>
+    </section>
+    <section class="main-content footer">
+        <div class="inner">
+            <footer class="site-footer no-padding">
+                <span class="site-footer-credits">Made with love by <a href="{{ authorLink }}">{{ author }}</a>.</span>
+            </footer>
+        </div>
+    </section>
+{% endblock %}
