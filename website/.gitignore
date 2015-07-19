@@ -1,0 +1,4 @@
+*.pem
+*.komodoproject
+rel/
+.couscous
