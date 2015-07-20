@@ -21,6 +21,12 @@
 		"page": "background.html",
 		"persistent": false
 	},
+	
+	"content_scripts": {
+		"matches": ["*://*.soundation.com/*"],
+		"css": ["content.css"],
+		"js": ["content.js"]
+	},
 
 	"short_name": "Modation"
 }
