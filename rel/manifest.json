@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+	"name": "Modation",
+	"version": "2.0",
+
+	"description": "Soundation, amplified.",
+	"icons": { "16": "img/newicon16.png",
+		"19": "img/newicon19.png",
+		"48": "img/newicon48.png",
+		"128": "img/newicon128.png" },
+
+	"author": "cyberbit",
+	"permissions": [
+		"https://*.soundation.com/*",
+		"alarms",
+		"notifications",
+		"storage"
+	],
+
+	"background": {
+		"page": "background.html",
+		"persistent": false
+	},
+
+	"short_name": "Modation"
+}
