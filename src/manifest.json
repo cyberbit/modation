@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation",
-	"version": "2.0",
+	"version": "2.0.1",
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/newicon16.png",
@@ -20,13 +20,28 @@
 	"background": {
 		"page": "background.html",
 		"persistent": false
+	}//,
+	
+	/*"browser_action": {
+		"default_icon": "img/newicon128.png",
+		"default_popup": "popup.html"
 	},
 	
-	"content_scripts": {
+	"content_scripts": [{
 		"matches": ["*://*.soundation.com/*"],
-		"css": ["content.css"],
-		"js": ["content.js"]
-	},
-
-	"short_name": "Modation"
+		"css": ["css/content.css"],
+		"js": [
+			"js/jquery.all.js",
+			"js/jquery.caretposition.custom.js",
+			"js/jquery.sew.min.js",
+			//"js/opentip-jquery.custom.js",
+			"js/crapi.js",
+			"js/modapi.js",
+			"js/content.js"
+		]
+	}],
+	
+	"options_page": "newoptions.html",
+	
+	"web_accessible_resources": ["content.html"]*/
 }

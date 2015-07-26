@@ -23,6 +23,13 @@ Array.prototype.unique = function() {
     }, []);
 };
 
+Array.prototype.diff = function(compare) {
+	return this.reduce(function(p, c) {
+		if (compare.indexOf(c) == -1) p.push(c);
+		return p;
+	}, [])
+}
+
 //Add/replace handler
 function handle(target, event, callback, trigger) {
     if (typeof trigger == "undefined") trigger = false;

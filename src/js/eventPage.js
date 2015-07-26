@@ -273,6 +273,12 @@ function alarmHandler(alarm) {
 							var $aside = $html.find("aside");
 							var $notifications = $aside.find(".notifications .notification");
 							
+							//Storage for message links
+							var messageLinks = [];
+							
+							//Storage for server notification IDs
+							var serverNotifs = [];
+							
 							//Add hostname to links
 							$notifications.find("a").each(function(i, e) {
 								var $link = $(e);
@@ -291,7 +297,7 @@ function alarmHandler(alarm) {
 								$msg.find(".author").remove();
 								
 								//Parse elements
-								var id = "modation" + $notif.find(".clear").attr("href").match(/(?:\/)(\d+)/)[0];
+								var id = "modation" + $notif.find(".clear").attr("href").match(/(?:\/)(\d+)/)[1];
 								var time = $notif.find("time").text();
 								var from = $notif.find(".author").text();
 								var msg = $msg.text().trim();
@@ -306,6 +312,19 @@ function alarmHandler(alarm) {
 									});
 								});
 								
+								//Match message links
+								if (link.match(/\/account\/messages\/\d+$/)) {
+									//Prevent duplicate message notification (issue #63)
+									if ($.inArray(link, messageLinks) != -1) return;
+									
+									//Remember link
+									messageLinks.push(link);
+								}
+								
+								//Add notification ID to server list
+								serverNotifs.push(id);
+								
+								//Set up notification
 								var notif = {
 									type: "basic",
 									iconUrl: "img/newiconflat128.png",
@@ -326,6 +345,16 @@ function alarmHandler(alarm) {
 										clear: clear,
 										actions: actions
 									};
+								});
+							});
+							
+							//Get all local notifications
+							chrome.notifications.getAll(function(notifs) {
+								var localNotifs = Object.keys(notifs);
+								
+								//Dismiss notifications no longer on server (issue #64)
+								$.each(localNotifs.diff(serverNotifs), function(i, v) {
+									chrome.notifications.clear(v);
 								});
 							});
 							
