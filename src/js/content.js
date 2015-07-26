@@ -1,41 +1,3 @@
-//Needs to be up here for original hash check (ugh)
-String.prototype.hashCode = function(){
-    var hash = 0, i, c;
-    if (this.length == 0) return hash;
-    for (i = 0, l = this.length; i < l; i++) {
-        c  = this.charCodeAt(i);
-        hash  = ((hash<<5)-hash)+c;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-};
-
-//Isotope options for feed
-var isotope_feed = {
-	itemSelector: ".feed-item",
-	masonry: {
-		columnWidth: 450,
-		gutter: 10
-	}
-};
-
-//Generate unique string ID (via http://stackoverflow.com/a/1349426)
-function makeid() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < 10; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
-
-//Unique identifier for instance differentiation
-var guid = makeid();
-	
-//Storage for audio player
-var $player = {};
-	
 //Storage for cloned user settings
 var storage = {};
 
@@ -47,52 +9,31 @@ preinit();
 
 //Wrapper
 $(function() {
-	//Handler for content script messager
-	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-		/*console.log("request: %O", request);
-		console.log("sender: %O", sender);*/
-		
-		//Requested to pause everything
-		if (request.action == "modation-pause") {
-			//Pause requested by another page
-			if (request.guid != guid) {				
-				//Pause player
-				$player.trigger("pause");
-				
-				sendResponse({status: "paused", guid: guid});
-			}
-			
-			//Pause requested by current page
-			else {
-				sendResponse({status: "ignored", guid: guid});
-			}
-		}
-	});
+	//Nutin.
 });
-
-/* ======== HELPERS ======== */
 
 //Initialization that is independent of user settings
 function preinit() {
-	//Initialize player
-	$player = (typeof player == "undefined" ? $({}) : $(player));
-	
 	$.get(chrome.extension.getURL("content.html"), function(d) {
 		$("body").append(d);
 		
-		modapi.login(function(mi) {
-			me = mi;
+		crapi.clone(function(d) {
+			//Cache storage
+			storage = d;
 			
-			crapi.clone(function(d) {
-				storage = d;
+			modapi.login(function(mi) {
+				//Cache user
+				me = mi;
 				
+				//Initialize all the things
 				init();
+				initTags();
 			});
 		});
 	});
 	
 	//Profile tips
-	Opentip.styles.profileTip = {
+	/*Opentip.styles.profileTip = {
 		//Targeting
 		target: true,
 		tipJoint: "left",
@@ -182,27 +123,13 @@ function preinit() {
 	}
 	
 	//Adjust Opentips z-index
-	Opentip.lastZIndex = 676;
+	Opentip.lastZIndex = 676;*/
 }
 
 //Improved initialization
 function init() {
-	//Initialize recent tracks
-	if (storage[me.email]["recent_tracks"]) {
-		//Add recent tracks link
-		if ($("body").hasClass("community")) {
-			$("nav.wrapper a[href='/tracks']").after(' <a class="modation-recent-tracks" href="/tracks/recent">Recent</a>');
-		}
-		
-		//Recent tracks page
-		if (location.href.match(/\/tracks\/recent/)) {
-			$("nav.wrapper .current").removeClass("current");
-			$(".modation-recent-tracks").addClass("current");
-		}
-	}
-	
 	//Profile Tips
-	if (storage[me.email]["profile_tips"]) {
+	/*if (storage[me.email]["profile_tips"]) {
 		//Add profile hover tips
 		$('a[href*="/user/"]').not('[href*="/track/"], [href*=youtube]').each(function(i, e) {
 			//If an image is inside the link, tooltip the image
@@ -314,375 +241,19 @@ function init() {
 	//Rest of the site
 	else {
 		afdCommunity();
-	}
+	}*/
 }
 
-//Get a factory item
-function _factory(key) {
-	return $(".modation-factory ." + key).clone();
-}
-
-/* ======== COMMUNITY MODS ======== */
-
-/* Sticky Sidebars */
-function sticky_sidebars() {
-	$("aside").stick_in_parent({offset_top: 10});
-}
-
-/* Group Mods */
-function group_mods() {
-    $("div#main h2").after(_factory("modation-group-mods"));
-	$(".modation-group-mods").fadeIn(2000);
-	
-	var $groupMods = $(".modation-group-mods");
-	
-	//Toggle old groups
-	$groupMods.find(".old-groups").on("click", function() {
-		toggleOldGroups(0, this);
-	});
-	
-	//Toggle admin groups
-	$groupMods.find(".admin-groups").on("click", function() {
-		toggleOnlyAdminGroups(0, this);
-	});
-	
-	//Minify groups
-	$groupMods.find(".minify-groups").on("click", function() {
-		minifyGroups(1, this);
-	});
-
-	/* Group Mods - Toggle old groups */
-	function toggleOldGroups(iToggle, oFrom) {
-		resetModLinks(1, iToggle, oFrom);
-		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
-			elem = $(this).find("p.last-activity")[0];
-			if ((typeof elem === 'undefined' || elem.innerHTML.indexOf("year") >= 0 || elem.innerHTML.indexOf("month") >= 0 || elem.innerHTML.search("([5-9]|[123]\\d) days") >= 0) && !($(this).find("div.admin").length > 0)) {
-				node = $(this);
-				(iToggle ? node.slideDown(600) : node.slideUp(600));
-			} else {
-				node = $(this);
-				node.slideDown(600);
-			}
-		});
-		resetModLinks(2, 1, oFrom);
-	}
-	
-	/* Group Mods - Toggle only admin groups */
-	function toggleOnlyAdminGroups(iToggle, oFrom) {
-		resetModLinks(2, iToggle, oFrom);
-		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
-			if ($(this).find("div.admin").length === 0) {
-				node = $(this);
-				
-				if (iToggle) node.slideDown(600);
-				else node.slideUp(600);
-			}
-		});
-		if (iToggle) resetModLinks(1, iToggle, oFrom);
-	}
-	
-	/* Group Mods - Reset mod links */
-	function resetModLinks(iMode, iToggle, oFrom) {
-		//alert(iMode + " " + iToggle);
-		switch (iMode) {
-			case 0: //All links reset
-				//Reset old groups link
-				$(oFrom).closest(".old-groups").off("click").on("click", function() {
-					toggleOldGroups(iToggle ? 0 : 1, this);
-				}).html((iToggle ? "Hide" : "Show") + " Old Groups");
-				
-				//Reset admin groups link
-				$(oFrom).closest(".admin-groups").off("click").on("click", function() {
-					toggleOnlyAdminGroups(iToggle ? 0 : 1, this);
-				}).html((iToggle ? "Show Only Admin" : "Show All") + " Groups");
-				break;
-			case 1: //Old groups link reset
-				$(oFrom).closest(".old-groups").off("click").on("click", function() {
-					toggleOldGroups(iToggle ? 0 : 1, this);
-				}).html((iToggle ? "Hide" : "Show") + " Old Groups");
-				break;
-			case 2: //Admin groups link reset
-				$(oFrom).closest(".admin-groups").off("click").on("click", function() {
-					toggleOnlyAdminGroups(iToggle ? 0 : 1, this);
-				}).html((iToggle ? "Show Only Admin" : "Show All") + " Groups");
-				break;
-		}
-	}
-	
-	/* Group Mods - Minify groups */
-	function minifyGroups(iToggle, oFrom) {
-		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().children("div.row.group").each(function (i, e) {
-			isAdmin = $(this).find("div.admin").length > 0;
-			img = $(this).find("div.img")[0].outerHTML;
-			link = $(this).find("a.name")[0].outerHTML;
-			vLastActivity = $(this).find("p.last-activity");
-			lastActivity = (vLastActivity.length > 0 ? vLastActivity[0].outerHTML.replace("Last activity ", "").replace(" ago", "") : '');
-			minifiedContent = img + "<div class=\"info\">" + link + (isAdmin ? "<span id=\"spacer\" style=\"width: 80px; height: 20px; float:right;\"></span>" : "") + lastActivity;
-			if (isAdmin) {
-				adminButton = $(this).find("div.admin a")[0].outerHTML;
-				$(this).find("div.admin").html(adminButton);
-				admin = $(this).find("div.admin")[0].outerHTML;
-				minifiedContent += admin + "</div>";
-			}
-			$(this).html(minifiedContent);
-		});
-		$(oFrom).parents(".modation-group-mods").nextAll('.list-container').first().find("div.row.group, div.img, div.info, p.last-activity, div.admin").addClass("minified");
-	}
-}
-
-//Player Actions
-function player_actions() {
-	var $titleBar = $("#title-bar");
-	var $a = $titleBar.find("a[href*=track]");
-	var link = $a.attr("href");
-	
-	//Modify title link
-	$("#title-bar > a").width(240);
-	
-	//Grab buttons
-	var $likeBtn = $titleBar.find("#likes");
-	var $downloadsBtn = _factory("modation-player-downloads");
-	
-	//Add downloads
-	$likeBtn.before($downloadsBtn);
-	$downloadsBtn.fadeIn(500);
-	
-	//Grab images
-	var likesIcon = chrome.runtime.getURL("img/likes-icon.png");
-	var likesIconPink = chrome.runtime.getURL("img/likes-icon-pink-2.png");
-	
-	//Grab track page
-	$.get(link, function(html) {
-		var $html = $(html);
-		var $like = $html.find("#like a");
-		var downloads = $html.find("span.downloads").text();
-		var $downloadsContent = $('<span class="modation-player-downloads-content"></span>').text(downloads).hide()
-		var downloadsContent = $downloadsContent[0].outerHTML;
-		var likeLink = $like.attr("href");
-		var liked = $like.find("img").attr("src").indexOf("broken") != -1;
-		
-		//Storage for button titles
-		var downloadsTitle = "Download";
-		var likeText = "Like this track", unlikeText = "You like this track";
-		var likesTitle = liked ? unlikeText : likeText;
-		
-		//Show downloads
-		$downloadsBtn.find("#circleG").fadeOut(200, function() {
-			$(this).remove();
-			
-			$downloadsBtn.html(downloadsContent);
-			$downloadsBtn.find(".modation-player-downloads-content").fadeIn(200);
-		});
-		
-		//Modify downloads button
-		$downloadsBtn.addClass("player-action");
-		
-		//Track is publicly downloadable
-		if ($html.find("a[href*='/download']").length) {
-			//Set button title
-			downloadsTitle = "Download " + $html.find(".title").text();
-			
-			//Add downloads handler
-			$downloadsBtn.click(function() {
-				var $me = $(this);
-				var downloads = parseInt($me.text());
-				
-				//Trace click
-				console.log("you downloaded track %o", $a.text());
-				
-				//Increment downloads counter
-				$me.text(downloads + 1);
-				
-				//Download track
-				location = link + "/download";
-			});
-		}
-		
-		//Track is not publicly downloadable
-		else {
-			//Set button title
-			downloadsTitle = "Downloads have been disabled for this track";
-			
-			//Disable button
-			$downloadsBtn.addClass("disabled");
-			
-			//Fix cursor events
-			$downloadsBtn.css({
-				"cursor": "default",
-				"pointer-events": "all"
-			});
-		}
-		
-		//Set downloads button title
-		$downloadsBtn.attr("title", downloadsTitle);
-		
-		//Modify like button
-		$likeBtn.addClass("player-action " + (liked ? "liked" : ""));
-		$likeBtn.attr("title", likesTitle);
-		$likeBtn.data("liked", liked);
-		$likeBtn.click(function() {
-			var $me = $(this);
-			var likes = parseInt($me.text());
-			
-			//Trace click
-			console.log("you %o track %o", $me.data("liked") ? "unlike" : "like", $a.text());
-			
-			//Disable button
-			$me.addClass("disabled");
-			
-			//Like track
-			if (!$me.data("liked")) {
-				$me.text(likes + 1).data("liked", true).addClass("liked").attr("title", unlikeText);
-			}
-			
-			//Unlike track
-			else {
-				$me.text(likes - 1).data("liked", false).removeClass("liked").attr("title", likeText);
-			}
-			
-			//Request like
-			$.getJSON(likeLink, function(datum) {
-				//Trace datum
-				console.log("like: %o", datum);
-				
-				//Enable button
-				$me.removeClass("disabled");
-			});
-		});
-	});
-}
-
-//Dynamic Feed
-function dynamic_feed() {
-	//Hide sidebar
-	$("aside").hide();
-	
-	//Format containers
-	//$(".main-wrapper").width(1080);
-	$("#main").width("100%");
-	$(".feed-item").width(430);
-	$(".feed-item.news").width(890);
-	
-	//Initialize Isotope
-	$("#main").isotope(isotope_feed);
-}
-
-//Small feed
-function small_feed() {
-	//Grab user feed item contents
-	var $contents = $(".feed-item.user, .feed-item.group").find(".feed-content");
-	
-	//Remove any text not in a container
-	$contents.contents().filter(function() {
-		return (this.nodeType == 3);
-	}).remove();
-	
-	//Hide everything else except for the track and time
-	$contents.contents().not(".time, .track").hide();
-	
-	$("#main").isotope(isotope_feed);
-}
-
-//Small player
-function small_player() {
-	//Tag body for CSS changes
-	$("body").addClass("smart-player");
-	
-	//Grab elements
-	var $play = $("#play-button");
-	var $wfArea = $("#wf-area");
-	var $picture = $("#picture img");
-	var wf = $("#waveform")[0];
-	var wfLoaded = $("#loaded-part")[0];
-	
-	//Grab canvas contexts
-	var wfCtx = wf.getContext("2d");
-	var wfLoadedCtx = wfLoaded.getContext("2d");
-	
-	//Hide logo
-	$("#textlogo").hide();
-	
-	//Modify play button
-	$play.css({
-		position: "absolute",
-		left: "25px",
-		top: "26px",
-		"z-index": "100"
-	});
-	
-	//Modify waveform area
-	$wfArea.css({
-		"margin-left": "100px"
-	});
-	
-	//Load high-quality thumbnail
-	var src = $picture.attr("src");
-	var srcLarge = src.replace(/\/(small)\//, "/large/");
-	$picture.attr("src", "");
-	
-	//Modify picture
-	$picture.css({
-		width: "150px",
-		height: "150px",
-		top: "3px",
-		position: "absolute",
-		clip: "rect(23px, 149px, 121px, 1px)",
-		background: "linear-gradient(to right, transparent 56%, rgba(34, 34, 34, .7) 79%, rgb(34, 34, 34)), url(" + srcLarge + ") no-repeat"
-	});
-	
-	$picture.on("error", function() {
-		$(this).css({
-			"background-size": "150px",
-			display: "inline"
-		});
-	});
-	
-	//Generate volume control
-	var $volume = _factory("modation-player-volume")
-	
-	//Add volume control
-	$play.after($volume);
-	
-	//Volume handler
-	$volume.on("input", function(e) {
-		var vol = $(this).val();
-		
-		//console.log("vol: %o to %o", player.volume, vol);
-		
-		player.volume = vol;
-	});
-	
-	//Grab new width
-	var width = $wfArea.width() - 1;
-	
-	//Modify waveform
-	$(wf).width(width);
-	wf.width = width;
-	
-	//Modify waveform clip mask
-	$(wfLoaded).width(width);
-	wfLoaded.width = width;
-	
-	//Grab waveform image link
-	var link = $("body").html().match(/setImageSrc\(\"(.*)\"\)/)[1];
-	
-	//Generate image
-	var image = new Image;
-	image.src = link;
-	
-	//Draw image
-	wfCtx.drawImage(image, 0, 0, image.width - 1, image.height, 0, 0, wf.width, wf.height);
-	wfLoadedCtx.drawImage(image, 0, 0, image.width - 1, image.height, 0, 0, wfLoaded.width, wfLoaded.height);
-}
-
-//Comment Tags
-function comment_tags() {
-	$comment = $("#comment textarea");
+//Initialize user tagging
+function initTags() {
+	var $newComment = $(".new_comment #comment_content");
 	
 	//Comment box exists
-	if ($comment.length) {
+	if ($newComment.length) {
+		var $comments = $(".main div.comments");
+		
 		//Storage for unique names on page
-		var names = $(".comment .content h4").map(function() {
+		var names = $comments.find(".comment .content > h4").map(function() {
 			return $(this).text();
 		}).get().unique();
 		
@@ -692,66 +263,13 @@ function comment_tags() {
 			namesParsed.push({val: v});
 		});
 		
-		//Trace names
-		console.log("names: %o", namesParsed);
-		
 		//Initialize inline select
-		$comment.sew({values: namesParsed});
-	}
-	
-	//Element factory for names
-	function _elemFactory(elem, e) {
-		//Grab tag template
-		$tag = _factory("modation-tag");
-		
-		//Set data
-		$tag.find(".modation-tag-val").text(e.val);
-		$tag.find(".modation-tag-meta").text(e.meta);
-		
-		elem.append($tag);
-	}
-}
-
-/* Super Pages Super Handler */
-function super_pages(selector, id) {
-	if ($('nav.pagination').length) {
-		addCSS($(document), '.disabled { pointer-events: none; -webkit-user-select: none; -webkit-filter: grayscale(1) opacity(.6); transition: all .3s; } ' + selector + ' { transition: all .3s; }', id + "-cover-css");
-		$('nav.pagination a').each(function() {
-			var href = $(this).attr("href");
-			$(this).click(function(e) {
-				_load(href);
-				e.preventDefault();
-			});
-		});
-	
-		$(window).on("popstate." + id, function(e) {
-			_load(location.href, false);
-		});
-	}
-	
-	//Internal load function for callbacks
-	function _load(href, push) {
-		if (typeof push == "undefined") push = true;
-		$(selector + ', nav.pagination').addClass("disabled");
-		$.get(href, function(data) {
-			var datum = $(data);
-			var tracks = datum.find(selector);
-			var pagination = datum.find('nav.pagination');
-			$(selector).html(tracks.contents());
-			$('nav.pagination').html(pagination.contents());
-			
-			//Push location to history to fake a saved state (fancy pants!)
-			if (push) history.pushState({id: id}, '', href);
-			
-			//Recursive, but only slightly
-			super_pages(selector, id);
-			$(selector + ', nav.pagination').removeClass("disabled");
-		});
+		$newComment.sew({values: namesParsed});
 	}
 }
 
 /* Watchlist UI generation */
-function watchlist_ui() {
+/*function watchlist_ui() {
 	var isGroup = location.href.match(/\/group\//);
 	var isTrack = location.href.match(/\/user\/[\w-]*\/track\//);
 	var link = location.href.replace("http://soundation.com/", '').split("?")[0];
@@ -776,7 +294,7 @@ function watchlist_ui() {
 	
 	if (isQueued) {
 		//alert("you are queued to isplooooode.");
-	}*/
+	}
 	
 	_generate();
 	
@@ -1016,4 +534,4 @@ function afdCommunity() {
 	
 	//:D
 	april.fool();
-}
+}*/

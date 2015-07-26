@@ -48,6 +48,11 @@ function showView(context, view, fade) {
     $(view).delay(fade).fadeIn(fade);
 }
 
+//Clone factory item
+function _factory(parent, key) {
+	return $(parent + " " + key).clone();
+}
+
 /*!
  * CrAPI (Chrome API Helper)
  *
