@@ -20,9 +20,9 @@
 	"background": {
 		"page": "background.html",
 		"persistent": false
-	}//,
+	},
 	
-	/*"browser_action": {
+	"browser_action": {
 		"default_icon": "img/newicon128.png",
 		"default_popup": "popup.html"
 	},
@@ -43,5 +43,5 @@
 	
 	"options_page": "newoptions.html",
 	
-	"web_accessible_resources": ["content.html"]*/
+	"web_accessible_resources": ["content.html"]
 }
