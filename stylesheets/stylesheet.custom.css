@@ -359,6 +359,10 @@ h2 {
     text-transform: uppercase
 }
 
+.fa-pad-right {
+    padding-right: .4em;
+}
+
 .no-margin {
     margin: 0
 }
