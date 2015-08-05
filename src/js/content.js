@@ -28,6 +28,9 @@ function preinit() {
 				//Initialize all the things
 				init();
 				initTags();
+				initComments();
+				initTracks();
+				initGroups();
 			});
 		});
 	});
@@ -266,6 +269,84 @@ function initTags() {
 		//Initialize inline select
 		$newComment.sew({values: namesParsed});
 	}
+}
+
+//Initialize comments
+function initComments() {
+	var $writeComment = $(".write-comment");
+	
+	//Comment box exists
+	if ($writeComment.length) {
+		var $header = $writeComment.siblings("h3");
+		var $comments = $writeComment.siblings("div.comments");
+		
+		//Set up comments
+		$writeComment.addClass("mod-write-comment");
+		$comments.addClass("mod-comments");
+		
+		//Move comments box to top of thread
+		$header.after($writeComment);
+	}
+}
+
+//Initialize tracks
+function initTracks() {
+	var $myTracks = $(".feed-item.track").has(".info a[href='" + me.link + "']");
+	
+	//Feed has editable tracks
+	if ($myTracks.length) {
+		//Iterate tracks
+		$myTracks.each(function(i, e) {
+			var $track = $(this);
+			
+			var shortlink = $track.find(".share-sheet input").val();
+			
+			console.log("shortlink: %o", shortlink);
+		});
+	}
+}
+
+//Initialize group list
+function initGroups() {
+	var $groupList = $(".group-list");
+	var $groupFilter = _factory(".modation-factory", ".modation-group-filter");
+	var $filter = $groupFilter.find(".filter");
+	
+	//Set up group list
+	$groupList.addClass("mod-group-list");
+	
+	//Add group filter before list
+	$groupList.before($groupFilter);
+	
+	//Initialize Isotope
+	$groupList.isotope({
+		itemSelector: ".group",
+		layoutMode: "vertical",
+		transitionDuration: ".3s"
+	});
+	
+	//Trigger layout after each image loads
+	$groupList.imagesLoaded().progress(function() {
+		$groupList.isotope("layout");
+	});
+	
+	//Set up search
+	handle($filter, "input.initGroups", function(e) {
+		var $this = $(this);
+		var val = $this.val();
+		var search = val.toLowerCase();
+		
+		//Filter group list
+		$groupList.isotope({
+			filter: function() {
+				var $this = $(this);
+				var $name = $this.find(".name");
+				var text = $name.text().toLowerCase();
+				
+				return (text.indexOf(search) != -1);
+			}
+		});
+	});
 }
 
 /* Watchlist UI generation */

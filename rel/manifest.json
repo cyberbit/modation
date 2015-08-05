@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation",
-	"version": "2.0.1",
+	"version": "2.1",
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/newicon16.png",
@@ -20,5 +20,21 @@
 	"background": {
 		"page": "background.html",
 		"persistent": false
-	}
+	},
+	
+	"content_scripts": [{
+		"matches": ["*://*.soundation.com/*"],
+		"css": ["css/content.css"],
+		"js": [
+			"js/jquery.all.js",
+			"js/jquery.caretposition.custom.min.js",
+			"js/jquery.sew.min.js",
+			"js/imagesloaded.pkgd.min.js",
+			"js/isotope.pkgd.min.js",
+			"js/api.min.js",
+			"js/content.min.js"
+		]
+	}],
+	
+	"web_accessible_resources": ["content.html"]
 }
