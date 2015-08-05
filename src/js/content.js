@@ -30,6 +30,7 @@ function preinit() {
 				initTags();
 				initComments();
 				initTracks();
+				initGroups();
 			});
 		});
 	});
@@ -303,6 +304,49 @@ function initTracks() {
 			console.log("shortlink: %o", shortlink);
 		});
 	}
+}
+
+//Initialize group list
+function initGroups() {
+	var $groupList = $(".group-list");
+	var $groupFilter = _factory(".modation-factory", ".modation-group-filter");
+	var $filter = $groupFilter.find(".filter");
+	
+	//Set up group list
+	$groupList.addClass("mod-group-list");
+	
+	//Add group filter before list
+	$groupList.before($groupFilter);
+	
+	//Initialize Isotope
+	$groupList.isotope({
+		itemSelector: ".group",
+		layoutMode: "vertical",
+		transitionDuration: ".3s"
+	});
+	
+	//Trigger layout after each image loads
+	$groupList.imagesLoaded().progress(function() {
+		$groupList.isotope("layout");
+	});
+	
+	//Set up search
+	handle($filter, "input.initGroups", function(e) {
+		var $this = $(this);
+		var val = $this.val();
+		var search = val.toLowerCase();
+		
+		//Filter group list
+		$groupList.isotope({
+			filter: function() {
+				var $this = $(this);
+				var $name = $this.find(".name");
+				var text = $name.text().toLowerCase();
+				
+				return (text.indexOf(search) != -1);
+			}
+		});
+	});
 }
 
 /* Watchlist UI generation */

@@ -231,3 +231,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     border-bottom: none;
     margin-bottom: 0;
 }
+
+.mod-group-list .group {
+    width: 100%;
+}

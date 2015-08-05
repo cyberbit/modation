@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation",
-	"version": "2.0.1",
+	"version": "2.1",
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/newicon16.png",
@@ -34,6 +34,8 @@
 			"js/jquery.all.js",
 			"js/jquery.caretposition.custom.js",
 			"js/jquery.sew.min.js",
+			"js/imagesloaded.pkgd.min.js",
+			"js/isotope.pkgd.min.js",
 			//"js/opentip-jquery.custom.js",
 			"js/crapi.js",
 			"js/modapi.js",
