@@ -277,7 +277,7 @@ function initComments() {
 	
 	//Comment box exists
 	if ($writeComment.length) {
-		var $header = $writeComment.siblings("h3");
+		var $header = $writeComment.prevAll("h3").first();
 		var $comments = $writeComment.siblings("div.comments");
 		
 		//Set up comments
@@ -308,7 +308,7 @@ function initTracks() {
 
 //Initialize group list
 function initGroups() {
-	var $groupList = $(".group-list");
+	var $groupList = $(".main .group-list");
 	var $groupFilter = _factory(".modation-factory", ".modation-group-filter");
 	var $filter = $groupFilter.find(".filter");
 	
