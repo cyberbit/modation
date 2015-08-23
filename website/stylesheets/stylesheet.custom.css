@@ -353,7 +353,7 @@ a:hover {
     padding: 1em;
 }
 
-.page-header .img-responsive {
+.page-header.docs .img-responsive {
     height: 2em;
     width: 2em;
     vertical-align: middle;

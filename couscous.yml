@@ -1,6 +1,10 @@
 template:
     directory: website
 
+exclude:
+    - src
+    - rel
+
 #Variables
 title: Modation
 version: "2.1.1"
