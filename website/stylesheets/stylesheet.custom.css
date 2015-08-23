@@ -349,6 +349,16 @@ a:hover {
     max-width: 400px
 }
 
+.page-header.docs {
+    padding: 1em;
+}
+
+.page-header.docs .img-responsive {
+    height: 2em;
+    width: 2em;
+    vertical-align: middle;
+}
+
 h1 {
     font-family: "Roboto Slab";
     font-weight: 500

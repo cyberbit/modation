@@ -2,8 +2,12 @@
 <html lang="en-us">
     <head>
         <meta charset="UTF-8">
-        <title>{{ title }} by {{ author }}</title>
         <meta content="width=device-width, initial-scale=1" name="viewport">
+        <meta name="theme-color" content="#333d45">
+        
+        <title>{{ (page) ? page ~ " - " }}{{ title }} by {{ author }}</title>
+        
+        <link rel="icon" sizes="192x192" href="img/newiconflat192.png">
         <link href="{{ baseUrl }}/stylesheets/normalize.css" media="screen" rel="stylesheet" type="text/css">
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
         <link href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100" rel="stylesheet" type="text/css">
@@ -15,7 +19,18 @@
     </head>
     <body>
         {% block content %}
-            {{ content|raw }}
+            <section class="main-content main">
+                <div class="inner">
+                    {{ content|raw }}
+                </div>
+            </section>
         {% endblock %}
+        <section class="main-content footer">
+            <div class="inner">
+                <footer class="site-footer no-padding">
+                    <span class="site-footer-credits">Made with love by <a href="{{ authorLink }}">{{ author }}</a>.</span>
+                </footer>
+            </div>
+        </section>
     </body>
 </html>
