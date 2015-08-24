@@ -19,6 +19,6 @@ page: Documentation
 5. Compile scripts using Closure. Switch references in manifest and content pages to minified files.
 6. Copy `src` to `rel`. Remove files not applicable to release (i.e., non-minified JS). Commit to release branch.
 7. Load `rel` into development Chrome. If problems are found, fix in `develop` and go back to compile step (5).
-8. Increment version in `couscous.yml`. Copy GitHub release HTML to `whats-new.twig`, using the headers **What's New**, **What's Changed**, and **What's Fixed**. Commit to release branch. Finish release using Git Flow.
+8. Increment version in `couscous.yml`. Copy GitHub release HTML to `whats-new.twig`, using the headers **What's New**, **What's Changed**, and **What's Fixed**. Commit to release branch. Finish release using Git Flow. Deploy project page using Couscous.
 9. Pack and zip project as `project-x.y.z.*`. Add archives to GitHub release, double-check information, and publish release. Tag release merge on `master` with `vx.y.z`.
 10. Upload `.zip` to webstore. Update description and screenshots as needed. Publish to webstore.
