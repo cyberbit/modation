@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <meta name="theme-color" content="#333d45">
+        
+        <title>Documentation - Modation by cyberbit</title>
+        
+        <link rel="icon" sizes="192x192" href="img/newiconflat192.png">
+        <link href="https://cyberbit.github.io/modation/stylesheets/normalize.css" media="screen" rel="stylesheet" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300,700" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100" rel="stylesheet" type="text/css">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href="https://cyberbit.github.io/modation/stylesheets/github-light.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="https://cyberbit.github.io/modation/stylesheets/stylesheet.custom.css" media="screen" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+            <section class="page-header docs">
+        <h1 class="project-name">
+            <img class="img-responsive" src="https://cyberbit.github.io/modation/img/newiconflat.png" />
+            Modation Docs <span class="version">v2.1.1</span>
+        </h1>
+    </section>
+    <section class="main-content main">
+        <div class="inner">
+            <h2 id="release-process">Release Process</h2>
+<ol>
+<li>Check issues on milestone and ensure they are closed, along with the milestone itself.</li>
+<li>Draft GitHub release with included changes, under the headers <strong>Spotlight</strong>, <strong>New features</strong>, and <strong>Changes</strong>.
+<blockquote>
+<p>For ordering issue numbers, use the <strong>right-weighted</strong> style:</p>
+<ul>
+<li>#33, <strong>#43</strong>: Restructured scripts.</li>
+<li>#6, #15, <strong>#45</strong>: Cancelled development on features already built into the new Community structure.</li>
+<li><strong>#52</strong>: Pulled support for multiple accounts.</li>
+<li>#35, <strong>#56</strong>: New project page! <a href="http://cyberbit.github.io/modation">http://cyberbit.github.io/modation</a></li>
+</ul>
+<p>If commit hashes are referenced, list those last:</p>
+<ul>
+<li>#26, <code>5b210ab</code>: Added Soundcloud-style tool tip to user and group links.</li>
+</ul>
+</blockquote></li>
+<li>Start new <code>release/x.y(.z)</code> branch using Git Flow.</li>
+<li>Update manifest. Increment version to <code>x.y</code> for feature releases, <code>x.y.z</code> for fixbag releases.</li>
+<li>Compile scripts using Closure. Switch references in manifest and content pages to minified files.</li>
+<li>Copy <code>src</code> to <code>rel</code>. Remove files not applicable to release (i.e., non-minified JS). Commit to release branch.</li>
+<li>Load <code>rel</code> into development Chrome. If problems are found, fix in <code>develop</code> and go back to compile step (5).</li>
+<li>Increment version in <code>couscous.yml</code>. Copy GitHub release HTML to <code>whats-new.twig</code>, using the headers <strong>What's New</strong>, <strong>What's Changed</strong>, and <strong>What's Fixed</strong>. Commit to release branch. Finish release using Git Flow. Deploy project page using Couscous.</li>
+<li>Pack and zip project as <code>project-x.y.z.*</code>. Add archives to GitHub release, double-check information, and publish release. Tag release merge on <code>master</code> with <code>vx.y.z</code>.</li>
+<li>Upload <code>.zip</code> to webstore. Update description and screenshots as needed. Publish to webstore.</li>
+</ol>
+        </div>
+    </section>
+        <section class="main-content footer">
+            <div class="inner">
+                <footer class="site-footer no-padding">
+                    <span class="site-footer-credits">Made with love by <a href="https://github.com/cyberbit">cyberbit</a>.</span>
+                </footer>
+            </div>
+        </section>
+    </body>
+</html>
