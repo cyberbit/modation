@@ -134,7 +134,7 @@ function CrAPI() {
  * $returns	{StorageArea}	Storage solution from chrome.storage
  */
 CrAPI.prototype.storage = function(type) {
-	type = typeof type == "undefined" ? "sync" : type;
+	type = typeof type == "undefined" ? "local" : type;
 	
 	//Parse type
 	switch (type) {

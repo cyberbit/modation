@@ -14,6 +14,8 @@ $(function() {
 
 //Initialization that is independent of user settings
 function preinit() {
+	console.debug("Modation :: preinit");
+	
 	$.get(chrome.extension.getURL("content.html"), function(d) {
 		$("body").append(d);
 		
