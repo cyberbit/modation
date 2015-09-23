@@ -284,7 +284,7 @@ function initComments() {
 		$writeComment.addClass("mod-write-comment");
 		$comments.addClass("mod-comments");
 		
-		//Move comments box to top of thread
+		//Move comment box to top of thread
 		$header.after($writeComment);
 	}
 }

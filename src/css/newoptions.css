@@ -21,3 +21,19 @@
 	opacity: 1;
 	height: 60px;
 }
+
+form .column-layout .column .field.checkbox label.default {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: 500;
+	font-size: 16px;
+	margin-left: 0;
+}
+
+form .column-layout .column .field.checkbox .field-help {
+	margin: 0 0 1em 2em;
+}
+
+footer .copyright {
+	margin-top: 0;
+}

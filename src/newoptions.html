@@ -1,196 +1,203 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" type="image/png" href="/img/newicon128.png" sizes="128x128">
-	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300,700' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100' rel='stylesheet' type='text/css'>
-	<link href="https://soundation.com/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
-	<link href="css/newoptions.css" rel="stylesheet" type="text/css" />
-	<title>Modation Control</title>
-	<script src="js/jquery.all.js"></script>
-	<!-- Original source -->
-	<script src="js/crapi.js"></script>
-	<script src="js/modapi.js"></script>
-	<script src="js/newoptions.js"></script>
-	<!-- Compiled source --><!--
-	<script src="js/api.min.js"></script>
-	<script src="js/newoptions.min.js"></script>-->
-</head>
-<body class="account account edit_profile">
-	<div class="page-loader"></div>
-	<div id="popup-bg" style="display: none"></div>
-	<div class="alert alert-notice hidden">
-		<span class="text"></span>
-		<img class="close" src="https://soundation.com/assets/x-white.svg">
-    </div>
-	<header>
-		<div class="main">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" type="image/png" href="/img/newicon128.png" sizes="128x128">
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100' rel='stylesheet' type='text/css'>
+		<link href="https://soundation.com/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="css/newoptions.css" rel="stylesheet" type="text/css" />
+		<title>Modation Control</title>
+		<script src="js/jquery.all.js"></script>
+		<!-- Original source -->
+		<script src="js/crapi.js"></script>
+		<script src="js/modapi.js"></script>
+		<script src="js/newoptions.js"></script>
+		<!-- Compiled source --><!--
+		<script src="js/api.min.js"></script>
+		<script src="js/newoptions.min.js"></script>-->
+	</head>
+	<body class="account account edit_profile">
+		<div class="page-loader"></div>
+		<div id="popup-bg" style="display: none"></div>
+		<div class="alert alert-notice hidden">
+			<span class="text"></span>
+			<img class="close" src="https://soundation.com/assets/x-white.svg">
+		</div>
+		<header>
+			<div class="main">
+				<div class="inner">
+					<div class="mobile">
+						<span>My Account</span>
+						<a href="#" class="menu">Menu</a>
+					</div>
+					<div class="container">
+						<nav class="main">
+							<a class="home">Home</a>
+							<!--<a href="#options" data-page="options">Options</a>-->
+							<a href="#mods" data-page="mods">Mods</a>
+							<!--<a href="#watchlist" data-page="watchlist">Watchlist</a>-->
+							<!--<a href="#about" data-page="about">About</a>-->
+						</nav>
+						<nav class="login">
+							<a target="_blank" class="user-link"></a>
+							<a target="_blank" class="user-login button outline">Login</a>
+						</nav>
+					</div>
+				</div>
+			</div>
+			<div class="sub">
+				<!--<nav class="inner" data-page="options">
+					<a href="#options/setup" data-tab="setup">Setup</a>
+					<a href="#options/notifications" data-tab="notifications">Notifications</a>
+				</nav>-->
+				<nav class="inner" data-page="mods">
+					<a href="#mods/community" data-tab="community">Community</a>
+					<!--<a href="#mods/watchlist" data-tab="watchlist">Watchlist</a>
+					<a href="#mods/studio" data-tab="studio">Studio</a>-->
+				</nav>
+				<!--<nav class="inner" data-page="watchlist">
+					<a href="#watchlist/setup" data-tab="setup">Setup</a>
+					<a href="#watchlist/notifications" data-tab="notifications">Notifications</a>
+				</nav>
+				<nav class="inner" data-page="about">
+					<a href="#about/setup" data-tab="setup">Setup</a>
+					<a href="#about/notifications" data-tab="notifications">Notifications</a>
+				</nav>-->
+			</div>
+		</header>
+		<main>
+			<!--<div class="inner" data-page="options">
+				<div class="main" data-content="options/setup">
+					<h2>Setup</h2>
+					<form>
+						<div class="column-layout">
+							<div class="column"></div>
+							<div class="column"></div>
+						</div>
+						<div class="form-actions">
+							<input class="button" name="commit" type="submit" value="Save" />
+						</div>
+					</form>
+				</div>
+				<div class="main" data-content="options/notifications">
+					<h2>Notifications</h2>
+					<form>
+						<div class="column-layout">
+							<div class="column"></div>
+							<div class="column"></div>
+						</div>
+						<div class="form-actions">
+							<input class="button" name="commit" type="submit" value="Save" />
+						</div>
+					</form>
+					<a href="/user/cyberbit" class="button my-profile">View My Profile</a>
+				</div>
+			</div>-->
+			<div class="inner" data-page="mods">
+				<div class="main" data-content="mods/community">
+					<h2>Community</h2>
+					<form>
+						<div class="column-layout">
+							<div class="column">
+								<div class="comments field checkbox">
+									<label class="default">Comments</label>
+									<input id="user-tags" type="checkbox"><label for="user-tags">User @ tagging</label>
+									<p class="field-help">Type @username to tag users in comments.</p>
+									<input id="move-comment-box" type="checkbox"><label for="move-comment-box">Move comment box</label>
+									<p class="field-help">Box will appear at the top of the thread.</p>
+								</div>
+								<div class="groups field checkbox">
+									<label class="default">Groups</label>
+									<input id="group-filters" type="checkbox"><label for="group-filters">Group list filter</label>
+									<p class="field-help">Add a quick filter to group lists.</p>
+								</div>
+							</div>
+							<div class="column"></div>
+						</div>
+					</form>
+				</div>
+				<!--<div class="main" data-content="mods/watchlist">
+					<h2>Watchlist</h2>
+					<form>
+						<div class="column-layout">
+							<div class="column"></div>
+							<div class="column"></div>
+						</div>
+						<div class="form-actions">
+							<input class="button" name="commit" type="submit" value="Save" />
+						</div>
+					</form>
+					<a href="/user/cyberbit" class="button my-profile">View My Profile</a>
+				</div>
+				<div class="main" data-content="mods/studio">
+					<h2>Studio</h2>
+					<form>
+						<div class="column-layout">
+							<div class="column"></div>
+							<div class="column"></div>
+						</div>
+						<div class="form-actions">
+							<input class="button" name="commit" type="submit" value="Save" />
+						</div>
+					</form>
+					<a href="/user/cyberbit" class="button my-profile">View My Profile</a>
+				</div>-->
+			</div>
+		</main>
+		<footer>
 			<div class="inner">
-				<div class="mobile">
-					<span>My Account</span>
-					<a href="#" class="menu">Menu</a>
+				<!--<div class="columns">
+					<div>
+						<h4>info</h4>
+						<ul>
+							<li><a href="https://soundation.com/learn">Learn Soundation</a></li>
+							<li><a href="https://soundation.com/accounts">Accounts &amp; Pricing</a></li>
+							<li><a href="https://soundation.com/features">Features &amp; Requirements</a></li>
+							<li><a href="http://www.musicfirst.com/soundation4education">Soundation 4 Education</a></li>
+							<li><a href="https://soundation.com/licensing-agreement">Licensing Agreement</a></li>
+							<li><a href="https://soundation.com/privacy-policy">Privacy Policy</a></li>
+							<li><a href="https://soundation.com/press">Press</a></li>
+							<li><a href="https://soundation.com/distribution">Distribution</a></li>
+							<li><a href="https://soundation.com/contact">Contact</a></li>
+						</ul>
+					</div>
+					<div>
+						<h4>community</h4>
+						<ul>
+							<li><a href="https://soundation.com/users">Users</a></li>
+							<li><a href="https://soundation.com/tracks">Tracks</a></li>
+							<li><a href="https://soundation.com/groups">Groups</a></li>
+							<li><a href="https://soundation.com/user/cyberbit">My Profile</a></li>
+						</ul>
+					</div>
+					<div>
+						<h4>social</h4>
+						<ul>
+							<li><a href="http://www.facebook.com/soundation">Facebook</a></li>
+							<li><a href="http://twitter.com/PowerFX1">Twitter</a></li>
+							<li><a href="http://soundationstudio.tumblr.com/">Tumblr</a></li>
+							<li><a href="http://www.youtube.com/user/SoundationStudio">YouTube</a></li>
+							<li><a href="https://plus.google.com/113152729183962496232" rel="publisher">Google+</a></li>
+						</ul>
+					</div>
+					<div>
+						<h4>sound shop</h4>
+						<ul>
+							<li><a href="https://soundation.com/categories/distribution">Distribution</a></li>
+							<li><a href="https://soundation.com/categories/midi-packs">MIDI Packs</a></li>
+							<li><a href="https://soundation.com/categories/sound-sets">Sound Sets</a></li>
+							<li><a href="https://soundation.com/categories/spc-packs">SPC Packs</a></li>
+							<li><a href="https://soundation.com/cart">My Cart</a></li>
+						</ul>
+					</div>
+				</div>-->
+				<div class="copyright">
+					Made with love by <a href="http://cyberbit.github.io/">cyberbit</a>. Styles by PowerFX Systems AB, <a href="http://powerfx.com">powerfx.com</a>
 				</div>
-				<div class="container">
-					<nav class="main">
-						<a class="home">Home</a>
-						<a href="#options" data-page="options">Options</a>
-						<a href="#mods" data-page="mods">Mods</a>
-						<a href="#watchlist" data-page="watchlist">Watchlist</a>
-						<a href="#about" data-page="about">About</a>
-					</nav>
-					<nav class="login">
-						<a target="_blank" class="user-link"></a>
-						<a target="_blank" class="user-login button outline">Login</a>
-					</nav>
-				</div>
 			</div>
-		</div>
-		<div class="sub">
-			<nav class="inner" data-page="options">
-				<a href="#options/setup" data-tab="setup">Setup</a>
-				<a href="#options/notifications" data-tab="notifications">Notifications</a>
-			</nav>
-			<nav class="inner" data-page="mods">
-				<a href="#mods/watchlist" data-tab="watchlist">Watchlist</a>
-				<a href="#mods/studio" data-tab="studio">Studio</a>
-			</nav>
-			<nav class="inner" data-page="watchlist">
-				<a href="#watchlist/setup" data-tab="setup">Setup</a>
-				<a href="#watchlist/notifications" data-tab="notifications">Notifications</a>
-			</nav>
-			<nav class="inner" data-page="about">
-				<a href="#about/setup" data-tab="setup">Setup</a>
-				<a href="#about/notifications" data-tab="notifications">Notifications</a>
-			</nav>
-		</div>
-	</header>
-	<main>
-		<div class="inner" data-page="options">
-			<div class="main" data-content="options/setup">
-				<h2>Setup</h2>
-				<form>
-					<div class="column-layout">
-						<div class="column"></div>
-						<div class="column"></div>
-					</div>
-					<div class="form-actions">
-						<input class="button" name="commit" type="submit" value="Save" />
-					</div>
-				</form>
-			</div>
-			<div class="main" data-content="options/notifications">
-				<h2>Notifications</h2>
-				<form>
-					<div class="column-layout">
-						<div class="column"></div>
-						<div class="column"></div>
-					</div>
-					<div class="form-actions">
-						<input class="button" name="commit" type="submit" value="Save" />
-					</div>
-				</form>
-				<a href="/user/cyberbit" class="button my-profile">View My Profile</a>
-			</div>
-		</div>
-		<div class="inner" data-page="mods">
-			<div class="main" data-content="mods/watchlist">
-				<h2>Watchlist</h2>
-				<form>
-					<div class="column-layout">
-						<div class="column"></div>
-						<div class="column"></div>
-					</div>
-					<div class="form-actions">
-						<input class="button" name="commit" type="submit" value="Save" />
-					</div>
-				</form>
-				<a href="/user/cyberbit" class="button my-profile">View My Profile</a>
-			</div>
-			<div class="main" data-content="mods/studio">
-				<h2>Studio</h2>
-				<form>
-					<div class="column-layout">
-						<div class="column"></div>
-						<div class="column"></div>
-					</div>
-					<div class="form-actions">
-						<input class="button" name="commit" type="submit" value="Save" />
-					</div>
-				</form>
-				<a href="/user/cyberbit" class="button my-profile">View My Profile</a>
-			</div>
-		</div>
-	</main>
-
-
-
-  <footer>
-  <div class="inner">
-
-    <div class="columns">
-      <div>
-        <h4>info</h4>
-        <ul>
-          <li><a href="https://soundation.com/learn">Learn Soundation</a></li>
-          <li><a href="https://soundation.com/accounts">Accounts &amp; Pricing</a></li>
-          <li><a href="https://soundation.com/features">Features &amp; Requirements</a></li>
-          <li><a href="http://www.musicfirst.com/soundation4education">Soundation 4 Education</a></li>
-            <li><a href="https://soundation.com/licensing-agreement">Licensing Agreement</a></li>
-            <li><a href="https://soundation.com/privacy-policy">Privacy Policy</a></li>
-            <li><a href="https://soundation.com/press">Press</a></li>
-            <li><a href="https://soundation.com/distribution">Distribution</a></li>
-          <li><a href="https://soundation.com/contact">Contact</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4>community</h4>
-        <ul>
-          <li><a href="https://soundation.com/users">Users</a></li>
-          <li><a href="https://soundation.com/tracks">Tracks</a></li>
-          <li><a href="https://soundation.com/groups">Groups</a></li>
-          <li><a href="https://soundation.com/user/cyberbit">My Profile</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4>social</h4>
-        <ul>
-          <li><a href="http://www.facebook.com/soundation">Facebook</a></li>
-          <li><a href="http://twitter.com/PowerFX1">Twitter</a></li>
-          <li><a href="http://soundationstudio.tumblr.com/">Tumblr</a></li>
-          <li><a href="http://www.youtube.com/user/SoundationStudio">YouTube</a></li>
-          <li><a href="https://plus.google.com/113152729183962496232" rel="publisher">Google+</a></li>
-        </ul>
-      </div>
-
-
-
-
-      <div>
-        <h4>sound shop</h4>
-        <ul>
-             <li><a href="https://soundation.com/categories/distribution">Distribution</a></li>
-             <li><a href="https://soundation.com/categories/midi-packs">MIDI Packs</a></li>
-             <li><a href="https://soundation.com/categories/sound-sets">Sound Sets</a></li>
-             <li><a href="https://soundation.com/categories/spc-packs">SPC Packs</a></li>
-           <li><a href="https://soundation.com/cart">My Cart</a></li>
-        </ul>
-      </div>
-
-    </div>
-
-    <div class="copyright">
-      <b>soundation.com</b> — created by PowerFX Systems AB, <a href="http://powerfx.com">powerfx.com</a>
-    </div>
-
-  </div>
-</footer>
-
-
-
-</body>
+		</footer>
+	</body>
 </html>
