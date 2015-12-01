@@ -60,6 +60,9 @@ function newLogin() {
 	var $link = $nav.find(".user-link");
 	var $btn = $nav.find(".user-login");
 	
+	//Load options
+	loadOptions();
+	
 	modapi.login(function(me) {
 		console.log("login: %o", me);
 		
@@ -70,7 +73,7 @@ function newLogin() {
 			$btn.text("Login").attr("href", global.path.login);
 			
 			//Show login message
-			showAlert("You are not logged in. Please login to Soundation", 0);
+			showAlert("You are not logged in. Please login to Soundation", 7000);
 		}
 		
 		//Login successful
@@ -79,22 +82,29 @@ function newLogin() {
 			$link.show().text(me.username).attr("href", global.path.home + me.link);
 			$btn.text("Account").attr("href", global.path.profile);
 			showAlert("Logged in as " + me.username);
-			
-			//Load options
-			loadOptions(me);
 		}
 	});
 }
 
 //Load options
-function loadOptions(me) {
+function loadOptions() {
 	//Clear local storage, if any
 	crapi.storage("local").clear();
 	
+	//Clone storage
 	crapi.clone(function(d) {
 		var options = d;
 		
 		console.log("options: %o", options);
+	});
+	
+	//Initialize option handlers
+	handle($(".option"), "change.loadOptions", function(e) {
+		var $this = $(this);
+		var id = $this.attr("id");
+		var state = $this.prop("checked");
+		
+		console.log("option change: %o: %o", id, state);
 	});
 }
 

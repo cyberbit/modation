@@ -4,6 +4,13 @@ var alarmRunning = false;
 //Storage for notification data
 var notifData = {};
 
+//Storage for mod defaults
+var modDefaults = {
+	"user-tags": true,
+	"move-comment-box": true,
+	"group-filters": true
+};
+
 $(function() {
 	//Initialize all the things
 	initInstall();
@@ -13,42 +20,64 @@ $(function() {
 
 //Initialize new installation
 function initInstall() {
-	/**
-	 * Note: This uses localStorage instead of the
-	 * storage API because installation metadata
-	 * on different machines shouldn't be mixed.
-	 */
-	
-	//No version upgrade
-	if (localStorage.version == modapi.manifest.version) return;
-	
-	//Set up installation metadata
-	var now = moment().format();
-	localStorage.installed = now;
-	localStorage.version = modapi.manifest.version;
-	
-	//Show new install notification
-	var notif = {
-		type: "basic",
-		iconUrl: "img/newiconflat128.png",
-		title: "Modation has updated!",
-		message: "Click here to see what's new."
-	};
-	
-	//Storage for notif ID
-	var id = "modation_update";
-	
-	//Update notification, or create if needed
-	chrome.notifications.update(id, notif, function (updated) {
-		if (!updated) chrome.notifications.create(id, notif);
+	//Set up storage
+	crapi.clone(function(d) {
+		d = {"mods":{"user-tags":true,"move-comment-box":true,"group-filters":true}};
 		
-		//Update notification data
-		notifData[id] = {
-			notif: notif,
-			link: "http://cyberbit.github.io/modation/",
-			actions: []
-		};
+		//No mod options
+		if (!d.mods) {
+			console.log("no mod options");
+			d.mods = modDefaults;
+		} else {
+			console.log("setup mod defaults");
+			//Set up default mod options
+			$.each(modDefaults, function(i, v) {
+				if (typeof d.mods[i] == "undefined") {
+					console.log("mod %o is undefined, set to %o", i, v);
+					d.mods[i] = v;
+				}
+			});
+		}
+		
+		console.log(d);
 	});
+	
+	//Version upgrade
+	if (localStorage.version != modapi.manifest.version) {
+		/**
+		 * Note: This uses localStorage instead of the
+		 * storage API because installation metadata
+		 * on different machines shouldn't be mixed.
+		 */
+		
+		//Set up installation metadata
+		var now = moment().format();
+		localStorage.installed = now;
+		localStorage.version = modapi.manifest.version;
+		
+		//Show new install notification
+		var notif = {
+			type: "basic",
+			iconUrl: "img/newiconflat128.png",
+			title: "Modation has updated!",
+			message: "Click here to see what's new."
+		};
+		
+		//Storage for notif ID
+		var id = "modation_update";
+		
+		//Update notification, or create if needed
+		chrome.notifications.update(id, notif, function (updated) {
+			if (!updated) chrome.notifications.create(id, notif);
+			
+			//Update notification data
+			notifData[id] = {
+				notif: notif,
+				link: "http://cyberbit.github.io/modation/",
+				actions: []
+			};
+		});
+	}
 }
 
 //Initialize alarms
