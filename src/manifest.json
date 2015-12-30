@@ -2,6 +2,7 @@
 	"manifest_version": 2,
 	"name": "Modation",
 	"version": "2.2",
+	"debug": true,
 
 	"description": "Soundation, amplified.",
 	"icons": { "16": "img/newicon16.png",
@@ -36,14 +37,17 @@
 			"js/jquery.sew.min.js",
 			"js/imagesloaded.pkgd.min.js",
 			"js/isotope.pkgd.min.js",
-			//"js/opentip-jquery.custom.js",
 			"js/crapi.js",
 			"js/modapi.js",
 			"js/content.js"
 		]
 	}],
 	
-	"options_page": "newoptions.html",
+	"options_page": "uioptions.html",
+	"options_ui": {
+		"page": "uioptions.html",
+		"chrome_style": true
+	},
 	
 	"web_accessible_resources": ["content.html"]
 }

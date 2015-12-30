@@ -1,3 +1,7 @@
+html {
+	min-width: 500px;
+}
+
 .page-loader {
 	position: fixed;
 	left: 0px;

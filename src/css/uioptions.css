@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+}
+
+main {
+    padding: 14px 17px;
+    padding-top: 0;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.field-help {
+    color: gray;
+    margin: 0 0 1em 0;
+}
+
+footer {
+    border-top: 1px solid #CECECE;
+    background: #EDEDED;
+    text-align: center;
+    padding: 1em;
+}

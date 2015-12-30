@@ -100,7 +100,6 @@ CrAPI.prototype.lock = function(state) {
  * Get lock state
  */
 CrAPI.prototype.locked = function() {
-	console.log("lock checked");
 	return localStorage.crapi_locked;
 }
 
@@ -138,7 +137,7 @@ function CrAPI() {
  * $returns	{StorageArea}	Storage solution from chrome.storage
  */
 CrAPI.prototype.storage = function(type) {
-	type = typeof type == "undefined" ? "sync" : type;
+	type = (typeof type == "undefined") ? "sync" : type;
 	
 	//Parse type
 	switch (type) {

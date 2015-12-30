@@ -21,16 +21,16 @@ function preinit() {
 			//Cache storage
 			storage = d;
 			
+			//Initialize all the things
+			if (storage.options.userTags) initTags();
+			if (storage.options.moveCommentBox) initComments();
+			if (storage.options.groupFilters) initGroups();
+			if (storage.options.moveGroupInvites) initGroupInvites();
+			if (storage.options.showAlertsOnTop) initAlerts();
+			
 			modapi.login(function(mi) {
 				//Cache user
 				me = mi;
-				
-				//Initialize all the things
-				init();
-				initTags();
-				initComments();
-				initTracks();
-				initGroups();
 			});
 		});
 	});
@@ -249,6 +249,8 @@ function init() {
 
 //Initialize user tagging
 function initTags() {
+	var userTagLinks = storage.options.userTagLinks;
+	
 	var $newComment = $(".new_comment #comment_content");
 	
 	//Comment box exists
@@ -257,7 +259,7 @@ function initTags() {
 		
 		//Storage for unique names on page
 		var names = $comments.find(".comment .content > h4").map(function() {
-			return $(this).text();
+			return (userTagLinks) ? $(this).html() : $(this).text();
 		}).get().unique();
 		
 		//Storage for parsed names
@@ -267,7 +269,9 @@ function initTags() {
 		});
 		
 		//Initialize inline select
-		$newComment.sew({values: namesParsed});
+		$newComment.sew({values: namesParsed, elementFactory: function($el, e) {
+			$el.html(userTagLinks ? $(e.val).text() : e.val);
+		}});
 	}
 }
 
@@ -347,6 +351,28 @@ function initGroups() {
 			}
 		});
 	});
+}
+
+// Initialize group invites
+function initGroupInvites() {
+	var $groupList = $(".main .group-list");
+    var $invitations = $(".main .invitations");
+	var $header = $invitations.prev("h3");
+	
+	// Set up invitations
+	$invitations.addClass("mod-group-invites");
+	
+	// Move invitations above group list
+	$groupList.before($invitations);
+	$invitations.before($header);
+}
+
+// Initialize alert
+function initAlerts() {
+    var $alert = $(".alert");
+	
+	// Set up alert
+	$alert.addClass("mod-alert");
 }
 
 /* Watchlist UI generation */

@@ -235,3 +235,21 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .mod-group-list .group {
     width: 100%;
 }
+
+.mod-group-invites {
+    margin-bottom: 20px;
+}
+
+.mod-alert.alert {
+	top: 0px;
+	transition: top .3s ease, opacity .3s linear .3s;
+	position: absolute;
+	z-index: 100;
+	width: 100%;
+}
+
+.mod-alert.alert.hidden {
+	top: -60px;
+	opacity: 1;
+	height: 60px;
+}
