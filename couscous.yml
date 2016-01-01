@@ -15,3 +15,6 @@ authorLink: https://github.com/cyberbit
 #Project URLs
 projectUrl: https://github.com/cyberbit/modation
 baseUrl: http://djmarcolesco.me/modation
+
+#Debugging
+#bodyClass: screenshots
