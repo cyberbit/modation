@@ -1,45 +1,41 @@
 $(document).ready(function() {
-	//parseNotifs();
-	
-	//initTabs();
-	
 	initLinks();
+
+	function initLinks() {
+		var $options = $(".options");
+		var $showNotifs = $(".show-notifs");
+		var $clearNotifs = $(".clear-notifs");
+		
+		// Options handler
+		handle($options, "click.initLinks", function(e) {
+			chrome.runtime.openOptionsPage();
+		});
+		
+		// Show notifications handler
+		handle($showNotifs, "click.initLinks", function(e) {
+			chrome.runtime.sendMessage({action: "showAllNotifications"});
+		});
+		
+		// Clear notifications handler
+		handle($clearNotifs, "click.initLinks", function(e) {
+			chrome.runtime.sendMessage({action: "confirm", msg: "Are you sure you want to clear all notifications?"}, function(result) {
+				if (result) {
+					modapi.login(function(me) {
+						$.post(global.path.feed + "/clear_notifications", {_method: "delete", authenticity_token: global.token});
+					});
+				}
+			});
+		});
+	}
 });
 
-function initLinks() {
-	var $options = $(".options");
-	var $showNotifs = $(".show-notifs");
-	var $clearNotifs = $(".clear-notifs");
-	
-	// Options handler
-	handle($options, "click.initLinks", function(e) {
-		chrome.runtime.openOptionsPage();
-	});
-	
-	// Show notifications handler
-	handle($showNotifs, "click.initLinks", function(e) {
-		chrome.runtime.sendMessage({action: "showAllNotifications"});
-	});
-	
-	// Clear notifications handler
-	handle($clearNotifs, "click.initLinks", function(e) {
-		chrome.runtime.sendMessage({action: "confirm", msg: "Are you sure you want to clear all notifications?"}, function(result) {
-			if (result) {
-				modapi.login(function(me) {
-					$.post(global.path.feed + "/clear_notifications", {_method: "delete", authenticity_token: global.token});
-				});
-			}
-		});
-	});
-}
-
 //Get a factory item
-function _factory(key) {
+/*function _factory(key) {
 	return $(".factory ." + key).clone();
-}
+}*/
 
 //Initialize tabs
-function initTabs() {
+/*function initTabs() {
 	$("nav a").click(function() {
 		$(this).parents("nav").find("a").removeClass("active");
 		$(this).addClass("active");
@@ -57,10 +53,10 @@ function initTabs() {
 	});
 	
 	$("nav a:first").click();
-}
+}*/
 
 //Better get and parse notificaions-er
-function parseNotifs() {
+/*function parseNotifs() {
 	//Grab storage
 	crapi.clone(function(d) {
 		//Login
@@ -191,7 +187,7 @@ function parseNotifs() {
 						//Watchlist notifs handler
 						/*if (watchlistAlerts) {
 							alertString += (alertString ? "\n" : "") + watchlistAlerts + " new from watchlist";
-						}*/
+						}*
 						
 						//Global notifs handler
 						if (alerts) {
@@ -216,10 +212,10 @@ function parseNotifs() {
 			}
 		});
 	});
-}
+}*/
 
 //Get and parse watchlist
-function parseWatchlist() {
+/*function parseWatchlist() {
 	//Show loader
 	$("#modation-watchlist .loader").show();
 	
@@ -301,10 +297,10 @@ function parseWatchlist() {
 			}
 		});
 	});
-}
+}*/
 
 //Clear queue item
-function clear_queue(email, queueID) {
+/*function clear_queue(email, queueID) {
 	crapi.clone(function(d) {		
 		//Grab queue item
 		var queueItem = d[email]['watchlist-queue'][queueID];
@@ -324,10 +320,10 @@ function clear_queue(email, queueID) {
 		//Update watchlist
 		crapi.update(email, d[email]);
 	});
-}
+}*/
 
 //Purge entire queue
-function purge_queue(email) {
+/*function purge_queue(email) {
 	crapi.clone(function(d) {
 		//Iterate queue items
 		$.each(d[email]['watchlist-queue'], function(i, v) {
@@ -350,10 +346,10 @@ function purge_queue(email) {
 		//Update watchlist
 		crapi.update(email, d[email]);
 	});
-}
+}*/
 
 //Helper function for debugging
-if (crapi.debug) {
+/*if (crapi.debug) {
 	_wItem = function() {
 		//Reset queue display
 		$("#modation-watchlist").find(".empty").remove();
@@ -368,4 +364,4 @@ if (crapi.debug) {
 		$wItem.find(".item-title").html('<a href="#">Debug Item</a>');
 		$wItem.find(".item-body").html('Body, Mind, Soul');
 	}
-}
+}*/

@@ -45,7 +45,7 @@ function newLogin() {
 	loadOptions();
 	
 	modapi.login(function(me) {
-		console.log("login: %o", me);
+		//console.log("login: %o", me);
 		
 		// Login unsuccessful
 		if (!me.success) {
@@ -112,7 +112,7 @@ function loadOptions() {
 		else _continue();
 		
 		function _continue() {
-			console.log("options: %o", options);
+			//console.log("options: %o", options);
 			
 			// Update options
 			$.each(options, function(i, v) {
@@ -222,7 +222,7 @@ function initNav() {
 	if (!location.hash) {
 		var page = $pageLinks.first().attr("href");
 		
-		location = firstTab(page.substring(1));
+		location = firstTab(page.substring(1)); // Closure error
 	}
 	
 	//Select tab
@@ -1019,7 +1019,7 @@ function check_watchlist(update, callback) {
 				//}
 			});
 			
-			console.log(wChanged);
+			//console.log(wChanged);
 			
 			console.debug("final iteration complete!");
 			if (update) crapi.update(email, d[email], callback);

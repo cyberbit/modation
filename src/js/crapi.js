@@ -156,9 +156,6 @@ CrAPI.prototype.storage = function(type) {
 			return false;
 			break;
 	}
-	
-	//Something weird happened
-	return -1;
 }
 
 /**
