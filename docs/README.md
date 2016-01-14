@@ -20,5 +20,6 @@ page: Documentation
 6. Copy `src` to `rel`. Remove files not applicable to release (i.e., non-minified JS). Commit to release branch.
 7. Load `rel` into development Chrome. If problems are found, fix in `develop` and go back to compile step (5).
 8. Increment version in `couscous.yml`. Copy GitHub release HTML to `whats-new.twig`, using the headers **What's New**, **What's Changed**, and **What's Fixed**. Commit to release branch. Finish release using Git Flow. Deploy project page using Couscous.
+ > If deployment fails, run `git push origin gh-pages` in the temp directory created by Couscous (see [CouscousPHP/Couscous#136](https://github.com/CouscousPHP/Couscous/issues/136#issuecomment-160843835)).
 9. Pack and zip project as `project-x.y.z.*`. Add archives to GitHub release, double-check information, and publish release. Tag release merge on `master` with `vx.y.z`.
 10. Upload `.zip` to webstore. Update description and screenshots as needed. Publish to webstore.
