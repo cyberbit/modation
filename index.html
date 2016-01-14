@@ -17,10 +17,10 @@
         <link href="http://djmarcolesco.me/modation/stylesheets/github-light.css" media="screen" rel="stylesheet" type="text/css">
         <link href="http://djmarcolesco.me/modation/stylesheets/stylesheet.custom.css" media="screen" rel="stylesheet" type="text/css">
     </head>
-    <body>
+    <body class="">
             <section class="page-header">
         <h1 class="no-margin"><img class="img-responsive" src="http://djmarcolesco.me/modation/img/newiconflat.png"></h1>
-        <h1 class="project-name">Modation <span class="version">v2.1.1</span></h1>
+        <h1 class="project-name">Modation <span class="version">v2.2</span></h1>
         <h2 class="project-tagline">Soundation, amplified.</h2>
         <a class="btn" href="https://chrome.google.com/webstore/detail/modation/mceoomlpmmmghcdfammgcjnhdnnambef">Download</a>
         <a class="btn" href="https://github.com/cyberbit/modation">View on GitHub</a>
@@ -32,16 +32,26 @@
     </section>
     <section class="main-content whats-new">
         <div class="inner">
-            <h2><a class="anchor" href="#whats-new" id="whats-new"><span class="octicon octicon-link"></span></a>What's New</h2>
+            <h2><a class="anchor" href="#whats-new" id="whats-new"></a>What's New</h2>
 <ul>
-    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/44" title="User tagging in comments">#44</a>: Added user tagging in comments (via @).</li>
-    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/59" title="Groups list filtering">#59</a>: Added quick filter to group lists.</li>
-    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/67" title="Show comments box above thread">#67</a>: Moved comments box above thread on tracks and groups.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/60">#60</a><span>:</span> New options page for customizing what mods are enabled.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/61">#61</a><span>,</span> <a class="issue-link" href="https://github.com/cyberbit/modation/issues/62">#62</a><span>:</span> New toolbar button and popup with quick actions.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/72">#72</a><span>:</span> [Mod] <strong>Show alerts on top of navigation.</strong> Alerts will overlap the main navigation links.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/84">#84</a><span>:</span> [Mod] <strong>Move group invitations.</strong> Invitations will appear at the top of the page.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/91">#91</a><span>:</span> Added options for all available mods.</li>
 </ul>
-<h2><a class="anchor" href="#whats-fixed" id="whats-fixed"><span class="octicon octicon-link"></span></a>What's Fixed</h2>
+
+<h2><a class="anchor" href="#whats-changed" id="whats-changed"></a>What's Changed</h2>
 <ul>
-    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/69" title="Group filter appears on track's group list">#69</a>: Fixed group filter appearing on track group lists.</li>
-    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/70" title="Duplicate comments box on groups">#70</a>: Fixed duplicate comment boxes on groups.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/89">#89</a><span>,</span> <a class="issue-link" href="https://github.com/cyberbit/modation/issues/90">#90</a><span>:</span> Improved install and update detection.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/97">#97</a><span>:</span> Optimized scripts for size and security.</li>
+</ul>
+
+<h2><a class="anchor" href="#whats-fixed" id="whats-fixed"></a>What's Fixed</h2>
+<ul>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/34">#34</a><span>:</span> Fixed badge on toolbar button showing incorrect notification counts.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/issues/83">#83</a><span>:</span> Fixed notifications appearing repeatedly.</li>
+    <li><a class="issue-link" href="https://github.com/cyberbit/modation/commit/6034a6157bf7b7eb5b8f0a3118d7a048d8f53ab5" class="commit-link"><tt>6034a61</tt></a><span>:</span> Fixed major user tag bug.</li>
 </ul>        </div>
     </section>
     <section class="main-content main">
@@ -50,7 +60,7 @@
 <p>Modation is an extension for Google's Chrome web browser that extends community functionality for <a href="http://soundation.com"><strong>Soundation</strong></a>, an online collaborative music studio. When you receive a feed notification alerting you of a new message, group invitation, follower, or anything else, a desktop notification appears, allowing you to instantly take action.</p>
 <h2 id="why-do-i-need-it">Why do I need it?</h2>
 <p>The Soundation Community is a tremendous feature, and one of the best parts of the site. One thing it lacks is a truly practical notifications system. The site will display a summary of new messages, follows, invitations, and memberships, but these are visible only within the site. Modation delivers these notifications to you immediately, adding an accessible, seemless experience without sacrificing usability.</p>
-<p>Modation also improves the Soundation website itself by offering user tagging, group list filtering, and a more accessible comments box on tracks and groups.</p>
+<p>Modation also improves the Soundation website itself by offering user tagging, group list filtering, a more accessible comments box on tracks and groups, and other Community improvements. Each of these mods can be toggled on or off via the options page, accessible from the popup window on the toolbar icon. This popup also shows some quick actions for showing or clearing all current notifications, and the icon itself will show the number of unread notifications. </p>
 <h2 id="what-about-privacy">What about privacy?</h2>
 <p>In no way does Modation track, store, record, upload, or save any personally identifiable information about your use. The only tracking that may occur would be performed by Google itself, and is detailed in their <a href="http://www.google.com/policies/privacy/">privacy policy</a>. I want to respect the privacy of all users, so the usage of this extension is anonymous and will stay that way.</p>
 <h2 id="im-requesting-a-feature-enhancement-bugfix-etc">I'm requesting a feature, enhancement, bugfix, etc.</h2>
@@ -60,7 +70,7 @@
 <h2 id="what-about-xyz">What about xyz?</h2>
 <p>If anything is unclear, or you have a question not addressed here, please <a href="https://github.com/cyberbit">contact</a> me.</p>
 <h2 id="release-history">Release History</h2>
-<p>All releases are available on GitHub <a href="https://github.com/cyberbit/modation/releases">here</a>. Anything older is archived on the dedicated Soundation group <a href="http://soundation.com/group/modation">here</a>.</p>
+<p>All stable and beta releases are available on <a href="https://github.com/cyberbit/modation/releases">GitHub</a>.</p>
         </div>
     </section>
         <section class="main-content footer">
