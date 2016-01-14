@@ -825,7 +825,7 @@ function check_watchlist(update, callback) {
 				//}
 			});
 			
-			console.log(wChanged);
+			//console.log(wChanged);
 			
 			console.debug("final iteration complete!");
 			if (update) crapi.update(email, d[email], callback);

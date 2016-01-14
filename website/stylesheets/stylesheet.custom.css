@@ -419,3 +419,24 @@ h2 {
   color: rgba(255, 255, 255, 0.50);
   font-size: .6em;
 }
+
+/* Debugging */
+
+body.screenshots .whats-new {
+    padding: 5em;
+}
+
+body.screenshots .whats-new .inner {
+    width: 640px;
+    height: 400px;
+    border: 1px solid red;
+    padding: 2rem 4rem;
+}
+
+body.screenshots .whats-new a {
+    display: none;
+}
+
+body.screenshots .whats-new a + span {
+    display: none;
+}

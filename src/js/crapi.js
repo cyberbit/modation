@@ -16,6 +16,10 @@ String.prototype.deres = function() {
 	return this.replace(/img[^>]*>/g, "");
 }
 
+String.prototype.decamel = function() {
+    return this.replace(/(?=[a-zA-z])(?=[A-Z])/g, "-").toLowerCase();
+}
+
 Array.prototype.unique = function() {
     return this.reduce(function(p, c) {
         if (p.indexOf(c) < 0) p.push(c);
@@ -96,7 +100,6 @@ CrAPI.prototype.lock = function(state) {
  * Get lock state
  */
 CrAPI.prototype.locked = function() {
-	console.log("lock checked");
 	return localStorage.crapi_locked;
 }
 
@@ -134,7 +137,7 @@ function CrAPI() {
  * $returns	{StorageArea}	Storage solution from chrome.storage
  */
 CrAPI.prototype.storage = function(type) {
-	type = typeof type == "undefined" ? "sync" : type;
+	type = (typeof type == "undefined") ? "sync" : type;
 	
 	//Parse type
 	switch (type) {
@@ -153,22 +156,28 @@ CrAPI.prototype.storage = function(type) {
 			return false;
 			break;
 	}
-	
-	//Something weird happened
-	return -1;
 }
 
 /**
  * Clone local storage
  *
+ * @param   {string=null}   keys        Passed directly as first parameter to .get
  * @param	{function}	callback	Revieves cloned storage and returns modified storage
  * @returns	{object}				Modified contents of storage from callback
  */
-CrAPI.prototype.clone = function(callback) {
-	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
+CrAPI.prototype.clone = function(keys, callback) {
+    if (typeof keys == "undefined") {
+        keys = null;
+        callback = this.DEFAULT_CALLBACK;
+    }
+    
+	if (typeof callback == "undefined") {
+        callback = keys;
+        keys = null;
+    }
 	
 	//Grab storage
-	this.storage().get(function(d) {
+	this.storage().get(keys, function(d) {
 		//Trace storage
 		console.log("%cCrAPI%c :: Clone storage: %O", "font-weight: bold; color: green", "", d);
 		
@@ -269,4 +278,155 @@ CrAPI.prototype.badge = function(matrix) {
 	if (options.title !== false) chrome.browserAction.setTitle({title: options.title});
 	if (color !== false) chrome.browserAction.setBadgeBackgroundColor({color: color});
 	if (options.text !== false) chrome.browserAction.setBadgeText({text: options.text});
+}
+
+/**
+ * Storage for CrAPI tests
+ */
+CrAPI.prototype.tests = {};
+
+/**
+ * Run all tests
+ */
+CrAPI.prototype.runTests = function() {
+    console.group("== CrAPI Tests ==");
+    try {
+        var _this = this;
+        var queue = [];
+        
+        /**
+         * Assume an array of n functions, where ()=direct call, []=stacked call, i=index of queue
+         *   For the first function, it should be (i + 0).call(_this, [i + 1])
+         *   For the next function, it should be (i + 1).call(_this, [i + 2])
+         *   For the second to last function, it should be (i + n - 1).call(_this, i + n)
+         *
+         *   queue contains iterated functions. Stack needs to be generated in reverse queue order.
+         */
+        
+        $.each(_this.tests, function() {
+            queue.push(this);
+        });
+        
+        console.debug("queue: %o", queue);
+        
+        var nextFn = function(next){console.debug("== End of Tests =="); console.groupEnd()};
+        for (i = queue.length - 1; i >= 0; i--) {
+            nextFn = _wrap(queue[i], _this, [nextFn]);
+        }
+        
+        nextFn();
+    } catch (e) {
+        console.error(e);
+        console.groupEnd();
+    }
+    
+    function _wrap(fn, context, params) {
+        return function() {
+            fn.apply(context, params);
+        };
+    }
+}
+
+/**
+ * Test Chrome storage functions
+ */
+CrAPI.prototype.tests.storageTest1 = function(next) {
+    console.groupCollapsed("Test Chrome storage functions");
+    try {
+        var _this = this;
+        
+        console.log("storageTest this: %o", this);
+        
+        var testKeys = ["test1", "test2"];
+        var testData1 = {
+            test1: "root set",
+            test2: {
+                initial: "data"
+            }
+        };
+        var testData2 = {
+            test2: {
+                secondary: "data"
+            }
+        };
+        
+        console.debug("Clearing test storage...");
+        _this.storage().remove(testKeys, function() {
+            _this.storage().get(testKeys, function(d) {
+                console.debug("Blank storage: %s", JSON.stringify(d));
+                
+                console.debug("Setting testData1: %o", testData1);
+                _this.storage().set(testData1, function() {
+                    _this.storage().get(testKeys, function(d) {
+                        console.debug("Result: %s", JSON.stringify(d));
+                        
+                        console.debug("Setting testData2: %o", testData2);
+                        _this.storage().set($.extend(true, {}, d, testData2), function() {
+                            _this.storage().get(testKeys, function(d) {
+                                console.debug("Result: %s", JSON.stringify(d));
+                                
+                                console.groupEnd();
+                                
+                                next();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    } catch (e) {
+        console.error(e);
+        console.groupEnd();
+    }
+}
+
+/**
+ * Test CrAPI storage functions
+ */
+CrAPI.prototype.tests.storageTest2 = function(next) {
+    console.groupCollapsed("Test CrAPI storage functions");
+    try {
+        var _this = this;
+        
+        var testKeys = ["test1", "test2"];
+        var testData1 = {
+            test1: "root set",
+            test2: {
+                initial: "data"
+            }
+        };
+        var testData2 = {
+            test2: {
+                secondary: "data"
+            }
+        };
+        
+        console.debug("Clearing test storage...");
+        _this.storage().remove(testKeys, function() {
+            _this.clone(testKeys, function(d) {
+                console.debug("Blank storage: %s", JSON.stringify(d));
+                
+                console.debug("Setting testData1: %o", testData1);
+                _this.updateAll(testData1, function() {
+                    _this.clone(testKeys, function(d) {
+                        console.debug("Result: %s", JSON.stringify(d));
+                        
+                        console.debug("Setting testData2: %o", testData2);
+                        _this.updateAll($.extend(true, {}, d, testData2), function() {
+                            _this.clone(testKeys, function(d) {
+                                console.debug("Result: %s", JSON.stringify(d));
+                                
+                                console.groupEnd();
+                                
+                                next();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    } catch (e) {
+        console.error(e);
+        console.groupEnd();
+    }
 }

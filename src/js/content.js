@@ -8,9 +8,9 @@ var me = {};
 preinit();
 
 //Wrapper
-$(function() {
+/*$(function() {
 	//Nutin.
-});
+});*/
 
 //Initialization that is independent of user settings
 function preinit() {
@@ -21,19 +21,133 @@ function preinit() {
 			//Cache storage
 			storage = d;
 			
+			//Initialize all the things
+			if (storage.options.userTags) initTags();
+			if (storage.options.moveCommentBox) initComments();
+			if (storage.options.groupFilters) initGroups();
+			if (storage.options.moveGroupInvites) initGroupInvites();
+			if (storage.options.showAlertsOnTop) initAlerts();
+			
 			modapi.login(function(mi) {
 				//Cache user
 				me = mi;
-				
-				//Initialize all the things
-				init();
-				initTags();
-				initComments();
-				initTracks();
-				initGroups();
 			});
 		});
 	});
+
+	//Initialize user tagging
+	function initTags() {
+		var userTagLinks = storage.options.userTagLinks;
+		
+		var $newComment = $(".new_comment #comment_content");
+		
+		//Comment box exists
+		if ($newComment.length) {
+			var $comments = $(".main div.comments");
+			
+			//Storage for unique names on page
+			var names = $comments.find(".comment .content > h4").map(function() {
+				return (userTagLinks) ? $(this).html() : $(this).text();
+			}).get().unique();
+			
+			//Storage for parsed names
+			var namesParsed = [];
+			$.each(names, function(i, v) {
+				namesParsed.push({val: v});
+			});
+			
+			//Initialize inline select
+			$newComment.sew({
+				values: namesParsed,
+				elementFactory: function($el, e) {
+					$el.html(userTagLinks ? $(e.val).text() : e.val);
+				}
+			});
+		}
+	}
+	
+	//Initialize comments
+	function initComments() {
+		var $writeComment = $(".write-comment");
+		
+		//Comment box exists
+		if ($writeComment.length) {
+			var $header = $writeComment.prevAll("h3").first();
+			var $comments = $writeComment.siblings("div.comments");
+			
+			//Set up comments
+			$writeComment.addClass("mod-write-comment");
+			$comments.addClass("mod-comments");
+			
+			//Move comment box to top of thread
+			$header.after($writeComment);
+		}
+	}
+	
+	//Initialize group list
+	function initGroups() {
+		var $groupList = $(".main .group-list");
+		var $groupFilter = _factory(".modation-factory", ".modation-group-filter");
+		var $filter = $groupFilter.find(".filter");
+		
+		//Set up group list
+		$groupList.addClass("mod-group-list");
+		
+		//Add group filter before list
+		$groupList.before($groupFilter);
+		
+		//Initialize Isotope
+		$groupList.isotope({
+			itemSelector: ".group",
+			layoutMode: "vertical",
+			transitionDuration: ".3s"
+		});
+		
+		//Trigger layout after each image loads
+		$groupList.imagesLoaded().progress(function() {
+			$groupList.isotope("layout");
+		});
+		
+		//Set up search
+		handle($filter, "input.initGroups", function(e) {
+			var $this = $(this);
+			var val = $this.val();
+			var search = val.toLowerCase();
+			
+			//Filter group list
+			$groupList.isotope({
+				filter: function() {
+					var $this = $(this);
+					var $name = $this.find(".name");
+					var text = $name.text().toLowerCase();
+					
+					return (text.indexOf(search) != -1);
+				}
+			});
+		});
+	}
+	
+	// Initialize group invites
+	function initGroupInvites() {
+		var $groupList = $(".main .group-list");
+		var $invitations = $(".main .invitations");
+		var $header = $invitations.prev("h3");
+		
+		// Set up invitations
+		$invitations.addClass("mod-group-invites");
+		
+		// Move invitations above group list
+		$groupList.before($invitations);
+		$invitations.before($header);
+	}
+	
+	// Initialize alert
+	function initAlerts() {
+		var $alert = $(".alert");
+		
+		// Set up alert
+		$alert.addClass("mod-alert");
+	}
 	
 	//Profile tips
 	/*Opentip.styles.profileTip = {
@@ -130,7 +244,7 @@ function preinit() {
 }
 
 //Improved initialization
-function init() {
+/*function init() {
 	//Profile Tips
 	/*if (storage[me.email]["profile_tips"]) {
 		//Add profile hover tips
@@ -244,53 +358,11 @@ function init() {
 	//Rest of the site
 	else {
 		afdCommunity();
-	}*/
-}
-
-//Initialize user tagging
-function initTags() {
-	var $newComment = $(".new_comment #comment_content");
-	
-	//Comment box exists
-	if ($newComment.length) {
-		var $comments = $(".main div.comments");
-		
-		//Storage for unique names on page
-		var names = $comments.find(".comment .content > h4").map(function() {
-			return $(this).text();
-		}).get().unique();
-		
-		//Storage for parsed names
-		var namesParsed = [];
-		$.each(names, function(i, v) {
-			namesParsed.push({val: v});
-		});
-		
-		//Initialize inline select
-		$newComment.sew({values: namesParsed});
-	}
-}
-
-//Initialize comments
-function initComments() {
-	var $writeComment = $(".write-comment");
-	
-	//Comment box exists
-	if ($writeComment.length) {
-		var $header = $writeComment.prevAll("h3").first();
-		var $comments = $writeComment.siblings("div.comments");
-		
-		//Set up comments
-		$writeComment.addClass("mod-write-comment");
-		$comments.addClass("mod-comments");
-		
-		//Move comments box to top of thread
-		$header.after($writeComment);
-	}
-}
+	}/*
+}*/
 
 //Initialize tracks
-function initTracks() {
+/*function initTracks() {
 	var $myTracks = $(".feed-item.track").has(".info a[href='" + me.link + "']");
 	
 	//Feed has editable tracks
@@ -304,50 +376,7 @@ function initTracks() {
 			console.log("shortlink: %o", shortlink);
 		});
 	}
-}
-
-//Initialize group list
-function initGroups() {
-	var $groupList = $(".main .group-list");
-	var $groupFilter = _factory(".modation-factory", ".modation-group-filter");
-	var $filter = $groupFilter.find(".filter");
-	
-	//Set up group list
-	$groupList.addClass("mod-group-list");
-	
-	//Add group filter before list
-	$groupList.before($groupFilter);
-	
-	//Initialize Isotope
-	$groupList.isotope({
-		itemSelector: ".group",
-		layoutMode: "vertical",
-		transitionDuration: ".3s"
-	});
-	
-	//Trigger layout after each image loads
-	$groupList.imagesLoaded().progress(function() {
-		$groupList.isotope("layout");
-	});
-	
-	//Set up search
-	handle($filter, "input.initGroups", function(e) {
-		var $this = $(this);
-		var val = $this.val();
-		var search = val.toLowerCase();
-		
-		//Filter group list
-		$groupList.isotope({
-			filter: function() {
-				var $this = $(this);
-				var $name = $this.find(".name");
-				var text = $name.text().toLowerCase();
-				
-				return (text.indexOf(search) != -1);
-			}
-		});
-	});
-}
+}*/
 
 /* Watchlist UI generation */
 /*function watchlist_ui() {

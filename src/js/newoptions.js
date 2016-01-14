@@ -4,97 +4,135 @@ var tracks = [];
 var pages = [];
 var trackInfo = [];
 
-//Storage for option defaults
+// Storage model
+var storageModel = {
+	options: {},
+	version: ""
+};
+
+// Storage for option defaults
 var optionDefaults = {
-	desktop_notifs: true,
-	sticky_sidebars: true,
-	group_mods: true,
-	recent_tracks: true,
-	profile_tips: true,
-	group_tips: true,
-	smart_player: true,
-	player_actions: true,
-	comment_tags: true,
-	dynamic_feed: false,
-	small_feed: false
+	userTags: true,
+	moveCommentBox: true,
+	groupFilters: true
 };
 
 $(function() {
-	//Initialize all the things
+	// Initialize all the things
 	initAlerts();
 	initNav();
 	initNewOptions();
-	
-	/*initOptions();
-	initStorage();
-	initTracks();
-	initWatchlist();
-	initPages();
-	
-	//Hash parsing for tabs
-	$(window).on("hashchange", function() {
-		parseHash();
-	});
-	
-	//Pick initial menu
-	selectMenu("tab-community", "menu-sticky-sidebars");
-	
-	//Login
-	login();*/
 });
 
-//Initialize new options handler
+// Initialize new options handler
 function initNewOptions() {
 	$(window).load(function() {
-		//Hide loader
+		// Hide loader
 		$(".page-loader").fadeOut("slow");
 		
-		//Login
+		// Login
 		newLogin();
 	});
 }
 
-//Login to Soundation
+// Login to Soundation
 function newLogin() {
 	var $nav = $("nav.login");
 	var $link = $nav.find(".user-link");
 	var $btn = $nav.find(".user-login");
 	
+	// Load options
+	loadOptions();
+	
 	modapi.login(function(me) {
-		console.log("login: %o", me);
+		//console.log("login: %o", me);
 		
-		//Login unsuccessful
+		// Login unsuccessful
 		if (!me.success) {
-			//Format login navigation
+			// Format login navigation
 			$link.hide();
 			$btn.text("Login").attr("href", global.path.login);
 			
-			//Show login message
-			showAlert("You are not logged in. Please login to Soundation", 0);
+			// Show login message
+			showAlert("You are not logged in. Please login to Soundation", 7000);
 		}
 		
-		//Login successful
+		// Login successful
 		else {
-			//Format login navigation
+			// Format login navigation
 			$link.show().text(me.username).attr("href", global.path.home + me.link);
 			$btn.text("Account").attr("href", global.path.profile);
 			showAlert("Logged in as " + me.username);
-			
-			//Load options
-			loadOptions(me);
 		}
 	});
 }
 
-//Load options
-function loadOptions(me) {
-	//Clear local storage, if any
-	crapi.storage("local").clear();
+// Load options
+function loadOptions() {
+	/**
+	 * This block probably needs to be in eventPage.js
+	 *
+	 * Enforcing storage model:
+	 *   Storage is blank:
+	 *    - Storage model (<- Current storage) <- version
+	 *   Storage has no version:
+	 *    - Clear all storage
+	 *    - Storage model (<- Current storage) <- version
+	 *   Storage has incorrect version:
+	 *    - Storage model <- Current storage <- version
+	 *   Storage has correct version:
+	 *    - No change
+	 */
 	
-	crapi.clone(function(d) {
-		var options = d;
+	// Clone storage
+	crapi.clone($.extend(true, {}, storageModel, {options: optionDefaults}), function(d) {
+		var options = d.options;
+		var version = crapi.manifest().version;
 		
-		console.log("options: %o", options);
+		// No storage version
+		if (!d.version) {
+			// Clear all storage
+            crapi.storage("local").clear();
+			crapi.storage("sync").clear();
+			
+			console.info("No storage version, clearing storage");
+        }
+		
+		// Storage and app versions don't match
+		if (d.version !== version) {
+			// Update storage model
+			crapi.updateAll($.extend(true, {}, storageModel, d, {version: version}), function() {
+				console.info("Updated storage model");
+				
+				_continue();
+			});
+        }
+		
+		// Storage and app versions match
+		else _continue();
+		
+		function _continue() {
+			//console.log("options: %o", options);
+			
+			// Update options
+			$.each(options, function(i, v) {
+				$("#" + i.decamel()).prop("checked", v);
+			});
+        }
+	});
+	
+	// Initialize option handlers
+	handle($(".option"), "change.loadOptions", function(e) {
+		var $this = $(this);
+		var id = $this.attr("id");
+		var state = $this.prop("checked");
+		
+		// Update storage
+		crapi.clone("options", function(d) {
+			d.options[$.camelCase(id)] = state;
+			
+			crapi.updateAll(d);
+		});
 	});
 }
 
@@ -184,7 +222,7 @@ function initNav() {
 	if (!location.hash) {
 		var page = $pageLinks.first().attr("href");
 		
-		location = firstTab(page.substring(1));
+		location = firstTab(page.substring(1)); // Closure error
 	}
 	
 	//Select tab
@@ -981,7 +1019,7 @@ function check_watchlist(update, callback) {
 				//}
 			});
 			
-			console.log(wChanged);
+			//console.log(wChanged);
 			
 			console.debug("final iteration complete!");
 			if (update) crapi.update(email, d[email], callback);

@@ -23,6 +23,27 @@ var global = {
 		feed: protocol + domain + "/feed",
 		api: protocol + "api." + domain + "/me",
 		profile: protocol + domain + "/account/profile"
+	},
+	storageModel: {
+		options: {},
+		version: ""
+	},
+	optionDefaults: {
+		/**
+		 * Community
+		 */
+		
+		// General
+		showAlertsOnTop: false,
+		
+		// Comments
+		userTags: true,
+		userTagLinks: false,
+		moveCommentBox: true,
+		
+		// Groups
+		groupFilters: true,
+		moveGroupInvites: true
 	}
 };
 

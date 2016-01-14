@@ -1,13 +1,16 @@
 {
 	"manifest_version": 2,
 	"name": "Modation",
-	"version": "2.1.1",
+	"version": "2.2",
+	"debug": true,
 
 	"description": "Soundation, amplified.",
-	"icons": { "16": "img/newicon16.png",
+	"icons": {
+		"16": "img/newicon16.png",
 		"19": "img/newicon19.png",
 		"48": "img/newicon48.png",
-		"128": "img/newicon128.png" },
+		"128": "img/newicon128.png"
+	},
 
 	"author": "cyberbit",
 	"permissions": [
@@ -29,21 +32,26 @@
 	
 	"content_scripts": [{
 		"matches": ["*://*.soundation.com/*"],
-		"css": ["css/content.css"],
+		"css": ["css/content.min.css"],
 		"js": [
 			"js/jquery.all.js",
-			"js/jquery.caretposition.custom.js",
-			"js/jquery.sew.min.js",
+			"js/jquery.caretposition.custom.min.js",
+			"js/jquery.sew.custom.min.js",
 			"js/imagesloaded.pkgd.min.js",
 			"js/isotope.pkgd.min.js",
-			//"js/opentip-jquery.custom.js",
+			//"js/api.min.js",
+			//"js/content.min.js"
 			"js/crapi.js",
 			"js/modapi.js",
 			"js/content.js"
 		]
 	}],
 	
-	"options_page": "newoptions.html",
+	"options_page": "uioptions.html",
+	"options_ui": {
+		"page": "uioptions.html",
+		"chrome_style": true
+	},
 	
 	"web_accessible_resources": ["content.html"]
 }

@@ -1,158 +1,486 @@
 //Switch for alarm state
 var alarmRunning = false;
 
-//Storage for notification data
-var notifData = {};
+//Storage for runtime event functions
+var msgFunctions = {};
 
 $(function() {
 	//Initialize all the things
-	initInstall();
+	initEvents();
 	initAlarms();
 	initNotifs();
-});
-
-//Initialize new installation
-function initInstall() {
-	/**
-	 * Note: This uses localStorage instead of the
-	 * storage API because installation metadata
-	 * on different machines shouldn't be mixed.
-	 */
 	
-	//No version upgrade
-	if (localStorage.version == modapi.manifest.version) return;
-	
-	//Set up installation metadata
-	var now = moment().format();
-	localStorage.installed = now;
-	localStorage.version = modapi.manifest.version;
-	
-	//Show new install notification
-	var notif = {
-		type: "basic",
-		iconUrl: "img/newiconflat128.png",
-		title: "Modation has updated!",
-		message: "Click here to see what's new."
-	};
-	
-	//Storage for notif ID
-	var id = "modation_update";
-	
-	//Update notification, or create if needed
-	chrome.notifications.update(id, notif, function (updated) {
-		if (!updated) chrome.notifications.create(id, notif);
+	//Initialize runtime event handler
+	function initEvents() {
+		// Runtime installed handler
+		chrome.runtime.onInstalled.addListener(function(details) {
+			initUpdate(details);
+		});
 		
-		//Update notification data
-		notifData[id] = {
-			notif: notif,
-			link: "http://cyberbit.github.io/modation/",
-			actions: []
+		// Runtime startup handler
+		chrome.runtime.onStartup.addListener(function() {
+			delete localStorage.notifData;
+			
+			updateBadge();
+		});
+		
+		//Runtime message handler
+		chrome.runtime.onMessage.addListener(function(msg, sender, response) {
+			//Pass message data to event handler
+			if (msgFunctions[msg.action]) msgFunctions[msg.action](msg, sender, response);
+		});
+		
+		// Remote confirm handler
+		msgFunctions.confirm = function(msg, sender, response) {
+			response(confirm(msg.msg));
 		};
-	});
-}
-
-//Initialize alarms
-function initAlarms() {
-	//Feed alarm
-	chrome.alarms.create("feed", {
-		delayInMinutes: (modapi.manifest.debug ? 0 : 1),
-		periodInMinutes: 1
-	});
+	}
 	
-	//Alarm handler
-	chrome.alarms.onAlarm.addListener(alarmHandler);
-}
-
-//Initialize notifications
-function initNotifs() {
-	//Click handler
-	chrome.notifications.onClicked.addListener(function(notifId) {
-		var data = notifData[notifId];
+	//Initialize update
+	function initUpdate(details) {
+		//console.log("initUpdate: %o", details);
 		
-		//Notification data exists
-		if (data) {
-			//console.log("clicked notification: %o, traveling to %o", data.notif, data.link);
+		// Clone storage
+		crapi.clone($.extend(true, {}, global.storageModel, {options: global.optionDefaults}), function(d) {
+			var version = crapi.manifest().version;
 			
-			//Follow link and clear notification
-			_follow(data.link, notifId);
-		}
-	});
-	
-	//Button handler
-	chrome.notifications.onButtonClicked.addListener(function(notifId, i) {
-		var data = notifData[notifId];
-		
-		//Notification data exists
-		if (data) {
-			var btn = data.actions[i];
+			// No storage version
+			if (!d.version) {
+				// Clear all storage
+				crapi.storage("local").clear();
+				crapi.storage("sync").clear();
+				
+				console.info("No storage version, clearing storage");
+			}
 			
-			//console.log("clicked button: %o", btn);
-			
-			//Confirmation required
-			if (btn.data.confirm) {
-				if (confirm(btn.data.confirm)) {
-					//console.log("action confirmed");
+			// Storage and app versions don't match
+			if (d.version !== version) {
+				// Update storage model
+				crapi.updateAll($.extend(true, {}, global.storageModel, d, {version: version}), function() {
+					console.info("Updated storage model");
 					
+					_continue();
+				});
+			}
+			
+			// Storage and app versions match
+			else _continue();
+			
+			function _continue() {
+				//Set up installation metadata
+				var now = moment().format();
+				localStorage.installed = now;
+				localStorage.version = version;
+				
+				//Show new install notification
+				var notif = {
+					type: "basic",
+					iconUrl: "img/newiconflat128.png",
+					title: "Modation has updated!",
+					message: "Click here to see what's new.",
+					contextMessage: (details.reason == "update" ? "v" + details.previousVersion + " => " : "") + "v" + version
+				};
+				
+				//Storage for notif ID
+				var id = "modation_update";
+				
+				//Update notification, or create if needed
+				chrome.notifications.create(id, notif, function (updated) {
+					//if (!updated) chrome.notifications.create(id, notif);
+					
+					//Update notification data
+					notifData(id, {
+						notif: notif,
+						link: "http://djmarcolesco.me/modation/",
+						actions: []
+					});
+				});
+			}
+		});
+	}
+	
+	//Initialize alarms
+	function initAlarms() {
+		//Feed alarm
+		chrome.alarms.create("feed", {
+			delayInMinutes: (modapi.manifest.debug ? 0 : 1),
+			periodInMinutes: 1
+		});
+		
+		//Alarm handler
+		chrome.alarms.onAlarm.addListener(alarmHandler);
+	}
+	
+	//Initialize notifications
+	function initNotifs() {
+		//Click handler
+		chrome.notifications.onClicked.addListener(function(notifId) {
+			var data = notifData(notifId);
+			
+			//Notification data exists
+			if (data) {
+				//console.log("clicked notification: %o, traveling to %o", data.notif, data.link);
+				
+				//Follow link and clear notification
+				_follow(data.link, notifId);
+			}
+		});
+		
+		//Button handler
+		chrome.notifications.onButtonClicked.addListener(function(notifId, i) {
+			var data = notifData(notifId);
+			
+			//Notification data exists
+			if (data) {
+				var btn = data.actions[i];
+				
+				//console.log("clicked button: %o", btn);
+				
+				//Confirmation required
+				if (btn.data.confirm) {
+					if (confirm(btn.data.confirm)) {
+						//console.log("action confirmed");
+						
+						//Follow link and clear notification
+						_follow(data.link, notifId, i);
+					}
+				}
+				
+				//Confirmation not required
+				else {
 					//Follow link and clear notification
 					_follow(data.link, notifId, i);
 				}
 			}
-			
-			//Confirmation not required
-			else {
-				//Follow link and clear notification
-				_follow(data.link, notifId, i);
-			}
-		}
-	});
-	
-	//Close handler
-	chrome.notifications.onClosed.addListener(function(notifId, user) {
-		if (user) {
-			//console.log("closed by user: %o", notifData[notifId]);
-			
-			//Clear notification
-			_clear(notifId);
-		}
-	});
-	
-	function _follow(link, id, i) {
-		//Do action, if needed
-		if (typeof i != "undefined") {
-			var btn = notifData[id].actions[i];
-			
-			//No method, follow action link
-			if (!btn.data.method) link = btn.link;
-			
-			//Method exists, run action seperately
-			else {
-				$.post(btn.link, {_method: btn.data.method, authenticity_token: modapi.token()});
-			}
-		}
-		
-		//Follow link
-		chrome.windows.getCurrent(function(window) {
-			//Create tab
-			chrome.tabs.create({
-				windowId: window.id,
-				url: link
-			});
-			
-			//Focus window
-			chrome.windows.update(window.id, {focused: true});
 		});
 		
-		//Clear notification
-		_clear(id);
+		//Close handler
+		chrome.notifications.onClosed.addListener(function(notifId, user) {
+			if (user) {
+				//console.log("closed by user: %o", notifData(notifId));
+				
+				//Clear notification
+				_clear(notifId);
+			}
+		});
+		
+		//Show all notifications handler
+		msgFunctions.showAllNotifications = function(msg) {
+			showAllNotifs();
+		};
+		
+		function _follow(link, id, i) {
+			//Do action, if needed
+			if (typeof i != "undefined") {
+				var btn = notifData(id).actions[i];
+				
+				//No method, follow action link
+				if (!btn.data.method) link = btn.link;
+				
+				//Method exists, run action seperately
+				else {
+					$.post(btn.link, {_method: btn.data.method, authenticity_token: modapi.token()});
+				}
+			}
+			
+			//Follow link
+			chrome.windows.getCurrent(function(window) {
+				//Create tab
+				chrome.tabs.create({
+					windowId: window.id,
+					url: link
+				});
+				
+				//Focus window
+				chrome.windows.update(window.id, {focused: true});
+			});
+			
+			//Clear notification
+			_clear(id);
+		}
+		
+		function _clear(id) {
+			chrome.notifications.clear(id);
+			
+			//Clear remote notification, if needed
+			if (notifData(id).clear) $.post(notifData(id).clear, {_method: "delete", authenticity_token: modapi.token()});
+			
+			//Clear notif data
+			notifData(id, "");
+			
+			//Update badge
+			updateBadge();
+		}
 	}
 	
-	function _clear(id) {
-		chrome.notifications.clear(id);
+	//New alarm handler
+	function alarmHandler(alarm) {
+		var views = chrome.extension.getViews({type: "popup"});
 		
-		//Clear remote notification, if needed
-		if (notifData[id].clear) $.post(notifData[id].clear, {_method: "delete", authenticity_token: modapi.token()});
+		//Grab storage
+		crapi.clone(function(d) {
+			//Login
+			modapi.login(function(me) {
+				//Feed alarm handler
+				if (alarm.name == "feed") {
+					//Handle unknown errors
+					try {
+						//User is not logged in
+						if (!me.success) {
+							//Log failure
+							console.warn("Could not login to Soundation");
+							
+							//Update badge
+							crapi.badge({
+								title: "Please login to view notifications",
+								color: "gray",
+								text: "?"
+							});
+							
+							var actions = [
+								{
+									title: "Login with Facebook",
+									link: global.path.home + "/users/auth/facebook",
+									data: {}
+								},
+								{
+									title: "Login with Google",
+									link: global.path.home + "/users/auth/google_oauth2",
+									data: {}
+								}
+							];
+							
+							var notif = {
+								type: "basic",
+								iconUrl: "img/newiconflat128.png",
+								title: "Login to Soundation",
+								message: "Click here to login, or use one of the buttons below.",
+								buttons: actions.map(function(v) { return {title: v.title}; })
+							};
+							
+							//Storage for notif ID
+							var id = "modation_login";
+							
+							//Notification not shown yet
+							if (!notifData(id)) {
+								//Update notification, or create if needed
+								chrome.notifications.create(id, notif, function (updated) {
+									//if (!updated) chrome.notifications.create(id, notif);
+									
+									//Update notification data
+									notifData(id, {
+										notif: notif,
+										link: global.path.login,
+										actions: actions
+									});
+								});
+							}
+							
+							//Set alarm state
+							alarmRunning = false;
+						}
+						
+						//Alarm is running
+						else if (alarmRunning) console.info("Alarm running, notification handler cancelled");
+						
+						//Popup is open
+						else if (views.length) console.info("Popup open, notification handler cancelled");
+						
+						//Popup is not open
+						else {
+							// Clear login notification
+							notifData("modation_login", "");
+							
+							//Set alarm state
+							alarmRunning = true;
+							
+							console.log("Modation :: Check notifications");
+							
+							//Grab feed
+							$.get(global.path.feed, function(html) {
+								var $html = $(html.deres()/*.replace(/<time>.*<\/time>/ig, "")*/);
+								var $aside = $html.find("aside");
+								var $notifications = $aside.find(".notifications .notification");
+								
+								//Storage for message links
+								var messageLinks = [];
+								
+								//Storage for server notification IDs
+								var serverNotifs = [];
+								
+								//Add hostname to links
+								$notifications.find("a").each(function(i, e) {
+									var $link = $(e);
+									var href = $link.attr("href");
+									$link.attr("href", global.path.home + href);
+								});
+								
+								// Storage for number of notifications processed
+								var processed = 0;
+								
+								//Iterate notifications
+								$notifications.each(function(i, e) {
+									//Grab elements
+									var $notif = $(e);
+									var $actions = $notif.find(".actions").children();
+									var $msg = $notif.clone();
+									$msg.find("time, .clear, .actions").remove();
+									var $links = $msg.find("a");
+									$msg.find(".author").remove();
+									
+									//Parse elements
+									var id = "modation" + $notif.find(".clear").attr("href").match(/(?:\/)(\d+)/)[1];
+									var time = $notif.find("time").text();
+									var from = $notif.find(".author").text();
+									var msg = $msg.text().trim();
+									var link = $links.last().attr("href");
+									var clear = $notif.find(".clear").attr("href");
+									var actions = [];
+									$actions.each(function(i, e) {
+										actions.push({
+											title: $(this).text(),
+											link: $(this).attr("href"),
+											data: $(this).data()
+										});
+									});
+									
+									//Match message links
+									if (link.match(/\/account\/messages\/\d+$/)) {
+										//Prevent duplicate message notification (issue #63)
+										if ($.inArray(link, messageLinks) != -1) return;
+										
+										//Remember link
+										messageLinks.push(link);
+									}
+									
+									//Add notification ID to server list
+									serverNotifs.push(id);
+									
+									//Set up notification
+									var notif = {
+										type: "basic",
+										iconUrl: "img/newiconflat128.png",
+										title: from,
+										message: msg,
+										contextMessage: time,
+										buttons: actions.map(function(v) { return {title: v.title}; })
+									};
+									
+									//Notification not shown yet
+									if (!notifData(id)) {
+										chrome.notifications.create(id, notif, function (updated) {
+											//if (!updated) chrome.notifications.create(id, notif);
+											
+											_updateData();
+										});
+									}
+									
+									//Notification shown
+									else {
+										_updateData();
+									}
+									
+									//Store notification
+									function _updateData() {
+										//console.log("update data: %o", id);
+										
+										//Update notification data
+										notifData(id, {
+											notif: notif,
+											link: link,
+											clear: clear,
+											actions: actions
+										});
+										
+										++processed;
+										
+										// Processed final notification, update badge
+										if (processed == Object.keys(notifData()).length) updateBadge();
+									}
+								});
+								
+								//Get all local notifications
+								var localNotifs = Object.keys(notifData());
+								
+								//console.log("local: %o, server: %o, diff: %o", localNotifs, serverNotifs, localNotifs.diff(serverNotifs));
+								
+								//Dismiss notifications no longer on server (issue #64)
+								$.each(localNotifs.diff(serverNotifs), function(i, v) {
+									chrome.notifications.clear(v);
+									
+									//Clear notif data
+									notifData(v, "");
+								});
+								
+								// No notifications were processed
+								if (processed === 0) updateBadge();
+								
+								//Set alarm state
+								alarmRunning = false;
+							});
+						}
+					}
+					
+					//Report error and stop running
+					catch (e) {
+						console.error("Unknown error occurred: %o", e);
+						
+						//Set alarm state
+						alarmRunning = false;
+					}
+				}
+			});
+		});
 	}
-}
+	
+	//Get/set notification data
+	function notifData(id, value) {
+		var notifsJSON = localStorage.notifData;
+		var notifs = (notifsJSON) ? $.parseJSON(notifsJSON) : {};
+		
+		if (typeof id == "undefined") return notifs;
+		if (typeof value == "undefined") value = false;
+		var notif = notifs[id];
+		
+		// Delete notification data
+		if (value === "") delete notifs[id];
+		
+		// Set notification data
+		else if (value) notifs[id] = value;
+		
+		// Update storage
+		localStorage.notifData = JSON.stringify(notifs);
+		
+		return notif;
+	}
+	
+	//Show all notifications
+	function showAllNotifs() {
+		var notifs = notifData();
+		
+		$.each(notifs, function(i, v) {
+			chrome.notifications.create(i, v.notif, function(){});
+		});
+		
+		// Update badge if no login notification
+		if (!notifs.modation_login) updateBadge();
+	}
+	
+	//Update badge
+	function updateBadge() {
+		//console.log("updateBadge: %o", notifData());
+		
+		var notifs = Object.keys(notifData()).length;
+		var title = (notifs == 0 ? "No new notifications :(" : notifs + " new notification" + (notifs > 1 ? "s" : ""));
+		
+		//Update badge
+		crapi.badge({
+			title: title,
+			color: "red",
+			text: notifs ? String(notifs) : ""
+		});
+	}
+});
 
 /* Checks for new installs */
 /*function install_notice() {
@@ -189,192 +517,6 @@ function initNotifs() {
 		});
 	}
 });*/
-
-//New alarm handler
-function alarmHandler(alarm) {
-	var views = chrome.extension.getViews({type: "popup"});
-	
-	//Grab storage
-	crapi.clone(function(d) {
-		//Login
-		modapi.login(function(me) {
-			//Feed alarm handler
-			if (alarm.name == "feed") {
-				//Handle unknown errors
-				try {
-					//User is not logged in
-					if (!me.success) {
-						//Log failure
-						console.warn("Could not login to Soundation");
-						
-						//Update badge
-						/*crapi.badge({
-							title: "Please login to view notifications",
-							color: "gray",
-							text: "?"
-						});*/
-						
-						var actions = [
-							{
-								title: "Login with Facebook",
-								link: global.path.home + "/users/auth/facebook",
-								data: {}
-							},
-							{
-								title: "Login with Google",
-								link: global.path.home + "/users/auth/google_oauth2",
-								data: {}
-							}
-						];
-						
-						var notif = {
-							type: "basic",
-							iconUrl: "img/newiconflat128.png",
-							title: "Login to Soundation",
-							message: "Click here to login, or use one of the buttons below.",
-							buttons: actions.map(function(v) { return {title: v.title}; })
-						};
-						
-						//Storage for notif ID
-						var id = "modation_login";
-						
-						//Update notification, or create if needed
-						chrome.notifications.update(id, notif, function (updated) {
-							if (!updated) chrome.notifications.create(id, notif);
-							
-							//Update notification data
-							notifData[id] = {
-								notif: notif,
-								link: global.path.login,
-								actions: actions
-							};
-						});
-						
-						//Set alarm state
-						alarmRunning = false;
-					}
-					
-					//Alarm is running
-					else if (alarmRunning) console.info("Alarm running, notification handler cancelled");
-					
-					//Popup is open
-					else if (views.length) console.info("Popup open, notification handler cancelled");
-					
-					//Popup is not open
-					else {
-						//Set alarm state
-						alarmRunning = true;
-						
-						console.log("Modation :: Check notifications");
-						
-						//Grab feed
-						$.get(global.path.feed, function(html) {
-							var $html = $(html.deres()/*.replace(/<time>.*<\/time>/ig, "")*/);
-							var $aside = $html.find("aside");
-							var $notifications = $aside.find(".notifications .notification");
-							
-							//Storage for message links
-							var messageLinks = [];
-							
-							//Storage for server notification IDs
-							var serverNotifs = [];
-							
-							//Add hostname to links
-							$notifications.find("a").each(function(i, e) {
-								var $link = $(e);
-								var href = $link.attr("href");
-								$link.attr("href", global.path.home + href);
-							});
-							
-							//Iterate notifications
-							$notifications.each(function(i, e) {
-								//Grab elements
-								var $notif = $(e);
-								var $actions = $notif.find(".actions").children();
-								var $msg = $notif.clone();
-								$msg.find("time, .clear, .actions").remove();
-								var $links = $msg.find("a");
-								$msg.find(".author").remove();
-								
-								//Parse elements
-								var id = "modation" + $notif.find(".clear").attr("href").match(/(?:\/)(\d+)/)[1];
-								var time = $notif.find("time").text();
-								var from = $notif.find(".author").text();
-								var msg = $msg.text().trim();
-								var link = $links.last().attr("href");
-								var clear = $notif.find(".clear").attr("href");
-								var actions = [];
-								$actions.each(function(i, e) {
-									actions.push({
-										title: $(this).text(),
-										link: $(this).attr("href"),
-										data: $(this).data()
-									});
-								});
-								
-								//Match message links
-								if (link.match(/\/account\/messages\/\d+$/)) {
-									//Prevent duplicate message notification (issue #63)
-									if ($.inArray(link, messageLinks) != -1) return;
-									
-									//Remember link
-									messageLinks.push(link);
-								}
-								
-								//Add notification ID to server list
-								serverNotifs.push(id);
-								
-								//Set up notification
-								var notif = {
-									type: "basic",
-									iconUrl: "img/newiconflat128.png",
-									title: from,
-									message: msg,
-									contextMessage: time,
-									buttons: actions.map(function(v) { return {title: v.title}; })
-								};
-								
-								//Update notification, or create if needed
-								chrome.notifications.update(id, notif, function (updated) {
-									if (!updated) chrome.notifications.create(id, notif);
-									
-									//Update notification data
-									notifData[id] = {
-										notif: notif,
-										link: link,
-										clear: clear,
-										actions: actions
-									};
-								});
-							});
-							
-							//Get all local notifications
-							chrome.notifications.getAll(function(notifs) {
-								var localNotifs = Object.keys(notifs);
-								
-								//Dismiss notifications no longer on server (issue #64)
-								$.each(localNotifs.diff(serverNotifs), function(i, v) {
-									chrome.notifications.clear(v);
-								});
-							});
-							
-							//Set alarm state
-							alarmRunning = false;
-						});
-					}
-				}
-				
-				//Report error and stop running
-				catch (e) {
-					console.error("Unknown error occurred: %o", e);
-					
-					//Set alarm state
-					alarmRunning = false;
-				}
-			}
-		});
-	});
-}
 
 //Alarm handler
 /*function alarmHandler(alarm) {
