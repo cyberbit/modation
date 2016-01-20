@@ -15,10 +15,13 @@
 	"author": "cyberbit",
 	"permissions": [
 		"https://*.soundation.com/*",
+		"https://s3.amazonaws.com/powerfx.content/*",
 		"alarms",
 		"notifications",
 		"storage"
 	],
+	
+	"optional_permissions": ["cookies"],
 
 	"background": {
 		"page": "background.html",

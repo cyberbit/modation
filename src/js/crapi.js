@@ -44,6 +44,62 @@ function handle(target, event, callback, trigger) {
     $target.on(event, callback);
 }
 
+// Get blob URL
+function getBlob(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function(e) {
+        var blob = window.URL.createObjectURL(this.response);
+        
+        // Run callback
+        callback(blob);
+    }
+    
+    xhr.send();
+}
+
+// Get data URI
+// (via https://davidwalsh.name/convert-image-data-uri-javascript)
+function getDataUri(url, callback) {
+    var image = new Image();
+
+    image.onload = function() {
+        var canvas = document.createElement("canvas");
+        canvas.width = this.naturalWidth; // or "width" if you want a special/scaled size
+        canvas.height = this.naturalHeight; // or "height" if you want a special/scaled size
+        
+        canvas.getContext("2d").drawImage(this, 0, 0);
+        
+        // Get raw image data
+        callback(canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, ""));
+        
+        // ... or get as Data URI
+        callback(canvas.toDataURL("image/png"));
+    };
+    
+    image.src = url;
+}
+
+// Get/modify localStorage key as JSON
+function localJSON(key, json) {
+    if (typeof json == "undefined") {
+        var value = localStorage[key];
+        
+        if (typeof value !== "undefined") {
+            value = $.parseJSON(value);
+        }
+        
+        return value;
+    }
+    
+    else {
+        if (json === "") delete localStorage[key];
+        
+        else localStorage[key] = JSON.stringify(json);
+    }
+}
+
 //Hide context, show view
 function showView(context, view, fade) {
     if (typeof fade == "undefined") fade = 170;
@@ -166,6 +222,8 @@ CrAPI.prototype.storage = function(type) {
  * @returns	{object}				Modified contents of storage from callback
  */
 CrAPI.prototype.clone = function(keys, callback) {
+    //if (this.debug) console.trace("crapi.clone stack trace");
+    
     if (typeof keys == "undefined") {
         keys = null;
         callback = this.DEFAULT_CALLBACK;

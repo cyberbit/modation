@@ -5,6 +5,7 @@ $(document).ready(function() {
 		var $options = $(".options");
 		var $showNotifs = $(".show-notifs");
 		var $clearNotifs = $(".clear-notifs");
+		var $openMessages = $(".open-messages");
 		
 		// Options handler
 		handle($options, "click.initLinks", function(e) {
@@ -24,6 +25,20 @@ $(document).ready(function() {
 						$.post(global.path.feed + "/clear_notifications", {_method: "delete", authenticity_token: global.token});
 					});
 				}
+			});
+		});
+		
+		// Open messages handler
+		handle($openMessages, "click.initLinks", function(e) {
+			var windowOptions = {
+				url: "messages.html",
+				width: 400,
+				height: 550,
+				type: "popup"
+			};
+			
+			chrome.windows.create(windowOptions, function(w) {
+				
 			});
 		});
 	}
