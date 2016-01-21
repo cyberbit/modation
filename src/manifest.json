@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation",
-	"version": "2.2",
+	"version": "2.3",
 	"debug": true,
 
 	"description": "Soundation, amplified.",

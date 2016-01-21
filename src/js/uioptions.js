@@ -60,14 +60,22 @@ $(function() {
 	// Remember me hook
 	function initRememberMe(state, callback) {
 		// Option disabled
-        if (!state) callback(true);
+        if (!state) {
+			// Ping Soundation to set cookie
+			$.get(global.path.home);
+			
+			callback(true);
+		}
 		
 		// Option enabled
 		else {
 			// Request permissions
 			chrome.permissions.request({
-				permissions: ["cookies"],
+				permissions: ["cookies"]
 			}, function(granted) {
+				// Bind cookie change handler
+				chrome.runtime.sendMessage({action: "rememberMe"});
+				
 				callback(granted);
 			});
 		}

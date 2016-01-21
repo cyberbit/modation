@@ -12,7 +12,7 @@ $(function() {
 	initEvents();
 	initAlarms();
 	initNotifs();
-	initCookies();
+	//initCookies();
 	
 	//Initialize runtime event handler
 	function initEvents() {
@@ -25,6 +25,7 @@ $(function() {
 		// Runtime startup handler
 		chrome.runtime.onStartup.addListener(function() {
             clearCache();
+			cacheOptions();
 			updateBadge();
 		});
 		
@@ -34,17 +35,20 @@ $(function() {
 			if (msgFunctions[msg.action]) msgFunctions[msg.action](msg, sender, response);
 		});
 		
-		// Cookie change handler
-		chrome.cookies.onChanged.addListener(function(info) {
-			//console.log("cookie info: %o", info);
-			
-			if (info.cause != "explicit") initCookies();
-		});
-		
 		// Remote confirm handler
 		msgFunctions.confirm = function(msg, sender, response) {
 			response(confirm(msg.msg));
 		};
+		
+		// "Remember me" handler
+		(msgFunctions.rememberMe = function() {
+			// Cookie change handler
+			if (chrome.cookies) chrome.cookies.onChanged.addListener(function(info) {
+				//console.log("cookie info: %o", info);
+				
+				if (info.cause != "explicit") initCookies();
+			});
+		})();
 	}
 	
 	//Initialize update
@@ -82,6 +86,10 @@ $(function() {
 				var now = moment().format();
 				localStorage.installed = now;
 				localStorage.version = version;
+				
+				// Cache options
+				console.log("cache options");
+				localJSON("options", d.options);
 				
 				//Show new install notification
 				var notif = {
@@ -178,7 +186,7 @@ $(function() {
 		});
 		
 		//Show all notifications handler
-		msgFunctions.showAllNotifications = function(msg) {
+		msgFunctions.showAllNotifications = function() {
 			showAllNotifs();
 		};
 		
@@ -227,11 +235,13 @@ $(function() {
 	}
 	
 	function initCookies() {
-        var options = localJSON("options") || {};
+        var options = localJSON("options");
+		
+		//console.log("initCookies: %o", JSON.stringify(options));
         
-        // Option not cached
+        /*// Option not cached
         if (typeof options.rememberMe == "undefined") {
-            crapi.clone("options", function(d) {
+            crapi.clone({options: global.optionDefaults}, function(d) {
                 // Cache option
                 options.rememberMe = d.options.rememberMe;
                 localJSON("options", options);
@@ -241,15 +251,15 @@ $(function() {
         }
         
         // Option cached
-        else {
+        else {*/
             _continue(options);
-        }
+        /*}*/
         
         function _continue(options) {
             // Remember me option enabled
             if (options.rememberMe) {
                 chrome.cookies.get({url: global.path.cookie, name: global.cookie}, function(cookie) {
-                    //console.log("cookie: %o", cookie);
+					cookie = cookie || {};
                     
                     // Session cookie
                     if (cookie.session) {
@@ -414,7 +424,7 @@ $(function() {
                                 //Add notification ID to server list
                                 serverNotifs.push(id);
                                 
-                                var blobs = localJSON("blobs") || {};
+                                /*var blobs = localJSON("blobs") || {};
                                 
                                 // Blob is cached
                                 if (blobs[fromLink]) {
@@ -434,12 +444,12 @@ $(function() {
                                             
                                             // Cache blob
                                             blobs[fromLink] = blob;
-                                            localJSON("blobs", blobs);
+                                            localJSON("blobs", blobs);*/
                                             
-                                            _continue(blob);
-                                        });
+                                            _continue("img/newiconflat128.png");
+                                        /*});
                                     });
-                                }
+                                }*/
                                 
                                 function _continue(blob) {
                                     //Set up notification
@@ -575,6 +585,16 @@ $(function() {
         
         console.info("Cache cleared");
     }
+	
+	// Cache options
+	function cacheOptions() {
+		// Clone storage with defaults
+		crapi.clone({options: global.optionDefaults}, function(d) {
+			// Cache options
+			console.log("cache options");
+			localJSON("options", d.options);
+		});
+	}
 });
 
 /* Checks for new installs */
