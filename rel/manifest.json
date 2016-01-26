@@ -43,9 +43,6 @@
 			"js/isotope.pkgd.min.js",
 			"js/api.min.js",
 			"js/content.min.js"
-			//"js/crapi.js",
-			//"js/modapi.js",
-			//"js/content.js"
 		]
 	}],
 	
