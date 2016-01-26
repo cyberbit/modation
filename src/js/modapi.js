@@ -18,17 +18,29 @@ var domain = "soundation.com";
 //Define global variables
 var global = {
 	path: {
+		protocol: protocol,
+		domain: domain,
 		home: protocol + domain,
+		cookie: protocol + domain,
 		login: protocol + domain + "?login=yes",
 		feed: protocol + domain + "/feed",
 		api: protocol + "api." + domain + "/me",
-		profile: protocol + domain + "/account/profile"
+		profile: protocol + domain + "/account/profile",
+		messages: protocol + domain + "/account/messages"
 	},
+	cookie: "_soundation_session",
 	storageModel: {
 		options: {},
 		version: ""
 	},
 	optionDefaults: {
+		/**
+		 * Global
+		 */
+		
+		// Login
+		rememberMe: false,
+		
 		/**
 		 * Community
 		 */

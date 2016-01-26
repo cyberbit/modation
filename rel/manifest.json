@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Modation",
-	"version": "2.2",
+	"version": "2.3",
 
 	"description": "Soundation, amplified.",
 	"icons": {
@@ -14,10 +14,13 @@
 	"author": "cyberbit",
 	"permissions": [
 		"https://*.soundation.com/*",
+		"https://s3.amazonaws.com/powerfx.content/*",
 		"alarms",
 		"notifications",
 		"storage"
 	],
+	
+	"optional_permissions": ["cookies"],
 
 	"background": {
 		"page": "background.html",
@@ -40,6 +43,9 @@
 			"js/isotope.pkgd.min.js",
 			"js/api.min.js",
 			"js/content.min.js"
+			//"js/crapi.js",
+			//"js/modapi.js",
+			//"js/content.js"
 		]
 	}],
 	
