@@ -21,7 +21,7 @@
             <section class="page-header docs">
         <h1 class="project-name">
             <img class="img-responsive" src="http://djmarcolesco.me/modation/img/newiconflat.png" />
-            Modation Docs <span class="version">v2.2</span>
+            Modation Docs <span class="version">v2.3</span>
         </h1>
     </section>
     <section class="main-content main">
@@ -45,8 +45,8 @@
 </blockquote></li>
 <li>Start new <code>release/x.y(.z)</code> branch using Git Flow.</li>
 <li>Update manifest. Increment version to <code>x.y</code> for feature releases, <code>x.y.z</code> for fixbag releases.</li>
-<li>Compile scripts using Closure. Switch references in manifest and content pages to minified files.</li>
-<li>Copy <code>src</code> to <code>rel</code>. Remove files not applicable to release (i.e., non-minified JS). Commit to release branch.</li>
+<li>Compile scripts using Closure. Remember to compile all APIs to <code>api.min.js</code>.</li>
+<li>Copy <code>src</code> to <code>rel</code>. Remove files not applicable to release (i.e., non-minified JS). Switch references in manifest and content pages to minified files. Commit to release branch.</li>
 <li>Load <code>rel</code> into development Chrome. If problems are found, fix in <code>develop</code> and go back to compile step (5).</li>
 <li>Increment version in <code>couscous.yml</code>. Copy GitHub release HTML to <code>whats-new.twig</code>, using the headers <strong>What's New</strong>, <strong>What's Changed</strong>, and <strong>What's Fixed</strong>. Commit to release branch. Finish release using Git Flow. Deploy project page using Couscous.
 <blockquote>
