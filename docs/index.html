@@ -50,7 +50,9 @@
 <li>Load <code>rel</code> into development Chrome. If problems are found, fix in <code>develop</code> and go back to compile step (5).</li>
 <li>Increment version in <code>couscous.yml</code>. Copy GitHub release HTML to <code>whats-new.twig</code>, using the headers <strong>What's New</strong>, <strong>What's Changed</strong>, and <strong>What's Fixed</strong>. Commit to release branch. Finish release using Git Flow. Deploy project page using Couscous.
 <blockquote>
-<p>If deployment fails, run <code>git push origin gh-pages</code> in the temp directory created by Couscous (see <a href="https://github.com/CouscousPHP/Couscous/issues/136#issuecomment-160843835">CouscousPHP/Couscous#136</a>).</p>
+<p>From <a href="https://github.com/CouscousPHP/Couscous/issues/136#issuecomment-160843835">CouscousPHP/Couscous#136</a>: if deployment fails, run <code>git push origin gh-pages</code> in the temp directory created by Couscous. Alternatively, add the following lines to git config:</p>
+<pre><code>[credential]
+    helper = wincred</code></pre>
 </blockquote></li>
 <li>Pack and zip project as <code>project-x.y.z.*</code>. Add archives to GitHub release, double-check information, and publish release. Tag release merge on <code>master</code> with <code>vx.y.z</code>.</li>
 <li>Upload <code>.zip</code> to webstore. Update description and screenshots as needed. Publish to webstore.</li>
