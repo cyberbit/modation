@@ -59,9 +59,14 @@ function getBlob(url, callback) {
     xhr.send();
 }
 
-// Get data URI
+// Get data URI (overlay parameter is optional)
 // (via https://davidwalsh.name/convert-image-data-uri-javascript)
-function getDataUri(url, callback) {
+function getDataUri(url, overlayUrl, callback) {
+    if (typeof callback == "undefined") {
+        callback = overlayUrl;
+        overlayUrl = false;
+    }
+    
     var image = new Image();
 
     image.onload = function() {
@@ -69,13 +74,39 @@ function getDataUri(url, callback) {
         canvas.width = this.naturalWidth; // or "width" if you want a special/scaled size
         canvas.height = this.naturalHeight; // or "height" if you want a special/scaled size
         
-        canvas.getContext("2d").drawImage(this, 0, 0);
+        var context = canvas.getContext("2d");
         
-        // Get raw image data
-        callback(canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, ""));
+        context.drawImage(this, 0, 0);
         
-        // ... or get as Data URI
-        callback(canvas.toDataURL("image/png"));
+        // Draw overlay
+        if (overlayUrl) {
+            // Calculations for position and size
+            var halfWidth = canvas.width / 2;
+            var halfHeight = canvas.height / 2;
+            
+            var overlay = new Image();
+            
+            overlay.onload = function() {
+                // Draw white background to handle images with transparency
+                context.fillStyle = "white";
+                context.fillRect(halfWidth, halfHeight, halfWidth, halfHeight);
+                
+                // Draw overlay
+                context.drawImage(this, halfWidth, halfHeight, halfWidth, halfHeight);
+                
+                _continue();
+            }
+            
+            overlay.src = overlayUrl;
+        }
+        
+        // No overlay
+        else _continue();
+        
+        function _continue() {
+            // Run callback with data URL
+            callback(canvas.toDataURL("image/png"));
+        }
     };
     
     image.src = url;

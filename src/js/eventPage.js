@@ -412,44 +412,48 @@ $(function() {
                                     });
                                 });
                                 
-                                //Match message links
+                                // Match message links
                                 if (link.match(/\/account\/messages\/\d+$/)) {
-                                    //Prevent duplicate message notification (issue #63)
+                                    // Prevent duplicate message notification (issue #63)
                                     if ($.inArray(link, messageLinks) != -1) return;
                                     
-                                    //Remember link
+                                    // Remember link
                                     messageLinks.push(link);
                                 }
                                 
-                                //Add notification ID to server list
+                                // Add notification ID to server list
                                 serverNotifs.push(id);
+								
+								// Determine if notification is group-related
+								var isGroup = link.match(/\/group\//);
                                 
-                                /*var blobs = localJSON("blobs") || {};
+                                var blobs = localJSON("blobs") || {};
                                 
                                 // Blob is cached
-                                if (blobs[fromLink]) {
-                                    _continue(blobs[fromLink]);
+                                if (blobs[(isGroup ? link : fromLink)]) {
+                                    _continue(blobs[(isGroup ? link : fromLink)]);
                                 }
                                 
                                 // Blob is not cached
                                 else {
                                     // Grab author profile page
-                                    $.get(fromLink, function(html) {
-                                        var $profile = $(html);
-                                        var img = $profile.find("aside img").attr("src");
+                                    $.get((isGroup ? link : fromLink), function(html) {
+                                        var $html = $(html);
+                                        var img = $html.find((isGroup ? ".top .inner .container" : "aside") + " img").attr("src");
                                         
                                         // Get blob URL
-                                        getBlob(img, function(blob) {
+                                        getDataUri("img/newiconflat128.png", img, function(blob) {
                                             var blobs = localJSON("blobs") || {};
                                             
                                             // Cache blob
-                                            blobs[fromLink] = blob;
-                                            localJSON("blobs", blobs);*/
+                                            blobs[(isGroup ? link : fromLink)] = blob;
+                                            localJSON("blobs", blobs);
                                             
-                                            _continue("img/newiconflat128.png");
-                                        /*});
+                                            //_continue("img/newiconflat128.png");
+                                            _continue(blob);
+                                        });
                                     });
-                                }*/
+                                }
                                 
                                 function _continue(blob) {
                                     //Set up notification
