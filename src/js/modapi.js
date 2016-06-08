@@ -188,4 +188,4 @@ ModAPI.prototype.login = function(callback) {
  *
  * @returns	{string}	Authenticity token
  */
-ModAPI.prototype.token = function() { return global.token; }
+ModAPI.prototype.token = function() { return global.token; };

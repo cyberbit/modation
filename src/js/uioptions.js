@@ -19,7 +19,7 @@ $(function() {
 		});
 		
 		// Initialize option handlers
-		handle($(".option"), "change.initOptions", function(e) {
+		handle($(".option"), "change.initOptions", function() {
 			var $this = $(this);
 			var id = $.camelCase($this.attr("id"));
 			var state = $this.prop("checked");

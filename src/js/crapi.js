@@ -1,9 +1,11 @@
+/* exported handle, getBlob, getDataUri, localJSON, showView, _factory */
+
 /*!
  * App Helpers
  */
 String.prototype.hashCode = function(){
     var hash = 0, i, c;
-    if (this.length == 0) return hash;
+    if (this.length === 0) return hash;
     for (i = 0, l = this.length; i < l; i++) {
         c  = this.charCodeAt(i);
         hash  = ((hash<<5)-hash)+c;
@@ -14,11 +16,26 @@ String.prototype.hashCode = function(){
 
 String.prototype.deres = function() {
 	return this.replace(/img[^>]*>/g, "");
-}
+};
 
 String.prototype.decamel = function() {
     return this.replace(/(?=[a-zA-z])(?=[A-Z])/g, "-").toLowerCase();
-}
+};
+
+String.prototype.matchAny = function(patterns) {
+    var that = this;
+    var matched = false;
+    
+    // Iterate patterns and return key of first match
+    $.each(patterns, function(i, v) {
+        if (that.match(v)) {
+            matched = i;
+            return false;
+        }
+    });
+    
+    return matched;
+};
 
 Array.prototype.unique = function() {
     return this.reduce(function(p, c) {
@@ -31,8 +48,8 @@ Array.prototype.diff = function(compare) {
 	return this.reduce(function(p, c) {
 		if (compare.indexOf(c) == -1) p.push(c);
 		return p;
-	}, [])
-}
+	}, []);
+};
 
 //Add/replace handler
 function handle(target, event, callback, trigger) {
@@ -49,12 +66,12 @@ function getBlob(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.responseType = "blob";
-    xhr.onload = function(e) {
+    xhr.onload = function() {
         var blob = window.URL.createObjectURL(this.response);
         
         // Run callback
         callback(blob);
-    }
+    };
     
     xhr.send();
 }
@@ -95,7 +112,7 @@ function getDataUri(url, overlayUrl, callback) {
                 context.drawImage(this, halfWidth, halfHeight, halfWidth, halfHeight);
                 
                 _continue();
-            }
+            };
             
             overlay.src = overlayUrl;
         }
@@ -167,12 +184,12 @@ crapi = new CrAPI();
  * @returns	{object}	Serialization of full manifest file (from API docs)
  * @name 
  */
-CrAPI.prototype.manifest = function() { return chrome.runtime.getManifest(); }
+CrAPI.prototype.manifest = function() { return chrome.runtime.getManifest(); };
 
 /**
  * Reload the current page
  */
-CrAPI.prototype.reload = function() { location.reload(); }
+CrAPI.prototype.reload = function() { location.reload(); };
 
 /**
  * Quick-access debug switch
@@ -188,14 +205,14 @@ CrAPI.prototype.lock = function(state) {
 	if (typeof state == "undefined") state = "";
 	
 	localStorage.crapi_locked = state;
-}
+};
 
 /**
  * Get lock state
  */
 CrAPI.prototype.locked = function() {
 	return localStorage.crapi_locked;
-}
+};
 
 /**
  * Contains workarounds for tricky bits in the Chrome API
@@ -204,7 +221,9 @@ function CrAPI() {
 	console.log("%cCrAPI%c :: Init", "font-weight: bold; color: green", "");
 	
 	//Default callback for all functions
-	this.DEFAULT_CALLBACK = function(d){return (typeof d != "undefined" ? d : false)};
+	this.DEFAULT_CALLBACK = function(d) {
+        return (typeof d != "undefined" ? d : false);
+    };
 	
 	//Quick badge colors
 	this.badgeColors = {
@@ -238,19 +257,16 @@ CrAPI.prototype.storage = function(type) {
 		//Local storage
 		case "local":
 			return chrome.storage.local;
-			break;
 		
 		//Synced storage
 		case "sync":
 			return chrome.storage.sync;
-			break;
 		
 		//Unknown type
 		default:
 			return false;
-			break;
 	}
-}
+};
 
 /**
  * Clone local storage
@@ -280,7 +296,7 @@ CrAPI.prototype.clone = function(keys, callback) {
 		//Run callback
 		callback(d);
 	});
-}
+};
 
 /**
  * Update storage for provided key
@@ -322,7 +338,7 @@ CrAPI.prototype.update = function(key, value, callback) {
 		//Run callback
 		callback(false);
 	}
-}
+};
 
 /**
  * Update everything in storage
@@ -349,7 +365,7 @@ CrAPI.prototype.updateAll = function(items, callback) {
 			console.log("%cCrAPI%c :: Update all: %O", "font-weight: bold; color: green", "", items);
 			
 			//Run callback
-			callback();
+			callback(true);
 		});
 	}
 	
@@ -360,7 +376,7 @@ CrAPI.prototype.updateAll = function(items, callback) {
 		//Run callback
 		callback(false);
 	}
-}
+};
 
 /**
  * Modify extension badge from settings matrix
@@ -374,7 +390,7 @@ CrAPI.prototype.badge = function(matrix) {
 	if (options.title !== false) chrome.browserAction.setTitle({title: options.title});
 	if (color !== false) chrome.browserAction.setBadgeBackgroundColor({color: color});
 	if (options.text !== false) chrome.browserAction.setBadgeText({text: options.text});
-}
+};
 
 /**
  * Storage for CrAPI tests
@@ -405,7 +421,11 @@ CrAPI.prototype.runTests = function() {
         
         console.debug("queue: %o", queue);
         
-        var nextFn = function(next){console.debug("== End of Tests =="); console.groupEnd()};
+        var nextFn = function() {
+            console.debug("== End of Tests ==");
+            console.groupEnd();
+        };
+        
         for (i = queue.length - 1; i >= 0; i--) {
             nextFn = _wrap(queue[i], _this, [nextFn]);
         }
@@ -421,7 +441,7 @@ CrAPI.prototype.runTests = function() {
             fn.apply(context, params);
         };
     }
-}
+};
 
 /**
  * Test Chrome storage functions
@@ -474,7 +494,7 @@ CrAPI.prototype.tests.storageTest1 = function(next) {
         console.error(e);
         console.groupEnd();
     }
-}
+};
 
 /**
  * Test CrAPI storage functions
@@ -525,4 +545,4 @@ CrAPI.prototype.tests.storageTest2 = function(next) {
         console.error(e);
         console.groupEnd();
     }
-}
+};

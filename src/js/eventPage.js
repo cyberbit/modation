@@ -49,7 +49,7 @@ $(function() {
 				
 				if (info.cause != "explicit") initCookies();
 			});
-		})();
+		}());
 	}
 	
 	//Initialize update
@@ -89,7 +89,6 @@ $(function() {
 				localStorage.version = version;
 				
 				// Cache options
-				console.log("cache options");
 				localJSON("options", d.options);
 				
 				//Show new install notification
@@ -105,7 +104,7 @@ $(function() {
 				var id = "modation_update";
 				
 				//Update notification, or create if needed
-				chrome.notifications.create(id, notif, function (updated) {
+				chrome.notifications.create(id, notif, function() {
 					//if (!updated) chrome.notifications.create(id, notif);
 					
 					//Update notification data
@@ -283,7 +282,7 @@ $(function() {
                             secure: cookie.secure,
                             httpOnly: cookie.httpOnly,
                             expirationDate: moment().add(1, "w").unix()
-                        }, function(cookie) {
+                        }, function() {
                             //console.log("cookie: %o, error: %o", cookie, chrome.runtime.lastError);
                         });
                     }
@@ -442,7 +441,7 @@ $(function() {
                         //Notification not shown yet
                         if (!notifData(id)) {
                             //Update notification, or create if needed
-                            chrome.notifications.create(id, notif, function (updated) {
+                            chrome.notifications.create(id, notif, function() {
                                 //if (!updated) chrome.notifications.create(id, notif);
                                 
                                 //Update notification data
@@ -514,7 +513,7 @@ $(function() {
                                 var link = $links.last().attr("href");
                                 var clear = $notif.find(".clear").attr("href");
                                 var actions = [];
-                                $actions.each(function(i, e) {
+                                $actions.each(function() {
                                     actions.push({
                                         title: $(this).text(),
                                         link: $(this).attr("href"),
@@ -578,7 +577,7 @@ $(function() {
                                     
                                     //Notification not shown yet
                                     if (!notifData(id)) {
-                                        chrome.notifications.create(id, notif, function (updated) {
+                                        chrome.notifications.create(id, notif, function() {
                                             //if (!updated) chrome.notifications.create(id, notif);
                                             
                                             _updateData();
@@ -953,7 +952,7 @@ $(function() {
 		//console.log("updateBadge: %o", notifData());
 		
 		var notifs = Object.keys(notifData()).length;
-		var title = (notifs == 0 ? "No new notifications :(" : notifs + " new notification" + (notifs > 1 ? "s" : ""));
+		var title = (notifs === 0 ? "No new notifications :(" : notifs + " new notification" + (notifs > 1 ? "s" : ""));
 		
 		//Update badge
 		crapi.badge({

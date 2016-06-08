@@ -121,7 +121,7 @@ function parseNotifs() {
 						});
 					});
 					
-					function _generateAlerts(data) {
+					function _generateAlerts() {
 						//var watchlistAlerts = data['watchlist-queue'].length;
 						var alerts = feedAlerts;// + watchlistAlerts;
 						var alertString = "";
@@ -137,7 +137,7 @@ function parseNotifs() {
 							});
 							
 							//Initialize author string
-							var authorCount = authors.length
+							var authorCount = authors.length;
 							var others = authorCount - 3;
 							alertString = feedAlerts + " new from ";
 							
@@ -201,7 +201,7 @@ function parseWatchlist() {
 			
 			//User is not logged in
 			if (!me.success) {
-				console.warn("Could not login to Soundation, bypassing watchlist check")
+				console.warn("Could not login to Soundation, bypassing watchlist check");
 			}
 			
 			//User is logged in
@@ -281,13 +281,17 @@ function clear_queue(email, queueID) {
 		var queueItem = d[email]['watchlist-queue'][queueID];
 		
 		//Grab watchlist item
-		var watchlistItem = d[email]['watchlist'][queueItem.index];
+		var watchlistItem = d[email].watchlist[queueItem.index];
 		
 		//Iterate properties
-		for (var prop in queueItem.state) watchlistItem[prop] = queueItem.state[prop];
+		for (var prop in queueItem.state) {
+			if (queueItem.state.hasOwnProperty(prop)) {
+				watchlistItem[prop] = queueItem.state[prop];
+			}
+		}
 		
 		//Push updated watchlist back into storage
-		d[email]['watchlist'][queueItem.index] = watchlistItem;
+		d[email].watchlist[queueItem.index] = watchlistItem;
 		
 		//Delete queue item
 		d[email]['watchlist-queue'].splice(queueID, 1);
@@ -306,13 +310,17 @@ function purge_queue(email) {
 			var queueItem = v;
 			
 			//Grab watchlist item
-			var watchlistItem = d[email]['watchlist'][queueItem.index];
+			var watchlistItem = d[email].watchlist[queueItem.index];
 			
 			//Iterate properties
-			for (var prop in queueItem.state) watchlistItem[prop] = queueItem.state[prop];
+			for (var prop in queueItem.state) {
+				if (queueItem.state.hasOwnProperty(prop)) {
+					watchlistItem[prop] = queueItem.state[prop];
+				}
+			}
 			
 			//Push updated watchlist back into storage
-			d[email]['watchlist'][queueItem.index] = watchlistItem;
+			d[email].watchlist[queueItem.index] = watchlistItem;
 		});
 		
 		//Clear queue
@@ -338,5 +346,5 @@ if (crapi.debug) {
 		//Load added item
 		$wItem.find(".item-title").html('<a href="#">Debug Item</a>');
 		$wItem.find(".item-body").html('Body, Mind, Soul');
-	}
+	};
 }

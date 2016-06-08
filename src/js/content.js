@@ -110,7 +110,7 @@ function preinit() {
 		});
 		
 		//Set up search
-		handle($filter, "input.initGroups", function(e) {
+		handle($filter, "input.initGroups", function() {
 			var $this = $(this);
 			var val = $this.val();
 			var search = val.toLowerCase();
