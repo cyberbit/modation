@@ -27,6 +27,7 @@ function preinit() {
 			if (storage.options.groupFilters) initGroups();
 			if (storage.options.moveGroupInvites) initGroupInvites();
 			if (storage.options.showAlertsOnTop) initAlerts();
+			if (storage.options.watchlist) initWatchlist();
 			
 			modapi.login(function(mi) {
 				//Cache user
@@ -147,6 +148,135 @@ function preinit() {
 		
 		// Set up alert
 		$alert.addClass("mod-alert");
+	}
+	
+	// Initialize watchlist buttons
+	function initWatchlist() {
+		var link = global.path.home + location.pathname;
+		
+		// Request watchlist type
+		chrome.runtime.sendMessage({action: "watchlistItemType", link: link}, function(result) {
+			var type = result;
+			
+			// Check to make sure only watchable pages are modified
+			if (type) {
+				/**
+				 * There is a potential problem lurking in here regarding
+				 * watchlist actions outside of the current tab. If an item
+				 * is removed from the watchlist outside of the current tab,
+				 * the stored watchlist in the current tab is out of sync, and
+				 * adding/removing an item could add back the previously removed
+				 * item and/or delete some other item. A solution to this would
+				 * be to clone the storage before every action, but I'll leave
+				 * that for a future update. This is the beta, after all!
+				 *
+				 * I simplified the implementation of the watchlist grab due to
+				 * the above statements, as the storage is already grabbed when
+				 * the page is loaded.
+				 */
+				
+				// Grab current watchlist
+				//crapi.clone(["watchlist"], function(d) {
+				{
+					var d = {watchlist: storage.watchlist};
+					var watchlist = d.watchlist;
+					
+					// Determine if item is watched
+					var watchedIndex = watchlist.findIndex(function(e) {
+						return e.link == link;
+					});
+					
+					var $firstSection = $("aside > section").first();
+					
+					// Set up actions section
+					var $actions = _factory(".modation-factory", ".modation-watchlist-actions");
+					var $addContainer = $actions.children(".add");
+					var $removeContainer = $actions.children(".remove");
+					var $target, $context;
+					
+					// Add actions section before first section (admin/artist)
+					$firstSection.before($actions);
+					
+					// Helper function to update view
+					(function _updateView() {
+						// Use ~ trick to convert index result into coerced boolean
+						// (see http://stackoverflow.com/a/12299678)
+						var watched = ~watchedIndex;
+						
+						/**
+						 * These two blocks are very similar. It would be great
+						 * to find some way to abstract them together.
+						 */
+						
+						// Item not on watchlist
+						if (!watched) {
+							$target = $addContainer;
+							$context = $removeContainer;
+							
+							var $watch = $addContainer.find(".watch");
+							handle($watch, "click.initWatchlist", function(e) {
+								e.preventDefault();
+								
+								// Request watchlist metadata
+								chrome.runtime.sendMessage({action: "parseWatchlistItem", link: link, html: document.documentElement.innerHTML, type: type}, function(result) {
+									// Add item to watchlist
+									var newIndex = d.watchlist.push(result.updates) - 1;
+									
+									crapi.updateAll(d, function(success) {
+										if (success) {
+											if (global.debug) console.log("item watched! %o", d);
+											
+											// Update watched index
+											watchedIndex = newIndex;
+											
+											// Trigger view update
+											_updateView();
+										}
+										
+										else {
+											console.error("Item not watched due to storage lock! Please try again in a few seconds.");
+										}
+									});
+								});
+							});
+						}
+						
+						// Item on watchlist
+						else {
+							$target = $removeContainer;
+							$context = $addContainer;
+							
+							var $unwatch = $removeContainer.find(".unwatch");
+							handle($unwatch, "click.initWatchlist", function(e) {
+								e.preventDefault();
+								
+								// Remove item from watchlist
+								var deleted = d.watchlist.splice(watchedIndex, 1);
+								
+								crapi.updateAll(d, function(success) {
+									if (success) {
+										if (global.debug) console.log("item unwatched! %o", deleted);
+										
+										// Update watched index
+										watchedIndex = -1;
+										
+										// Trigger view update
+										_updateView();
+									}
+									
+									else {
+										console.error("Item not unwatched due to storage lock! Please try again in a few seconds.");
+									}
+								});
+							});
+						}
+						
+						showView($context, $target, 0);
+					})();
+				}
+				//});
+			}
+		});
 	}
 	
 	//Profile tips

@@ -135,8 +135,15 @@ function localJSON(key, json) {
 function showView(context, view, fade) {
     if (typeof fade == "undefined") fade = 170;
     
-    $(context).fadeOut(fade);
-    $(view).delay(fade).fadeIn(fade);
+    if (fade > 0) {
+        $(context).fadeOut(fade);
+        $(view).delay(fade).fadeIn(fade);
+    }
+    
+    else {
+        $(context).hide();
+        $(view).show();
+    }
 }
 
 //Clone factory item
