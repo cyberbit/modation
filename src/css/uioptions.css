@@ -9,6 +9,10 @@ main {
     overflow-y: auto;
 }
 
+h2 span {
+    color: red;
+}
+
 .field-help {
     color: gray;
     margin: 0 0 1em 0;

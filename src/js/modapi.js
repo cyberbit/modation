@@ -17,6 +17,10 @@ var domain = "soundation.com";
 
 //Define global variables
 var global = {
+	// Debug mode
+	debug: modapi.manifest.debug,
+	
+	// Generated paths for common locations
 	path: {
 		protocol: protocol,
 		domain: domain,
@@ -28,11 +32,18 @@ var global = {
 		profile: protocol + domain + "/account/profile",
 		messages: protocol + domain + "/account/messages"
 	},
+	
+	// Cookie to change for Remember Me mod
 	cookie: "_soundation_session",
+	
+	// Storage model
 	storageModel: {
 		options: {},
+		watchlist: [],
 		version: ""
 	},
+	
+	// Option defaults used for updates or new installs
 	optionDefaults: {
 		/**
 		 * Global
@@ -48,6 +59,9 @@ var global = {
 		// General
 		showAlertsOnTop: false,
 		
+		// Watchlist
+		watchlist: false,
+		
 		// Comments
 		userTags: true,
 		userTagLinks: false,
@@ -56,6 +70,31 @@ var global = {
 		// Groups
 		groupFilters: true,
 		moveGroupInvites: true
+	},
+	
+	// Regular expressions to match common strings
+	regex: {
+		messageLink: /\/account\/messages\/\d+$/,
+		groupLink: /\/group\//,
+		trackLink: /\/user\/.*\/track\//
+	},
+	
+	// Watchlist model
+	watchlistModel: {
+		track: {
+			link: "",
+			likes: 0,
+			downloads: 0,
+			comments: 0
+		},
+		
+		group: {
+			link: "",
+			lastComment: "",
+			members: 0,
+			followers: 0,
+			tracks: 0
+		}
 	}
 };
 
@@ -129,19 +168,18 @@ ModAPI.prototype.login = function(callback) {
 	});*/
 	
 	function _me(callback) {
-		$.getJSON(global.path.api)
-			.fail(function(jqXHR, textStatus) {
-				//Log failure
-				console.error("%cModAPI%c :: Unable to connect to Soundation API", "font-weight: bold; color: #f60", "");
-			}).success(function(data) {
-				var me = data.data || data;
-				
-				//Inject success
-				me.success = data.success;
-				
-				//Run callback
-				callback(me);
-			});
+		$.getJSON(global.path.api).fail(function() {
+			//Log failure
+			console.error("%cModAPI%c :: Unable to connect to Soundation API", "font-weight: bold; color: #f60", "");
+		}).success(function(data) {
+			var me = data.data || data;
+			
+			//Inject success
+			me.success = data.success;
+			
+			//Run callback
+			callback(me);
+		});
 	}
 };
 
@@ -150,4 +188,4 @@ ModAPI.prototype.login = function(callback) {
  *
  * @returns	{string}	Authenticity token
  */
-ModAPI.prototype.token = function() { return global.token; }
+ModAPI.prototype.token = function() { return global.token; };

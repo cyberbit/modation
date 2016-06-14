@@ -12,6 +12,7 @@ $(function() {
 	initEvents();
 	initAlarms();
 	initNotifs();
+	initWatchlist();
 	//initCookies();
 	
 	//Initialize runtime event handler
@@ -48,7 +49,7 @@ $(function() {
 				
 				if (info.cause != "explicit") initCookies();
 			});
-		})();
+		}());
 	}
 	
 	//Initialize update
@@ -88,7 +89,6 @@ $(function() {
 				localStorage.version = version;
 				
 				// Cache options
-				console.log("cache options");
 				localJSON("options", d.options);
 				
 				//Show new install notification
@@ -104,7 +104,7 @@ $(function() {
 				var id = "modation_update";
 				
 				//Update notification, or create if needed
-				chrome.notifications.create(id, notif, function (updated) {
+				chrome.notifications.create(id, notif, function() {
 					//if (!updated) chrome.notifications.create(id, notif);
 					
 					//Update notification data
@@ -118,18 +118,28 @@ $(function() {
 		});
 	}
 	
-	//Initialize alarms
+	// Initialize alarms
 	function initAlarms() {
-		//Feed alarm
+		// Feed alarm
 		chrome.alarms.create("feed", {
 			delayInMinutes: (modapi.manifest.debug ? 0 : 1),
 			periodInMinutes: 1
 		});
 		
-		//Alarm handler
+		// Watchlist alarm
+		chrome.alarms.create("watchlist", {
+			delayInMinutes: (modapi.manifest.debug ? 0 : 1),
+			periodInMinutes: 10
+		});
+		
+		// Alarm handler
 		chrome.alarms.onAlarm.addListener(alarmHandler);
 		
-		handle($("body"), "alarm.initAlarms", function(){alarmHandler({name: "feed"})});
+		// Manually run all alarms: $("body").trigger("alarm")
+		handle($("body"), "alarm.initAlarms", function() {
+			alarmHandler({name: "feed"});
+			alarmHandler({name: "watchlist"});
+		});
 	}
 	
 	//Initialize notifications
@@ -272,7 +282,7 @@ $(function() {
                             secure: cookie.secure,
                             httpOnly: cookie.httpOnly,
                             expirationDate: moment().add(1, "w").unix()
-                        }, function(cookie) {
+                        }, function() {
                             //console.log("cookie: %o, error: %o", cookie, chrome.runtime.lastError);
                         });
                     }
@@ -281,9 +291,110 @@ $(function() {
         }
     }
 	
+	function initWatchlist() {
+		/**
+		 * Usage:
+		 * chrome.runtime.sendMessage({action: "parseWatchlistItem", link: location.href, html: document.documentElement.innerHTML}, function(result) {
+		 *     console.log("%o", result);
+		 * })
+		 */
+		msgFunctions.watchlistItemType = function(msg, sender, response) {
+			response(watchlistItemType(msg.link));
+		};
+		
+		msgFunctions.parseWatchlistItem = function(msg, sender, response) {
+			response(parseWatchlistItem(msg.link, msg.html, msg.type));
+		};
+	}
+	
+	// Determine watchlist type
+	function watchlistItemType(link) {
+		return link.matchAny({
+			group: global.regex.groupLink,
+			track: global.regex.trackLink
+		});
+	}
+	
+	// Parse and return metadata from watchable page
+	function parseWatchlistItem(link, html, type) {
+		type = type || watchlistItemType(link);
+		
+		// Enforce watchlist model
+		var updates = global.watchlistModel[type];
+		updates.link = link;
+		
+		var $html = $(html);
+		
+		// Track handler
+		if (type == "track") {
+			var likes = parseInt($html.find(".stats .likes").text());
+			var downloads = parseInt($html.find(".stats .downloads").text());
+			var comments = parseInt($html.find(".stats .comments").text());
+			
+			// Store updates
+			$.extend(updates, {
+				likes: likes,
+				downloads: downloads,
+				comments: comments
+			});
+		}
+		
+		// Group handler
+		else if (type == "group") {
+			/**
+			 * Here, I'm using the hash of the comment body to determine if the top
+			 * comment is new. It's not ideal, but there is such variance in other
+			 * methods that I've decided to go this way. There are a few drawbacks:
+			 *  - If someone posts a new comment with exactly the same text as the
+			 *    previous comment, it will not be detected
+			 *  - If a comment is deleted or flagged and is still at the top of the
+			 *    thread, it will be detected as a new comment
+			 *  - If a comment body cannot be determined, a blank string is used,
+			 *    which could confuse the parser and cause a detection miss
+			 *
+			 * There are advantages, though:
+			 *  + No complex, buggy ID determination
+			 *  + Not affected by login status (except private groups and tracks)
+			 *  + Ignores user changes (profile image, username, link, etc.)
+			 * 
+			 * ================
+			 * 
+			 * However, using a count for determining new comments has a bunch of
+			 * advantages as well:
+			 *  + Ability to detect multiple new comments
+			 *  + Simpler parsing
+			 *
+			 * Some disadvantages:
+			 *  - Negative changes in comments would have to be specially handled
+			 *  - Groups do not have an obvious comment counter, so it would need to
+			 *    calculated via comment pages (potentially slow and buggy)
+			 */
+			
+			var lastCommentContent = $html.find(".comments .comment:first .content > p").html() || "";
+			var lastComment = lastCommentContent.hashCode();
+			var members = parseInt($html.find(".stats a[href*=members] b").text());
+			var followers = parseInt($html.find(".stats a[href*=followers] b").text());
+			var tracks = parseInt($html.find(".stats a[href*=tracks] b").text());
+			
+			// Store updates
+			$.extend(updates, {
+				lastComment: lastComment,
+				members: members,
+				followers: followers,
+				tracks: tracks
+			});
+		}
+		
+		return {
+			updates: updates,
+			type: type
+		};
+	}
+	
 	//New alarm handler
 	function alarmHandler(alarm) {
 		var views = chrome.extension.getViews({type: "popup"});
+		var options = localJSON("options") || {};
 		
         //Login
         modapi.login(function(me) {
@@ -330,7 +441,7 @@ $(function() {
                         //Notification not shown yet
                         if (!notifData(id)) {
                             //Update notification, or create if needed
-                            chrome.notifications.create(id, notif, function (updated) {
+                            chrome.notifications.create(id, notif, function() {
                                 //if (!updated) chrome.notifications.create(id, notif);
                                 
                                 //Update notification data
@@ -375,11 +486,9 @@ $(function() {
                             var serverNotifs = [];
                             
                             //Add hostname to links
-                            $notifications.find("a").each(function(i, e) {
-                                var $link = $(e);
-                                var href = $link.attr("href");
-                                $link.attr("href", global.path.home + href);
-                            });
+                            $notifications.find("a").attr("href", function(i, v) {
+								return global.path.home + v;
+							});
                             
                             // Storage for number of notifications processed
                             var processed = 0;
@@ -404,7 +513,7 @@ $(function() {
                                 var link = $links.last().attr("href");
                                 var clear = $notif.find(".clear").attr("href");
                                 var actions = [];
-                                $actions.each(function(i, e) {
+                                $actions.each(function() {
                                     actions.push({
                                         title: $(this).text(),
                                         link: $(this).attr("href"),
@@ -412,44 +521,48 @@ $(function() {
                                     });
                                 });
                                 
-                                //Match message links
-                                if (link.match(/\/account\/messages\/\d+$/)) {
-                                    //Prevent duplicate message notification (issue #63)
+                                // Match message links
+                                if (link.match(global.regex.messageLink)) {
+                                    // Prevent duplicate message notification (issue #63)
                                     if ($.inArray(link, messageLinks) != -1) return;
                                     
-                                    //Remember link
+                                    // Remember link
                                     messageLinks.push(link);
                                 }
                                 
-                                //Add notification ID to server list
+                                // Add notification ID to server list
                                 serverNotifs.push(id);
+								
+								// Determine if notification is group-related
+								var isGroup = link.match(global.regex.groupLink);
                                 
-                                /*var blobs = localJSON("blobs") || {};
+                                var blobs = localJSON("blobs") || {};
                                 
                                 // Blob is cached
-                                if (blobs[fromLink]) {
-                                    _continue(blobs[fromLink]);
+                                if (blobs[(isGroup ? link : fromLink)]) {
+                                    _continue(blobs[(isGroup ? link : fromLink)]);
                                 }
                                 
                                 // Blob is not cached
                                 else {
                                     // Grab author profile page
-                                    $.get(fromLink, function(html) {
-                                        var $profile = $(html);
-                                        var img = $profile.find("aside img").attr("src");
+                                    $.get((isGroup ? link : fromLink), function(html) {
+                                        var $html = $(html);
+                                        var img = $html.find((isGroup ? ".top .inner .container" : "aside") + " img").attr("src");
                                         
                                         // Get blob URL
-                                        getBlob(img, function(blob) {
+                                        getDataUri("img/newiconflat128.png", img, function(blob) {
                                             var blobs = localJSON("blobs") || {};
                                             
                                             // Cache blob
-                                            blobs[fromLink] = blob;
-                                            localJSON("blobs", blobs);*/
+                                            blobs[(isGroup ? link : fromLink)] = blob;
+                                            localJSON("blobs", blobs);
                                             
-                                            _continue("img/newiconflat128.png");
-                                        /*});
+                                            //_continue("img/newiconflat128.png");
+                                            _continue(blob);
+                                        });
                                     });
-                                }*/
+                                }
                                 
                                 function _continue(blob) {
                                     //Set up notification
@@ -464,7 +577,7 @@ $(function() {
                                     
                                     //Notification not shown yet
                                     if (!notifData(id)) {
-                                        chrome.notifications.create(id, notif, function (updated) {
+                                        chrome.notifications.create(id, notif, function() {
                                             //if (!updated) chrome.notifications.create(id, notif);
                                             
                                             _updateData();
@@ -491,13 +604,15 @@ $(function() {
                                         ++processed;
                                         
                                         // Processed final notification, update badge
-                                        if (processed == Object.keys(notifData()).length) updateBadge();
+                                        if (processed == $notifications.length) updateBadge();
                                     }
                                 }
                             });
                             
-                            //Get all local notifications
-                            var localNotifs = Object.keys(notifData());
+                            //Get all local feed notifications (regex filters out watchlist items)
+                            var localNotifs = Object.keys(notifData()).filter(function(v) {
+								return v.match(/modation(\d)+/);
+							});
                             
                             //console.log("local: %o, server: %o, diff: %o", localNotifs, serverNotifs, localNotifs.diff(serverNotifs));
                             
@@ -525,6 +640,276 @@ $(function() {
                     //Set alarm state
                     alarmRunning = false;
                 }
+            }
+			
+			// Watchlist alarm handler
+			else if (alarm.name == "watchlist" && options.watchlist) {
+				// Grab current watchlist
+				crapi.clone(["watchlist"], function(d) {
+					/*var testWatchlist = [
+						// Track w/ comments
+						{
+							link: "https://soundation.com/user/cyberbit/track/an-hour",
+							likes: 0,
+							downloads: 0,
+							comments: 0
+						},
+						
+						// Group w/ comments
+						{
+							link: "https://soundation.com/group/team-soundation",
+							lastComment: "",
+							members: 0,
+							followers: 0,
+							tracks: 0
+						},
+						
+						// Track w/ no comments
+						{
+							link: "https://soundation.com/user/cyberbit/track/sdf-3",
+							likes: 0,
+							downloads: 0,
+							comments: 0
+						},
+						
+						// Track w/ bad link
+						{
+							link: "https://soundation.com/user/cyberbit/track/this-track-is-invalid",
+							likes: 0,
+							downloads: 0,
+							comments: 0
+						},
+						
+						// Group w/ no comments
+						{
+							link: "https://soundation.com/group/no-comment",
+							lastComment: "",
+							members: 0,
+							followers: 0,
+							tracks: 0
+						},
+						
+						// Group w/ comments disabled
+						{
+							link: "https://soundation.com/group/pts",
+							lastComment: "",
+							members: 0,
+							followers: 0,
+							tracks: 0
+						},
+						
+						// Private group w/ comments
+						{
+							link: "https://soundation.com/group/privately-owned",
+							lastComment: "",
+							members: 0,
+							followers: 0,
+							tracks: 0
+						}
+					];*/
+					
+					// User is not logged in
+					if (!me.success) {
+						console.info("Not logged in, skipping watchlist");
+					}
+					
+					// User is logged in
+					else {
+						// Storage for watchlist and metadata
+						var watchlist = (typeof testWatchlist == "undefined" ?  d.watchlist : testWatchlist);
+						var processed = [];
+						var meta = [];
+						
+						// Storage for watchlist proccessing counter
+						var numProcessed = 0;
+						
+						// Iterate watchlist
+						$.each(watchlist, function(i, v) {
+							// Set next processed item as current version
+							processed[i] = v;
+							meta[i] = {};
+							
+							// Store type in metadata
+							var type = watchlistItemType(v.link);
+							meta[i].type = type;
+							
+							// Grab page
+							$.get(v.link, function(html) {
+								var $html = $(html);
+								
+								// Parse item
+								var info = parseWatchlistItem(v.link, $html, type);
+								
+								// Storage for item updates to merge later
+								var updates = info.updates;
+								
+								// Track handler
+								if (type == "track") {
+									// Store meta information
+									meta[i].title = $html.find(".main > h2").text();
+									
+									if (global.debug) console.log("track %o: current %o, new %o", v.link, {
+										likes: v.likes,
+										downloads: v.downloads,
+										comments: v.comments
+									}, updates);
+								}
+								
+								// Group handler
+								else if (type == "group") {
+									/**
+									 * Here, I'm using the hash of the comment body to determine if the top
+									 * comment is new. It's not ideal, but there is such variance in other
+									 * methods that I've decided to go this way. There are a few drawbacks:
+									 *  - If someone posts a new comment with exactly the same text as the
+									 *    previous comment, it will not be detected
+									 *  - If a comment is deleted or flagged and is still at the top of the
+									 *    thread, it will be detected as a new comment
+									 *  - If a comment body cannot be determined, a blank string is used,
+									 *    which could confuse the parser and cause a detection miss
+									 *
+									 * There are advantages, though:
+									 *  + No complex, buggy ID determination
+									 *  + Not affected by login status (except private groups and tracks)
+									 *  + Ignores user changes (profile image, username, link, etc.)
+									 * 
+									 * ================
+									 * 
+									 * However, using a count for determining new comments has a bunch of
+									 * advantages as well:
+									 *  + Ability to detect multiple new comments
+									 *  + Simpler parsing
+									 *
+									 * Some disadvantages:
+									 *  - Negative changes in comments would have to be specially handled
+									 *  - Groups do not have an obvious comment counter, so it would need to
+									 *    calculated via comment pages (potentially slow and buggy)
+									 */
+									
+									var $lastComment = $html.find(".comments .comment:first");
+									var $lastCommentAuthor = $lastComment.find(".content > h4 a");
+									var $lastCommentBody = $lastComment.find(".content > p");
+									
+									// Store meta information
+									meta[i].title = $html.find(".top .inner .container h2").text();
+									meta[i].commentBody = $lastCommentBody.text();
+									meta[i].commentAuthor = $lastCommentAuthor.text();
+									meta[i].commentAuthorLink = $lastCommentAuthor.attr("href");
+									
+									if (global.debug) console.log("group %o: current %o, new %o", v.link, {
+										lastComment: v.lastComment,
+										members: v.members,
+										followers: v.followers,
+										tracks: v.tracks
+									}, updates);
+								}
+								
+								// Merge current and new watchlist results
+								processed[i] = $.extend({}, processed[i], updates);
+							}).always(function() {
+								++numProcessed;
+								
+								// Detect end of watchlist
+								if (numProcessed == watchlist.length) {
+									var changes = [];
+									
+									/**
+									 * These can be optimised by combining the
+									 * two $.each routines, but that can be an
+									 * easy pick for another time.
+									 */
+									
+									// Iterate processed items and determine changes
+									$.each(processed, function(i, v) {
+										var current = watchlist[i];
+										var metum = meta[i];
+										changes[i] = [];
+										
+										if (metum.type == "track") {
+                                            var likes = v.likes - current.likes;
+											var downloads = v.downloads - current.downloads;
+											var comments = v.comments - current.comments;
+											
+											if (likes) changes[i].push(likes + " like" + (Math.abs(likes) == 1 ? "" : "s"));
+											if (downloads) changes[i].push(downloads + " download" + (Math.abs(downloads) == 1 ? "" : "s"));
+											if (comments) changes[i].push(comments + " comment" + (Math.abs(comments) == 1 ? "" : "s"));
+											
+											if (global.debug) console.log("changes for track %o: %o", v.link, changes[i]);
+                                        }
+										
+										else if (metum.type == "group") {
+                                            var followers = v.followers - current.followers;
+											var lastComment = (v.lastComment !== current.lastComment) ? metum.commentBody : false;
+											var members = v.members - current.members;
+											var tracks = v.tracks - current.tracks;
+											
+											if (lastComment) changes[i].push("New comment from @" + metum.commentAuthor);
+											if (followers) changes[i].push(followers + " follower" + (Math.abs(followers) == 1 ? "" : "s"));
+											if (members) changes[i].push(members + " member" + (Math.abs(members) == 1 ? "" : "s"));
+											if (tracks) changes[i].push(tracks + " track" + (Math.abs(tracks) == 1 ? "" : "s"));
+											
+											if (global.debug) console.log("changes for group %o: %o", v.link, changes[i]);
+                                        }
+									});
+									
+									// Generate notifications
+									numProcessed = 0;
+									$.each(changes, function(i, v) {
+										var current = watchlist[i];
+										var id = "modationwatch" + current.link.hashCode();
+										var metum = meta[i];
+										
+										//Set up notification
+										var notif = {
+											type: "basic",
+											iconUrl: "img/newiconflat128.png",
+											title: metum.title,
+											message: v.join(", ")
+										};
+										
+										// Changes exist
+										if (v.length) {
+											// Notification not shown yet
+											if (!notifData(id)) {
+												chrome.notifications.create(id, notif, function() {
+													_updateData();
+												});
+											}
+											
+											//Notification shown
+											else {
+												_updateData();
+											}
+										}
+										
+										// No changes
+										else ++numProcessed;
+										
+										// Store notification
+										function _updateData() {
+											++numProcessed;
+											
+											//Update notification data
+											notifData(id, {
+												notif: notif,
+												link: current.link
+											});
+											
+											// Generated final notification, update storage and badge
+											if (numProcessed == changes.length) {
+												// Update watchlist storage
+												crapi.updateAll({watchlist: processed});
+												
+												// Update badge
+												updateBadge();
+											}
+										}
+									});
+                                }
+							});
+						});
+					}
+				});
             }
         });
 	}
@@ -567,7 +952,7 @@ $(function() {
 		//console.log("updateBadge: %o", notifData());
 		
 		var notifs = Object.keys(notifData()).length;
-		var title = (notifs == 0 ? "No new notifications :(" : notifs + " new notification" + (notifs > 1 ? "s" : ""));
+		var title = (notifs === 0 ? "No new notifications :(" : notifs + " new notification" + (notifs > 1 ? "s" : ""));
 		
 		//Update badge
 		crapi.badge({

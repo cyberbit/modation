@@ -8,20 +8,20 @@ $(document).ready(function() {
 		var $openMessages = $(".open-messages");
 		
 		// Options handler
-		handle($options, "click.initLinks", function(e) {
+		handle($options, "click.initLinks", function() {
 			chrome.runtime.openOptionsPage();
 		});
 		
 		// Show notifications handler
-		handle($showNotifs, "click.initLinks", function(e) {
+		handle($showNotifs, "click.initLinks", function() {
 			chrome.runtime.sendMessage({action: "showAllNotifications"});
 		});
 		
 		// Clear notifications handler
-		handle($clearNotifs, "click.initLinks", function(e) {
+		handle($clearNotifs, "click.initLinks", function() {
 			chrome.runtime.sendMessage({action: "confirm", msg: "Are you sure you want to clear all notifications?"}, function(result) {
 				if (result) {
-					modapi.login(function(me) {
+					modapi.login(function() {
 						$.post(global.path.feed + "/clear_notifications", {_method: "delete", authenticity_token: global.token});
 					});
 				}
@@ -29,7 +29,7 @@ $(document).ready(function() {
 		});
 		
 		// Open messages handler
-		handle($openMessages, "click.initLinks", function(e) {
+		handle($openMessages, "click.initLinks", function() {
 			var windowOptions = {
 				url: "messages.html",
 				width: 400,
@@ -37,7 +37,7 @@ $(document).ready(function() {
 				type: "popup"
 			};
 			
-			chrome.windows.create(windowOptions, function(w) {
+			chrome.windows.create(windowOptions, function() {
 				
 			});
 		});
