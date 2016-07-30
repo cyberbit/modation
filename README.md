@@ -2,6 +2,8 @@
 layout: home
 ---
 
+[![Code Climate](https://codeclimate.com/github/cyberbit/modation/badges/gpa.svg)](https://codeclimate.com/github/cyberbit/modation)
+
 ## What is it?
 Modation is an extension for Google's Chrome web browser that extends community functionality for [**Soundation**](http://soundation.com), an online collaborative music studio. When you receive a feed notification alerting you of a new message, group invitation, follower, or anything else, a desktop notification appears, allowing you to instantly take action.
 
