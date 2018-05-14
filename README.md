@@ -4,6 +4,8 @@ layout: home
 
 [![Code Climate](https://codeclimate.com/github/cyberbit/modation/badges/gpa.svg)](https://codeclimate.com/github/cyberbit/modation)
 
+[![Beerpay](https://beerpay.io/cyberbit/modation/badge.svg?style=flat)](https://beerpay.io/cyberbit/modation)  [![Beerpay](https://beerpay.io/cyberbit/modation/make-wish.svg?style=flat)](https://beerpay.io/cyberbit/modation?focus=wish)
+
 ## What is it?
 Modation is an extension for Google's Chrome web browser that extends community functionality for [**Soundation**](http://soundation.com), an online collaborative music studio. When you receive a feed notification alerting you of a new message, group invitation, follower, or anything else, a desktop notification appears, allowing you to instantly take action.
 
@@ -26,8 +28,3 @@ If anything is unclear, or you have a question not addressed here, please [conta
 
 ## Release History
 All stable and beta releases are available on [GitHub](https://github.com/cyberbit/modation/releases).
-
-## Support on Beerpay
-Hey dude! Help me out for a couple of :beers:!
-
-[![Beerpay](https://beerpay.io/cyberbit/modation/badge.svg?style=beer-square)](https://beerpay.io/cyberbit/modation)  [![Beerpay](https://beerpay.io/cyberbit/modation/make-wish.svg?style=flat-square)](https://beerpay.io/cyberbit/modation?focus=wish)
