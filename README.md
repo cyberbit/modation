@@ -26,3 +26,8 @@ If anything is unclear, or you have a question not addressed here, please [conta
 
 ## Release History
 All stable and beta releases are available on [GitHub](https://github.com/cyberbit/modation/releases).
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/cyberbit/modation/badge.svg?style=beer-square)](https://beerpay.io/cyberbit/modation)  [![Beerpay](https://beerpay.io/cyberbit/modation/make-wish.svg?style=flat-square)](https://beerpay.io/cyberbit/modation?focus=wish)
