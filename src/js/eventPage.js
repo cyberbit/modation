@@ -746,8 +746,8 @@ $(function() {
 								// Track handler
 								if (type == "track") {
 									// Store meta information
-									meta[i].title = $html.find(".main > h2").text();
 									
+									meta[i].title = $html.find(".title").text().trim();
 									if (global.debug) console.log("track %o: current %o, new %o", v.link, {
 										likes: v.likes,
 										downloads: v.downloads,
@@ -787,15 +787,15 @@ $(function() {
 									 */
 									
 									var $lastComment = $html.find(".comments .comment:first");
-									var $lastCommentAuthor = $lastComment.find(".content > h4 a");
+									var $lastCommentAuthor = $lastComment.find(".comment-author");
 									var $lastCommentBody = $lastComment.find(".content > p");
 									
 									// Store meta information
-									meta[i].title = $html.find(".top .inner .container h2").text();
+									meta[i].title = $html.find(".group-hero-container-info > h2").text();
 									meta[i].commentBody = $lastCommentBody.text();
 									meta[i].commentAuthor = $lastCommentAuthor.text();
-									meta[i].commentAuthorLink = $lastCommentAuthor.attr("href");
 									
+									meta[i].commentAuthorLink = $lastCommentAuthor.find('a').attr("href");
 									if (global.debug) console.log("group %o: current %o, new %o", v.link, {
 										lastComment: v.lastComment,
 										members: v.members,
