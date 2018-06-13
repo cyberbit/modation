@@ -2,3 +2,4 @@
 *.komodoproject
 .couscous
 modapi/
+/node_modules/
