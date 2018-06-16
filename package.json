@@ -23,10 +23,18 @@
     "url": "https://github.com/cyberbit/modation/issues"
   },
   "homepage": "https://github.com/cyberbit/modation#readme",
-  "dependencies": {
-    "google-closure-compiler": "^20180610.0.0"
-  },
   "devDependencies": {
-    "npx": "^10.2.0"
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "google-closure-compiler": "^20180610.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-concat": "^2.6.1"
+  },
+  "dependencies": {
+    "imagesloaded": "^4.1.4",
+    "isotope-layout": "^3.0.6",
+    "jquery": "^1.11.3",
+    "moment": "^2.22.2"
   }
 }
