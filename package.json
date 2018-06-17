@@ -7,11 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:api": "java -jar node_modules/google-closure-compiler/compiler.jar --compilation_level SIMPLE --js src\\js\\crapi.js --js src\\js\\modapi.js --js_output_file src\\js\\api.min.js",
-    "build:js_eventPage": "java -jar node_modules/google-closure-compiler/compiler.jar --compilation_level SIMPLE --js src\\js\\eventPage.js --js_output_file src\\js\\eventPage.min.js",
-    "build:rel": "xcopy src rel /E /Y",
-    "build": "npm run build:api && npm run build:js_eventPage && npm run build:rel"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -26,7 +22,6 @@
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
-    "google-closure-compiler": "^20180610.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
     "gulp-concat": "^2.6.1",

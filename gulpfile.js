@@ -2,7 +2,6 @@ const gulp = require('gulp');
 const pump = require('pump');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
-const closureCompiler = require('google-closure-compiler').gulp();
 const uglify = require('gulp-uglify');
 const rename = require('gulp-rename');
 
@@ -80,9 +79,6 @@ gulp.task('js:api', cb => {
         gulp.src('src/js/api/*.js'),
         uglify(),
         concat('api.min.js'),
-        // closureCompiler({
-        //     js_output_file: 'api.min.js'
-        // }),
         gulp.dest('rel/js')
     ],
     cb)
