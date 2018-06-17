@@ -4,6 +4,7 @@ const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const rename = require('gulp-rename');
+const sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('default', ['dev']);
 
@@ -77,8 +78,10 @@ gulp.task('js:vendor', cb => {
 gulp.task('js:api', cb => {
     pump([
         gulp.src('src/js/api/*.js'),
-        uglify(),
-        concat('api.min.js'),
+        sourcemaps.init(),
+            uglify(),
+            concat('api.min.js'),
+        sourcemaps.write(),
         gulp.dest('rel/js')
     ],
     cb)
@@ -93,10 +96,12 @@ gulp.task('js:build', cb => {
             'src/js/newpopup.js',
             'src/js/uioptions.js'
         ]),
-        uglify(),
-        rename({
-            suffix: '.min'
-        }),
+        sourcemaps.init(),
+            uglify(),
+            rename({
+                suffix: '.min'
+            }),
+        sourcemaps.write(),
         gulp.dest('rel/js')
     ],
     cb)
