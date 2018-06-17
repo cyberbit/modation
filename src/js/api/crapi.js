@@ -200,7 +200,8 @@ CrAPI.prototype.reload = function() { location.reload(); };
  *
  * @type boolean
  */
-CrAPI.prototype.debug = crapi.manifest().debug;
+console.time('debug');
+chrome.management.getSelf(function(v) { CrAPI.prototype.debug = v.installType === 'development'; console.timeEnd('debug'); });
 
 /**
  * (Un)set write lock
