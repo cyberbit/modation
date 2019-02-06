@@ -17,7 +17,8 @@
 		"https://s3.amazonaws.com/powerfx.content/*",
 		"alarms",
 		"notifications",
-		"storage"
+		"storage",
+		"webNavigation"
 	],
 
 	"optional_permissions": ["cookies"],

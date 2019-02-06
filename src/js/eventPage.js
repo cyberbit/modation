@@ -50,6 +50,14 @@ $(function() {
 				if (info.cause != "explicit") initCookies();
 			});
 		}());
+
+		// Navigation handler
+		chrome.webNavigation.onHistoryStateUpdated.addListener(function (meta) {
+			console.log("IT HAPPENED %o", meta);
+
+			// need to send message to specific tab
+			chrome.tabs.sendMessage(meta.tabId, {action: "onHistoryStateUpdated", meta: meta});
+		})
 	}
 
 	//Initialize update
