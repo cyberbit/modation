@@ -9,6 +9,10 @@ gulp.task('default', ['dev']);
 
 gulp.task('dev', ['chrome', 'html', 'js']);
 
+gulp.task('watch', ['dev'], cb => {
+    gulp.watch('src/js/**/*.js', ['js']);
+});
+
 /**********
  * Chrome *
  **********/
