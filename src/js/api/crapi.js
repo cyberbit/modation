@@ -200,8 +200,19 @@ CrAPI.prototype.reload = function() { location.reload(); };
  *
  * @type boolean
  */
-console.time('debug');
-chrome.management.getSelf(function(v) { CrAPI.prototype.debug = v.installType === 'development'; console.timeEnd('debug'); });
+if (!localJSON('crapi_self')) {
+    chrome.runtime.sendMessage({ action: "getSelf", async: true }, function (result) {
+        // Cache management information
+        localJSON('crapi_self', result);
+
+        CrAPI.prototype.self = result;
+
+        // Set debug flag
+        global.debug = result.installType === 'development';
+    });
+} else {
+    CrAPI.prototype.self = localJSON('crapi_self');
+}
 
 /**
  * (Un)set write lock

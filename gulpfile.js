@@ -67,7 +67,13 @@ gulp.task('js:vendor', cb => {
             'node_modules/imagesloaded/imagesloaded.pkgd.min.js',
 
             // Moment
-            'node_modules/moment/min/moment.min.js'
+            'node_modules/moment/min/moment.min.js',
+
+            // JSZip
+            'node_modules/jszip/dist/jszip.min.js',
+
+            // FileSaver
+            'node_modules/file-saver/FileSaver.min.js'
         ]),
         gulp.dest('rel/js/vendor')
     ],

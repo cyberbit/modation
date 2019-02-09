@@ -17,9 +17,10 @@ var domain = "soundation.com";
 
 //Define global variables
 var global = {
-	// Debug mode
-	debug: modapi.manifest.debug,
-	
+	// This key is set correctly by CrAPI "at some point" on first load. This
+	// logic protects against fatal runtime errors on first install.
+	debug: crapi.self ? crapi.self.installType === 'development' : false,
+
 	// Generated paths for common locations
 	path: {
 		protocol: protocol,
@@ -29,56 +30,57 @@ var global = {
 		login: protocol + domain + "?login=yes",
 		feed: protocol + domain + "/feed",
 		api: protocol + "api." + domain + "/me",
+		songs: protocol + "api." + domain + "/songs",
 		profile: protocol + domain + "/account/profile",
 		messages: protocol + domain + "/account/messages"
 	},
-	
+
 	// Cookie to change for Remember Me mod
 	cookie: "_soundation_session",
-	
+
 	// Storage model
 	storageModel: {
 		options: {},
 		watchlist: [],
 		version: ""
 	},
-	
+
 	// Option defaults used for updates or new installs
 	optionDefaults: {
 		/**
 		 * Global
 		 */
-		
+
 		// Login
 		rememberMe: false,
-		
+
 		/**
 		 * Community
 		 */
-		
+
 		// General
 		showAlertsOnTop: false,
-		
+
 		// Watchlist
 		watchlist: false,
-		
+
 		// Comments
 		userTags: true,
 		userTagLinks: false,
 		moveCommentBox: true,
-		
+
 		// Groups
 		groupFilters: true,
 		moveGroupInvites: true
 	},
-	
+
 	// Regular expressions to match common strings
 	regex: {
 		messageLink: /\/account\/messages\/\d+$/,
 		groupLink: /\/group\//,
 		trackLink: /\/user\/.*\/track\//
 	},
-	
+
 	// Watchlist model
 	watchlistModel: {
 		track: {
@@ -87,7 +89,7 @@ var global = {
 			downloads: 0,
 			comments: 0
 		},
-		
+
 		group: {
 			link: "",
 			lastComment: "",
@@ -103,7 +105,7 @@ var global = {
  */
 function ModAPI() {
 	console.log("%cModAPI%c :: Init", "font-weight: bold; color: #f60", "");
-	
+
 	//Default callback for all functions
 	this.DEFAULT_CALLBACK = function(){};
 }
@@ -115,43 +117,43 @@ function ModAPI() {
  */
 ModAPI.prototype.login = function(callback) {
 	if (typeof callback == "undefined") callback = this.DEFAULT_CALLBACK;
-	
+
 	console.log("%cModAPI%c :: Login", "font-weight: bold; color: #f60", "");
-	
+
 	//Ping Soundation to set session cookie
 	$.get(global.path.home, function(html) {
 		var parsedHtml = html.deres();
 		var $html = $(parsedHtml);
 		var profileLink = $html.find(".user-link").attr("href");
 		var token = $html.filter("[name=csrf-token]").attr("content");
-		
+
 		//Grab Soundation user
 		_me(function(me) {
 			//Inject additional properties
 			me.link = profileLink;
-			
+
 			//Globalize token
 			global.token = token;
-			
+
 			//Pass user object to callback
 			//Any failure here should be handled in the callback
 			callback(me);
 		});
 	});
-	
+
 	//Grab Soundation user (attempt 1)
 	/*_me(function(me) {
 		//Attempt 1 failed
 		if (!me.success) {
 			//Log failure
 			console.warn("Attempt 1 failed! Pinging Soundation...");
-			
+
 			//Ping Soundation to set session cookie
 			$.get(global.path.home).always(function() {
 				var args = arguments;
-				
+
 				console.log("login args: %o", args);
-				
+
 				_me(function(me) {
 					//Pass user object to callback
 					//Any failure here should be handled in the callback
@@ -159,24 +161,24 @@ ModAPI.prototype.login = function(callback) {
 				});
 			});
 		}
-		
+
 		//Attempt 1 succeeded
 		else {
 			//Pass user object to callback
 			callback(me);
 		}
 	});*/
-	
+
 	function _me(callback) {
 		$.getJSON(global.path.api).fail(function() {
 			//Log failure
 			console.error("%cModAPI%c :: Unable to connect to Soundation API", "font-weight: bold; color: #f60", "");
 		}).success(function(data) {
 			var me = data.data || data;
-			
+
 			//Inject success
 			me.success = data.success;
-			
+
 			//Run callback
 			callback(me);
 		});

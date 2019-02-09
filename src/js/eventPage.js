@@ -7,6 +7,45 @@ var msgFunctions = {};
 // Storage cache keys
 var cacheKeys = ["notifData", "blobs", "options"];
 
+function initSongs() {
+	var zip = new JSZip();
+
+	$.getJSON(global.path.songs, function (d) {
+		var songs = d.data;
+		var processed = 0;
+		var total = songs.length;
+
+		console.log('found %o songs', songs.length);
+
+		// Iterate songs
+		$.each(songs, function (i, v) {
+			console.log('processing %o...', v.title);
+			console.log('song meta: %o', v);
+
+			// Get song data
+			$.getJSON(global.path.songs + '/' + v.id, function (d) {
+				processed++;
+
+				var sng = atob(d.data.data);
+
+				zip.file(v.title + '.sng', sng);
+
+				// Once all items are processed, export songs
+				if (processed == total) {
+					_exportZip();
+				}
+			});
+		});
+	});
+
+	function _exportZip() {
+		// Export ZIP file
+		zip.generateAsync({ type: "blob" }).then(function (blob) {
+		    saveAs(blob, "songs.zip");
+		});
+	}
+}
+
 $(function() {
 	//Initialize all the things
 	initEvents();
@@ -34,6 +73,10 @@ $(function() {
 		chrome.runtime.onMessage.addListener(function(msg, sender, response) {
 			// Pass message data to event handler
 			if (msgFunctions[msg.action]) msgFunctions[msg.action](msg, sender, response);
+
+			// Allow asynchronous message
+			// (see https://stackoverflow.com/a/20077854/3402854)
+			if (msg.async === true) return true;
 		});
 
 		// Remote confirm handler
@@ -50,6 +93,16 @@ $(function() {
 				if (info.cause != "explicit") initCookies();
 			});
 		}());
+
+		// Return management information
+		msgFunctions.getSelf = function(msg, sender, response) {
+			// response([1,2,3]);
+			chrome.management.getSelf(function (result) {
+				// response([1,2,3]);
+				// console.log('eventPage: %o', result);
+				response(result);
+			});
+		};
 	}
 
 	//Initialize update
