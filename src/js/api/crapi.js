@@ -29,19 +29,30 @@ String.prototype.decamel = function() {
     return this.replace(/(?=[a-zA-z])(?=[A-Z])/g, "-").toLowerCase();
 };
 
-String.prototype.matchAny = function(patterns) {
+String.prototype.matchAny = function(patterns, all) {
+    if (typeof all === 'undefined') {
+        all = false;
+    }
+
     var that = this;
-    var matched = false;
+    var matched = [];
 
     // Iterate patterns and return key of first match
     $.each(patterns, function(i, v) {
         if (that.match(v)) {
-            matched = i;
-            return false;
+            matched.push(i);
+
+            if (!all) {
+                return false;
+            }
         }
     });
 
-    return matched;
+    if (!all && !matched.length) {
+        return false;
+    }
+
+    return all ? matched : matched[0];
 };
 
 Array.prototype.unique = function() {
@@ -201,7 +212,9 @@ CrAPI.prototype.reload = function() { location.reload(); };
  * @type boolean
  */
 console.time('debug');
-chrome.management.getSelf(function(v) { CrAPI.prototype.debug = v.installType === 'development'; console.timeEnd('debug'); });
+if (chrome.management) {
+    chrome.management.getSelf(function(v) { CrAPI.prototype.debug = v.installType === 'development'; console.timeEnd('debug'); });
+}
 
 /**
  * (Un)set write lock
