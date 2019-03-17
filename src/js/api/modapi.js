@@ -77,8 +77,59 @@ var global = {
 		messageLink: /\/account\/messages\/\d+$/,
 		groupLink: /\/group\//,
 		trackLink: /\/user\/.*\/track\//,
+		userLink: /\/user\/[^\/]*$/,
 		profileLink: /\/account\/profile/,
 		generalLink: /\/soundation.com\//
+	},
+
+	maps: {
+		message: function (url, $html) {
+			return {};
+		},
+		group: function (url, $html) {
+			var $remix = $html.find('[data-react-class=RemixGroupView');
+
+			if ($remix.length) {
+				var react = JSON.parse($remix.attr('data-react-props'));
+
+				return {
+					title: react.groupData.name,
+					members: react.groupData.groupMembershipsCount,
+					followers: react.groupData.followersCount,
+					tracks: react.groupData.tracksCount,
+					react: react
+				};
+			}
+
+			var $hero = $html.find('.group-hero-container');
+			var $stats = $hero.find('.stats');
+
+			return {
+				title: $hero.find('h2').text(),
+				members: $stats.find('a[href$=members] .count').text(),
+				followers: $stats.find('a[href$=followers] .count').text(),
+				tracks: $stats.find('a[href$=tracks] .count').text()
+			};
+		},
+		track: function (url, $html) {
+			return {};
+		},
+		user: function (url, $html) {
+			var $hero = $html.find('[data-react-class=ProfileHeroHoc]');
+
+			return JSON.parse($hero.attr('data-react-props'));
+		},
+		profile: function (url, $html) {
+			return {};
+		},
+		general: function (url, $html) {
+			// get csrf token
+			var token = $html.find('meta[name=csrf-token]').attr('content');
+
+			return {
+				token: token
+			};
+		}
 	},
 
 	// Watchlist model

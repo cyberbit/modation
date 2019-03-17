@@ -16,25 +16,55 @@ preinit();
 
 //Initialization that is independent of user settings
 function preinit() {
+	var trigger = [];
+
 	// This is doable as an IIFE, in theory, but it would have been too fancy
 	msgFunctions.onHistoryStateUpdated = function (msg) {
 		var meta = msg.meta;
 
 		console.log("Location changed to %o", meta.url);
 
-		var trigger = meta.url.matchAny({
+		trigger = meta.url.matchAny({
 			message: global.regex.messageLink,
 			group: global.regex.groupLink,
 			track: global.regex.trackLink,
+			user: global.regex.userLink,
 			profile: global.regex.profileLink,
 			general: global.regex.generalLink
 		}, true);
-
-		console.log('Triggered %o scripts', trigger);
 	};
+
+	msgFunctions.onNavigationCompleted = function (msg) {
+		var meta = msg.meta;
+
+		console.log('Navigation complete');
+
+		var $html = $(document);
+
+		// call data maps
+		var data = {};
+		$.each(global.maps, function (key, map) {
+			var datum = null;
+
+			if (trigger.includes(key)) {
+				datum = map(meta.url, $html);
+			}
+
+			data[key] = datum;
+		});
+
+		$.each(trigger, function (i, v) {
+			console.log('trigger %o data %o', v, data[v]);
+		});
+	}
 
 	// Bind content script on load
 	msgFunctions.onHistoryStateUpdated({
+		meta: {
+			url: location.href
+		}
+	});
+	msgFunctions.onNavigationCompleted({
 		meta: {
 			url: location.href
 		}
