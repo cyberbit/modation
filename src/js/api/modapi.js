@@ -74,17 +74,40 @@ var global = {
 
 	// Regular expressions to match common strings
 	regex: {
-		messageLink: /\/account\/messages\/\d+$/,
+		messageLink: /\/account\/messages\/\d+/,
 		groupLink: /\/group\//,
 		trackLink: /\/user\/.*\/track\//,
 		userLink: /\/user\/[^\/]*$/,
 		profileLink: /\/account\/profile/,
-		generalLink: /\/soundation.com\//
+		generalLink: /\/soundation.com\//,
+		feedLink: /soundation.com\/feed/
 	},
 
 	maps: {
 		message: function (url, $html) {
-			return {};
+			var $container = $html.find('.account.messages .inner.container');
+			var $messages = $container.find('.messages .message');
+			var $pagination = $container.find('.pagination');
+
+			var messages = $.map($messages, function (v, i) {
+				var $this = $(v);
+
+				return {
+					author: $this.find('h4 a').text(),
+					age: $this.find('.age').text(),
+					body: $this.find('.body').text()
+				}
+			});
+
+			return {
+				user: $container.find('.raw-users a').text(),
+				messages: messages,
+				firstPage: $pagination.find('.first a').attr('href'),
+				prevPage: $pagination.find('.prev a').attr('href'),
+				currentPage: $pagination.find('.page.current').text(),
+				nextPage: $pagination.find('.next a').attr('href'),
+				lastPage: $pagination.find('.last a').attr('href')
+			};
 		},
 		group: function (url, $html) {
 			var $remix = $html.find('[data-react-class=RemixGroupView');
@@ -112,7 +135,17 @@ var global = {
 			};
 		},
 		track: function (url, $html) {
-			return {};
+			var $hero = $html.find('.player.hero');
+			var $aside = $html.find('.community.tracks aside');
+
+			return {
+				artist: $hero.find('.artist a').text(),
+				title: $hero.find('.title a').text(),
+				plays: $hero.find('.stats .plays').text(),
+				likes: $hero.find('.stats .likes').text(),
+				downloads: $hero.find('.stats .downloads').text(),
+				comments: $hero.find('.stats .comments').text()
+			};
 		},
 		user: function (url, $html) {
 			var $hero = $html.find('[data-react-class=ProfileHeroHoc]');
@@ -128,6 +161,33 @@ var global = {
 
 			return {
 				token: token
+			};
+		},
+		feed: function (url, $html) {
+			var $container = $html.find('.community.feed .inner.container');
+			var $feedItems = $container.find('.feed-item');
+			var $pagination = $container.find('.pagination');
+
+			var feedItems = $.map($feedItems, function (v, i) {
+				var $this = $(v);
+				var type = $this.is('.track') ? 'track' : 'news';
+
+				return {
+					type: type,
+					artist: $this.find('.info .artist').text(),
+					title: $this.find('.info .title').text(),
+					time: $this.find('.info time').text(),
+					content: $this.find('.content').get(0).innerHTML
+				}
+			});
+
+			return {
+				feedItems: feedItems,
+				firstPage: $pagination.find('.first a').attr('href'),
+				prevPage: $pagination.find('.prev a').attr('href'),
+				currentPage: $pagination.find('.page.current').text(),
+				nextPage: $pagination.find('.next a').attr('href'),
+				lastPage: $pagination.find('.last a').attr('href')
 			};
 		}
 	},

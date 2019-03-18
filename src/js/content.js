@@ -30,7 +30,8 @@ function preinit() {
 			track: global.regex.trackLink,
 			user: global.regex.userLink,
 			profile: global.regex.profileLink,
-			general: global.regex.generalLink
+			general: global.regex.generalLink,
+			feed: global.regex.feedLink
 		}, true);
 	};
 
