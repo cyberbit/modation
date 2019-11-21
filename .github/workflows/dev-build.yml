@@ -28,5 +28,5 @@ jobs:
     - name: Archive artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: modation-dev-$SHA7
+        name: modation-dev-${{ env.SHA7 }}
         path: rel
