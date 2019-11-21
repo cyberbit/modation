@@ -7,8 +7,6 @@
     "doc": "docs"
   },
   "scripts": {
-    "build": "gulp",
-    "watch": "gulp watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
