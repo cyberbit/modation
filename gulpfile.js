@@ -8,7 +8,7 @@ const sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('default', ['dev']);
 
-gulp.task('dev', ['chrome', 'html', 'js']);
+gulp.task('dev', ['chrome', 'images', 'html', 'css', 'js']);
 
 gulp.task('watch', ['dev'], cb => {
     gulp.watch('src/js/**/*.js', ['js']);
@@ -29,7 +29,14 @@ gulp.task('chrome:manifest', cb => {
     cb)
 });
 
-// TODO: Images
+gulp.task('images', cb => {
+    pump([
+        gulp.src([
+            'src/img/*'
+        ]),
+        gulp.dest('rel/img')
+    ])
+})
 
 /********
  * HTML *
@@ -49,7 +56,16 @@ gulp.task('html', cb => {
     cb)
 });
 
-// TODO: CSS
+gulp.task('css', cb => {
+    pump([
+        gulp.src([
+            'src/css/content.min.css',
+            'src/css/popup.min.css',
+            'src/css/uioptions.min.css'
+        ]),
+        gulp.dest('rel/css')
+    ])
+})
 
 /**************
  * JavaScript *
