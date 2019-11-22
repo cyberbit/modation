@@ -87,7 +87,13 @@ gulp.task('js:vendor', cb => {
             'node_modules/imagesloaded/imagesloaded.pkgd.min.js',
 
             // Moment
-            'node_modules/moment/min/moment.min.js'
+            'node_modules/moment/min/moment.min.js',
+
+            // jQuery caret position (custom build)
+            'src/js/jquery.caretposition.custom.min.js',
+
+            // jQuery Sew (custom build)
+            'src/js/jquery.sew.custom.min.js'
         ]),
         gulp.dest('rel/js/vendor')
     ],
