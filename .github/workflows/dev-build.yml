@@ -30,10 +30,12 @@ jobs:
 
     - name: Build and pack extension
       run: |
+        echo $CRX_KEY > key.pem
         npm ci
         npm run build
         npm run pack
       env:
+        CRX_KEY: {{ secrets.CRX_KEY }}
         CI: true
 
     - name: Upload release source artifact
