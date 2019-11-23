@@ -28,14 +28,12 @@ jobs:
       with:
         node-version: 8.x
 
-    - name: Build and pack extension
+    # TODO add packing step, need to debug key issues
+    - name: Build extension
       run: |
-        echo $CRX_KEY > key.pem
         npm ci
         npm run build
-        npm run pack
       env:
-        CRX_KEY: ${{ secrets.CRX_KEY }}
         CI: true
 
     - name: Upload release source artifact
