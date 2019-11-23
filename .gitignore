@@ -4,3 +4,4 @@
 modapi/
 /node_modules/
 /rel/
+/build/

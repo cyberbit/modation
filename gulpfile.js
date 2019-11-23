@@ -5,6 +5,9 @@ const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const rename = require('gulp-rename');
 const sourcemaps = require('gulp-sourcemaps');
+const crx = require('gulp-crx-pack');
+const manifest = require('./src/manifest.json');
+const fs = require('fs');
 
 gulp.task('default', ['dev']);
 
@@ -28,6 +31,22 @@ gulp.task('chrome:manifest', cb => {
     ],
     cb)
 });
+
+// TODO this doesn't work right :(
+gulp.task('chrome:pack', cb => {
+    pump([
+       gulp.src('rel'),
+       crx({
+           privateKey: fs.readFileSync('./modation.pem', 'utf8'),
+           filename: 'modation.crx'
+       }),
+       gulp.dest('./build')
+    ]);
+})
+
+/**********
+ * Images *
+ **********/
 
 gulp.task('images', cb => {
     pump([
