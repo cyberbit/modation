@@ -8,6 +8,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const crx = require('gulp-crx-pack');
 const manifest = require('./src/manifest.json');
 const fs = require('fs');
+const eslint = require('gulp-eslint');
 
 gulp.task('default', ['dev']);
 
@@ -123,6 +124,9 @@ gulp.task('js:vendor', cb => {
 gulp.task('js:api', cb => {
     pump([
         gulp.src('src/js/api/*.js'),
+        eslint(),
+        eslint.format(),
+        eslint.failAfterError(),
         sourcemaps.init(),
             uglify(),
             concat('api.min.js'),
@@ -141,6 +145,9 @@ gulp.task('js:build', cb => {
             'src/js/newpopup.js',
             'src/js/uioptions.js'
         ]),
+        eslint(),
+        eslint.format(),
+        eslint.failAfterError(),
         sourcemaps.init(),
             uglify(),
             rename({
