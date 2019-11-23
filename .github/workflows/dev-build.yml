@@ -42,8 +42,8 @@ jobs:
         name: modation-dev+${{ steps.buildnumber.outputs.build_number }}
         path: rel
 
-    - name: Upload packed extension artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: modation-dev+${{ steps.buildnumber.outputs.build_number }}
-        path: build/modation.crx
+    # - name: Upload packed extension artifact
+    #   uses: actions/upload-artifact@v1
+    #   with:
+    #     name: modation-dev+${{ steps.buildnumber.outputs.build_number }}
+    #     path: build/modation.crx
