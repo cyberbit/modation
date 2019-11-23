@@ -28,15 +28,22 @@ jobs:
       with:
         node-version: 8.x
 
-    - name: Build
+    - name: Build and pack extension
       run: |
         npm ci
         npm run build
+        npm run pack
       env:
         CI: true
 
-    - name: Archive artifacts
+    - name: Upload release source artifact
       uses: actions/upload-artifact@v1
       with:
         name: modation-dev+${{ steps.buildnumber.outputs.build_number }}
         path: rel
+
+    - name: Upload packed extension artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: modation-dev+${{ steps.buildnumber.outputs.build_number }}
+        path: build/modation.crx

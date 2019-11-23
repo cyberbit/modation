@@ -5,10 +5,13 @@ const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const rename = require('gulp-rename');
 const sourcemaps = require('gulp-sourcemaps');
+const crx = require('gulp-crx-pack');
+const manifest = require('./src/manifest.json');
+const fs = require('fs');
 
 gulp.task('default', ['dev']);
 
-gulp.task('dev', ['chrome', 'html', 'js']);
+gulp.task('dev', ['chrome', 'images', 'html', 'css', 'js']);
 
 gulp.task('watch', ['dev'], cb => {
     gulp.watch('src/js/**/*.js', ['js']);
@@ -29,7 +32,30 @@ gulp.task('chrome:manifest', cb => {
     cb)
 });
 
-// TODO: Images
+// TODO this doesn't work right :(
+gulp.task('chrome:pack', cb => {
+    pump([
+       gulp.src('rel'),
+       crx({
+           privateKey: fs.readFileSync('./modation.pem', 'utf8'),
+           filename: 'modation.crx'
+       }),
+       gulp.dest('./build')
+    ]);
+})
+
+/**********
+ * Images *
+ **********/
+
+gulp.task('images', cb => {
+    pump([
+        gulp.src([
+            'src/img/*'
+        ]),
+        gulp.dest('rel/img')
+    ])
+})
 
 /********
  * HTML *
@@ -49,7 +75,16 @@ gulp.task('html', cb => {
     cb)
 });
 
-// TODO: CSS
+gulp.task('css', cb => {
+    pump([
+        gulp.src([
+            'src/css/content.min.css',
+            'src/css/popup.min.css',
+            'src/css/uioptions.min.css'
+        ]),
+        gulp.dest('rel/css')
+    ])
+})
 
 /**************
  * JavaScript *
@@ -71,7 +106,13 @@ gulp.task('js:vendor', cb => {
             'node_modules/imagesloaded/imagesloaded.pkgd.min.js',
 
             // Moment
-            'node_modules/moment/min/moment.min.js'
+            'node_modules/moment/min/moment.min.js',
+
+            // jQuery caret position (custom build)
+            'src/js/jquery.caretposition.custom.min.js',
+
+            // jQuery Sew (custom build)
+            'src/js/jquery.sew.custom.min.js'
         ]),
         gulp.dest('rel/js/vendor')
     ],

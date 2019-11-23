@@ -58,6 +58,18 @@ $(function() {
 			// need to send message to specific tab
 			chrome.tabs.sendMessage(meta.tabId, {action: "onHistoryStateUpdated", meta: meta});
 		})
+
+		// Navigation complete handler
+		chrome.webRequest.onCompleted.addListener(function (meta) {
+			console.log("REQUEST OCCURRRRRRD %o", meta);
+
+			// need to send message to specific tab
+			chrome.tabs.sendMessage(meta.tabId, {action: "onNavigationCompleted", meta: meta});
+		}, {
+			urls: [
+				'https://soundation.com/datalayer'
+			]
+		});
 	}
 
 	//Initialize update
