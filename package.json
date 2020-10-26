@@ -5,7 +5,9 @@
     "url": "https://dj.marcoles.co/"
   },
   "dependencies": {
+    "axios": "^0.21.0",
     "bulma-fluent": "^0.3.25",
+    "lodash": "^4.17.20",
     "vue": "^2.6.11"
   },
   "description": "vue-chrome-extension-boilerplate",

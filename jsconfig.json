@@ -1,5 +1,10 @@
 {
   "include": [
     "./src/**/*"
-  ]
+  ],
+  "typeAcquisition": {
+    "include": [
+      "chrome"
+    ]
+  }
 }
