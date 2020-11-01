@@ -1,18 +1,27 @@
 <template>
   <div>
-    <h1>{{ msg }}</h1>
+    <section class="section">
+      <div class="container has-text-centered">
+        <h3 class="title is-3">
+          Hey there!
+        </h3>
+        <h4 class="title is-4">
+          <div>
+            There's no options to set quite yet. Stay tuned for future updates! 💙
+          </div>
+        </h4>
+      </div>
+    </section>
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {
-      msg: 'Welcome!'
-    }
+    //
   }
 }
 </script>
 
-<style lang="stylus">
+<style lang="scss">
 </style>

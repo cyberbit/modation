@@ -97,6 +97,7 @@ function configFunc(env, argv) {
       new CleanWebpackPlugin({
         cleanStaleWebpackAssets: false,
       }),
+      // TODO remove key and unsafe-eval for production build
       new CopyWebpackPlugin({
         patterns: [
           { from: 'assets', to: 'assets' },

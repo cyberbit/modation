@@ -1,4 +1,4 @@
-import './index.styl'
+import '../plugins/bootstrap'
 
 console.log('Content script working...')
 
@@ -40,5 +40,5 @@ chrome.runtime.sendMessage({ action: 'onGetTab' }, ({ tab }) => {
 // Runtime message handler
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
     // Pass message data to event handler
-    if (msgFunctions[msg.action]) msgFunctions[msg.action](msg, sender, response);
+    if (msgFunctions[msg.action]) msgFunctions[msg.action](msg, sender, response)
 });

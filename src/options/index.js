@@ -1,5 +1,7 @@
+import '../plugins/bootstrap'
+
 import Vue from 'vue'
-import 'bulma-fluent/bulma.sass'
+import '../assets/main.scss'
 
 import App from './App.vue'
 

@@ -1,40 +1,41 @@
 {
-    "background": {
-      "scripts": ["./background.js"]
-    },
-    "browser_action": {
-      "default_popup": "./popup.html"
-    },
-    "content_scripts": [
-      {
-        "all_frames": false,
-        "js": ["./contentScripts.js"],
-        "matches": ["*://*.soundation.com/*"],
-        "run_at": "document_end"
-      }
-    ],
-    "description": "Soundation, amplified.",
-    "icons": {
-      "16": "assets/icons/icon_16.png",
-      "32": "assets/icons/icon_32.png",
-      "64": "assets/icons/icon_64.png",
-      "128": "assets/icons/icon_128.png"
-    },
-    "manifest_version": 2,
-    "name": "Modation",
-    "options_ui": {
-      "chrome_style": false,
-      "page": "./options.html"
-    },
-    "permissions": [
-      "https://*.soundation.com/*",
-      "https://s3.amazonaws.com/powerfx.content/*",
-      "background",
-      "storage",
-      "tabs",
-      "webRequest",
-      "webNavigation"
-    ],
-    "version": "3.0",
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
-  }
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6ze2Ty97PA0vHniRyYS8TLgJIb0kbEspubR4VHYVoynlGYA1ls5CtA1MeQCneMZWlquk4ohqgEnpNoa01N78PqWZ3Tcx/eJdQ6NQ95zUpAVwvfGdZHTsn0fYD1q/nDEaO2ZAgyIIKP+cGIMmjdoOGRocPwI+Wuu9E/JvXpTzT5jBl78A7T8k3TSo/pAT4rcxAjLoqhi8UfI6/YoXceGUlZAGtZPVgd+myKEyJdykUbDDKviAmhqHc7PShBqFG9MGyvpTZ/zNoy2B4bHmv0IzPmLcPWHc+yegqipP6U8ze4bdC01Xlv1Z5DnislFYNA05XaPnaEaJHlHn/npgSy/uhwIDAQAB",
+  "background": {
+    "scripts": ["./background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_popup": "./popup.html"
+  },
+  "content_scripts": [
+    {
+      "all_frames": false,
+      "js": ["./contentScripts.js"],
+      "matches": ["*://*.soundation.com/*"],
+      "run_at": "document_end"
+    }
+  ],
+  "description": "Soundation, amplified.",
+  "icons": {
+    "16": "assets/icons/icon_16.png",
+    "32": "assets/icons/icon_32.png",
+    "64": "assets/icons/icon_64.png",
+    "128": "assets/icons/icon_128.png"
+  },
+  "web_accessible_resources": [
+    "assets/*"
+  ],
+  "manifest_version": 2,
+  "name": "Modation",
+  "options_ui": {
+    "chrome_style": false,
+    "page": "./options.html"
+  },
+  "permissions": [
+    "https://*.soundation.com/*",
+    "webRequest",
+    "webNavigation"
+  ],
+  "version": "3.0",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

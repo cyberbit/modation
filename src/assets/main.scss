@@ -1,0 +1,43 @@
+@charset "utf-8";
+
+@import 'https://cdn.materialdesignicons.com/5.8.55/css/materialdesignicons.min.css';
+
+// initial
+$black: #010101;
+$yellow: #ffcd36;
+$blue: #1128ff;
+$gray-dark: #3e3e3e;
+$green: #008a70;
+$white: #fdfdfd;
+$gray: #797979;
+$blue-light: #41edd3;
+$gray-light: #bcbcbc;
+
+$discord-purple: #7289da;
+
+// add custom colors
+$custom-colors: (
+  "discord": ($discord-purple)
+);
+
+// derived
+$primary: $blue;
+$info: $blue-light;
+$success: $green;
+$warning: $yellow;
+$light: $white;
+$dark: $gray-dark;
+
+$background: $white;
+$link: $blue;
+
+// generic
+
+// Import only what you need from Bulma
+@import "../../node_modules/bulma/sass/utilities/_all";
+@import "../../node_modules/bulma/sass/base/_all";
+@import "../../node_modules/bulma/sass/elements/_all";
+@import "../../node_modules/bulma/sass/form/_all";
+@import "../../node_modules/bulma/sass/components/_all";
+@import "../../node_modules/bulma/sass/grid/_all";
+@import "../../node_modules/bulma/sass/layout/_all";
