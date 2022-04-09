@@ -42,6 +42,6 @@
     "imagesloaded": "^4.1.4",
     "isotope-layout": "^3.0.6",
     "jquery": "^1.11.3",
-    "moment": "^2.22.2"
+    "moment": "^2.29.2"
   }
 }
